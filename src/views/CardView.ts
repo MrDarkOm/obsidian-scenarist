@@ -220,29 +220,146 @@ export class CardView extends ItemView {
 		inp.onchange = () => this.commitProp(entity, 'tags', inp.value.trim() || null);
 	}
 
-	/** Поле ссылок на заметки. */
+	/** Поле ссылок на заметки — чипы в стиле тегов. */
 	private renderBacklinksProp(section: HTMLElement, entity: Entity) {
+		const rawVal = entity.props['backlinks'] ? String(entity.props['backlinks']) : '';
+		// Парсим [[...]] конструкции
+		const links: string[] = [];
+		const re = /\[\[([^\]]+)\]\]/g;
+		let m: RegExpExecArray | null;
+		while ((m = re.exec(rawVal)) !== null) links.push(m[1]);
+
 		const row = section.createDiv('scenarist-prop');
 		row.createEl('div', { cls: 'scenarist-prop-label', text: 'Ссылки на заметки' });
 		const valWrap = row.createDiv('scenarist-prop-value');
-		const ta = valWrap.createEl('textarea', { cls: 'scenarist-prop-textarea' });
-		ta.value = entity.props['backlinks'] ? String(entity.props['backlinks']) : '';
-		ta.placeholder = '[[Заметка 1]], [[Заметка 2]]…';
-		ta.rows = 2;
-		this.autoGrow(ta);
-		ta.oninput = () => this.autoGrow(ta);
-		ta.onchange = () => this.commitProp(entity, 'backlinks', ta.value.trim() || null);
+		const chipRow = valWrap.createDiv('scenarist-card-tags scenarist-link-chips');
+		chipRow.style.margin = '0';
+
+		const commitLinks = (newLinks: string[]) => {
+			const val = newLinks.length ? newLinks.map((l) => `[[${l}]]`).join(', ') : null;
+			this.commitProp(entity, 'backlinks', val);
+		};
+
+		for (const link of links) {
+			const chip = chipRow.createEl('span', { cls: 'scenarist-link-chip' });
+			const text = chip.createEl('span', {
+				cls: 'scenarist-tag-chip-text',
+				text: `[[${link}]]`,
+			});
+			text.title = `Открыть: ${link}`;
+			text.onclick = (e) => { e.stopPropagation(); this.openObsidianLink(link); };
+			const x = chip.createEl('span', { cls: 'scenarist-tag-chip-x', text: '×' });
+			x.onclick = (e) => { e.stopPropagation(); commitLinks(links.filter((l) => l !== link)); };
+		}
+
+		const addBtn = chipRow.createEl('button', { cls: 'scenarist-tag-add', text: '+ ссылка' });
+		addBtn.onclick = () => {
+			addBtn.style.display = 'none';
+			const inp = chipRow.createEl('input', { cls: 'scenarist-tag-input' });
+			inp.placeholder = 'Название заметки…';
+			inp.style.width = '160px';
+			inp.focus();
+			const commit = () => {
+				let val = inp.value.trim().replace(/^\[\[|\]\]$/g, '');
+				if (val && !links.includes(val)) commitLinks([...links, val]);
+			};
+			inp.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter') commit();
+				if (e.key === 'Escape') { inp.remove(); addBtn.style.display = ''; }
+			});
+			inp.addEventListener('blur', commit);
+		};
 	}
 
-	private renderFieldControl(wrap: HTMLElement, entity: Entity, field: { key: string; label: string; type: string; options?: { value: string; color: string }[] }) {
+	/** Открыть wikilink через Obsidian. */
+	private openObsidianLink(linkText: string) {
+		this.app.workspace.openLinkText(linkText, '', false);
+	}
+
+	private renderFieldControl(wrap: HTMLElement, entity: Entity, field: { key: string; label: string; type: string; required?: boolean; options?: { value: string; color: string }[] }) {
 		const val = entity.props[field.key];
+
+		// ── Мульти-выбор (жанры) ────────────────────────────────────────────────
+		if (field.type === 'multiselect') {
+			const selected = val ? String(val).split(',').map((v) => v.trim()).filter(Boolean) : [];
+			// Список из настроек (пользователь может расширять)
+			const settingsOpts: string[] = this.plugin.settings.genreOptions?.length
+				? this.plugin.settings.genreOptions
+				: (field.options || []).map((o) => o.value);
+			const optMap = new Map((field.options || []).map((o) => [o.value, o.color]));
+
+			const chipRow = wrap.createDiv('scenarist-card-tags scenarist-genre-chips');
+			chipRow.style.margin = '0';
+
+			const commitGenres = (next: string[]) =>
+				this.commitProp(entity, field.key, next.length ? next.join(', ') : null);
+
+			// Чипы выбранных жанров
+			const renderChips = () => {
+				chipRow.empty();
+				for (const v of selected) {
+					const color = optMap.get(v) || '#888';
+					const chip = chipRow.createEl('span', { cls: 'scenarist-genre-chip' });
+					chip.style.setProperty('--chip-color', color);
+					chip.createEl('span', { text: v });
+					const x = chip.createEl('span', { cls: 'scenarist-tag-chip-x', text: '×' });
+					x.onclick = () => commitGenres(selected.filter((s) => s !== v));
+				}
+				// Выпадающий список для добавления
+				const available = settingsOpts.filter((o) => !selected.includes(o));
+				const sel = chipRow.createEl('select', { cls: 'scenarist-genre-add' });
+				sel.createEl('option', { value: '', text: '＋ жанр…' });
+				available.forEach((o) => sel.createEl('option', { value: o, text: o }));
+				sel.createEl('option', { value: '__new__', text: '＋ Добавить свой…' });
+
+				sel.onchange = async () => {
+					if (!sel.value) return;
+					if (sel.value === '__new__') {
+						sel.style.display = 'none';
+						const inp = chipRow.createEl('input', { cls: 'scenarist-tag-input' });
+						inp.placeholder = 'Новый жанр…';
+						inp.focus();
+						const doAdd = async () => {
+							const newG = inp.value.trim();
+							if (newG) {
+								if (!this.plugin.settings.genreOptions.includes(newG)) {
+									this.plugin.settings.genreOptions.push(newG);
+									await this.plugin.saveSettings();
+								}
+								if (!selected.includes(newG)) {
+									selected.push(newG);
+									optMap.set(newG, '#888');
+									commitGenres(selected);
+								}
+							} else { sel.value = ''; sel.style.display = ''; renderChips(); }
+						};
+						inp.addEventListener('keydown', (e) => {
+							if (e.key === 'Enter') { doAdd(); }
+							if (e.key === 'Escape') { inp.remove(); sel.style.display = ''; sel.value = ''; }
+						});
+						inp.addEventListener('blur', doAdd);
+					} else {
+						selected.push(sel.value);
+						commitGenres(selected);
+					}
+				};
+			};
+			renderChips();
+			return;
+		}
+
 		if (field.type === 'select' || field.type === 'status') {
 			const sel = wrap.createEl('select', { cls: 'scenarist-prop-select' });
-			sel.createEl('option', { value: '', text: '—' });
+			if (!field.required) sel.createEl('option', { value: '', text: '—' });
 			(field.options || []).forEach((o) => {
 				const opt = sel.createEl('option', { value: o.value, text: o.value });
 				if (o.value === val) opt.selected = true;
 			});
+			// Обязательное поле: установить первый вариант если пусто
+			if (field.required && !val && field.options?.length) {
+				sel.value = field.options[0].value;
+				queueMicrotask(() => this.commitProp(entity, field.key, field.options![0].value));
+			}
 			sel.onchange = () => this.commitProp(entity, field.key, sel.value || null);
 		} else if (field.type === 'checkbox') {
 			const cb = wrap.createEl('input', { cls: 'scenarist-prop-check' });

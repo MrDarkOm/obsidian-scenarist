@@ -16,6 +16,8 @@ export interface ScenaristSettings {
 	rootFolder: string;
 	autoCreateNotes: boolean;
 	categoryQuickTypes: QuickCategoryType[];
+	/** Список доступных жанров (расширяется пользователем). */
+	genreOptions: string[];
 }
 
 export const DEFAULT_QUICK_TYPES: QuickCategoryType[] = [
@@ -24,10 +26,16 @@ export const DEFAULT_QUICK_TYPES: QuickCategoryType[] = [
 	{ id: 'lang', label: 'Языки',       icon: 'languages',  preset: 'language',     enabled: false, isDefault: true },
 ];
 
+export const DEFAULT_GENRE_OPTIONS: string[] = [
+	'Приключение', 'Комедия', 'Триллер', 'Драма', 'Фэнтези',
+	'Научная фантастика', 'Хоррор', 'Романтика', 'Детектив', 'Боевик',
+];
+
 export const DEFAULT_SETTINGS: ScenaristSettings = {
 	rootFolder: 'Scenarist',
 	autoCreateNotes: true,
 	categoryQuickTypes: DEFAULT_QUICK_TYPES.map((t) => ({ ...t })),
+	genreOptions: [...DEFAULT_GENRE_OPTIONS],
 };
 
 // -------------------------------------------------------

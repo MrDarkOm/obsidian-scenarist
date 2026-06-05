@@ -58,14 +58,19 @@ export class CreateEntityModal extends Modal {
 
 		const fieldInputs: Record<string, HTMLInputElement | HTMLSelectElement> = {};
 		for (const field of fields) {
+			// Мульти-выбор в модалке создания не показываем (можно задать в карточке)
+			if (field.type === 'multiselect') continue;
+
 			const row = contentEl.createDiv('scenarist-form-row');
 			row.createEl('label', { text: field.label, cls: 'scenarist-label' });
 			if (field.type === 'select' || field.type === 'status') {
 				const sel = row.createEl('select', { cls: 'scenarist-select' });
-				sel.createEl('option', { value: '', text: '—' });
+				if (!field.required) sel.createEl('option', { value: '', text: '—' });
 				(field.options || []).forEach((o) =>
 					sel.createEl('option', { value: o.value, text: o.value })
 				);
+				// Обязательное поле — предвыбираем первый вариант
+				if (field.required && field.options?.length) sel.value = field.options[0].value;
 				fieldInputs[field.key] = sel;
 			} else if (field.type === 'checkbox') {
 				const cb = row.createEl('input');

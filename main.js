@@ -31,10 +31,23 @@ var DEFAULT_QUICK_TYPES = [
   { id: "loc", label: "\u041B\u043E\u043A\u0430\u0446\u0438\u0438", icon: "map-pin", preset: "location", enabled: true, isDefault: true },
   { id: "lang", label: "\u042F\u0437\u044B\u043A\u0438", icon: "languages", preset: "language", enabled: false, isDefault: true }
 ];
+var DEFAULT_GENRE_OPTIONS = [
+  "\u041F\u0440\u0438\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435",
+  "\u041A\u043E\u043C\u0435\u0434\u0438\u044F",
+  "\u0422\u0440\u0438\u043B\u043B\u0435\u0440",
+  "\u0414\u0440\u0430\u043C\u0430",
+  "\u0424\u044D\u043D\u0442\u0435\u0437\u0438",
+  "\u041D\u0430\u0443\u0447\u043D\u0430\u044F \u0444\u0430\u043D\u0442\u0430\u0441\u0442\u0438\u043A\u0430",
+  "\u0425\u043E\u0440\u0440\u043E\u0440",
+  "\u0420\u043E\u043C\u0430\u043D\u0442\u0438\u043A\u0430",
+  "\u0414\u0435\u0442\u0435\u043A\u0442\u0438\u0432",
+  "\u0411\u043E\u0435\u0432\u0438\u043A"
+];
 var DEFAULT_SETTINGS = {
   rootFolder: "Scenarist",
   autoCreateNotes: true,
-  categoryQuickTypes: DEFAULT_QUICK_TYPES.map((t) => ({ ...t }))
+  categoryQuickTypes: DEFAULT_QUICK_TYPES.map((t) => ({ ...t })),
+  genreOptions: [...DEFAULT_GENRE_OPTIONS]
 };
 var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
@@ -317,6 +330,7 @@ var SCHEMAS = {
         key: "format",
         label: "\u0424\u043E\u0440\u043C\u0430\u0442",
         type: "select",
+        required: true,
         options: [
           { value: "\u0421\u0435\u0440\u0438\u044F", color: "#9b59b6" },
           { value: "\u0412\u0430\u043D\u0448\u043E\u0442", color: "#4a9eff" }
@@ -326,6 +340,7 @@ var SCHEMAS = {
         key: "type",
         label: "\u0422\u0438\u043F",
         type: "select",
+        required: true,
         options: [
           { value: "\u0420\u0430\u0441\u0441\u043A\u0430\u0437", color: "#4a9eff" },
           { value: "\u0421\u0446\u0435\u043D\u0430\u0440\u0438\u0439", color: "#7ed321" }
@@ -336,8 +351,8 @@ var SCHEMAS = {
         label: "\u0421\u0442\u0430\u0442\u0443\u0441",
         type: "status",
         options: [
-          { value: "\u0412 \u0440\u0430\u0431\u043E\u0442\u0435", color: "#f5a623" },
-          { value: "\u0418\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435", color: "#7ed321" },
+          { value: "\u041E\u0431\u044B\u0447\u043D\u043E\u0435", color: "#888" },
+          { value: "\u0418\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435", color: "#f5c518" },
           { value: "\u0410\u0440\u0445\u0438\u0432", color: "#c0392b" }
         ]
       },
@@ -362,18 +377,25 @@ var SCHEMAS = {
       {
         key: "genre",
         label: "\u0416\u0430\u043D\u0440",
-        type: "select",
+        type: "multiselect",
         options: [
           { value: "\u041F\u0440\u0438\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435", color: "#9b59b6" },
           { value: "\u041A\u043E\u043C\u0435\u0434\u0438\u044F", color: "#e67e22" },
           { value: "\u0422\u0440\u0438\u043B\u043B\u0435\u0440", color: "#f5a623" },
-          { value: "\u0414\u0440\u0430\u043C\u0430", color: "#4a9eff" }
+          { value: "\u0414\u0440\u0430\u043C\u0430", color: "#4a9eff" },
+          { value: "\u0424\u044D\u043D\u0442\u0435\u0437\u0438", color: "#7ed321" },
+          { value: "\u041D\u0430\u0443\u0447\u043D\u0430\u044F \u0444\u0430\u043D\u0442\u0430\u0441\u0442\u0438\u043A\u0430", color: "#00bcd4" },
+          { value: "\u0425\u043E\u0440\u0440\u043E\u0440", color: "#c0392b" },
+          { value: "\u0420\u043E\u043C\u0430\u043D\u0442\u0438\u043A\u0430", color: "#e84393" },
+          { value: "\u0414\u0435\u0442\u0435\u043A\u0442\u0438\u0432", color: "#8b5a2b" },
+          { value: "\u0411\u043E\u0435\u0432\u0438\u043A", color: "#f5a623" }
         ]
       },
       {
         key: "format",
         label: "\u0424\u043E\u0440\u043C\u0430\u0442",
         type: "select",
+        required: true,
         options: [
           { value: "A4", color: "#c0392b" },
           { value: "WebToon", color: "#e67e22" }
@@ -442,9 +464,10 @@ var SCHEMAS = {
         key: "status",
         label: "\u0421\u0442\u0430\u0442\u0443\u0441",
         type: "status",
+        required: true,
         options: [
-          { value: "\u041D\u0435 \u043D\u0430\u0447\u0430\u0442\u043E", color: "#888" },
-          { value: "\u0412 \u043F\u0440\u043E\u0446\u0435\u0441\u0441\u0435", color: "#4a9eff" },
+          { value: "\u0421\u043E\u0437\u0434\u0430\u043D\u043E", color: "#888" },
+          { value: "\u0412 \u0440\u0430\u0431\u043E\u0442\u0435", color: "#4a9eff" },
           { value: "\u0427\u0435\u0440\u043D\u043E\u0432\u0438\u043A", color: "#f5a623" },
           { value: "\u0413\u043E\u0442\u043E\u0432\u043E", color: "#7ed321" },
           { value: "\u0410\u0440\u0445\u0438\u0432", color: "#c0392b" }
@@ -1249,6 +1272,7 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
     return { icon: s.icon, label: s.label, fields: s.fields, links: s.links };
   }
   onOpen() {
+    var _a;
     const { contentEl } = this;
     const { icon, label, fields, links } = this.defs();
     const hidden = /* @__PURE__ */ new Set(["project", "category"]);
@@ -1266,14 +1290,19 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
     });
     const fieldInputs = {};
     for (const field of fields) {
+      if (field.type === "multiselect")
+        continue;
       const row = contentEl.createDiv("scenarist-form-row");
       row.createEl("label", { text: field.label, cls: "scenarist-label" });
       if (field.type === "select" || field.type === "status") {
         const sel = row.createEl("select", { cls: "scenarist-select" });
-        sel.createEl("option", { value: "", text: "\u2014" });
+        if (!field.required)
+          sel.createEl("option", { value: "", text: "\u2014" });
         (field.options || []).forEach(
           (o) => sel.createEl("option", { value: o.value, text: o.value })
         );
+        if (field.required && ((_a = field.options) == null ? void 0 : _a.length))
+          sel.value = field.options[0].value;
         fieldInputs[field.key] = sel;
       } else if (field.type === "checkbox") {
         const cb = row.createEl("input");
@@ -2233,29 +2262,151 @@ var CardView = class extends import_obsidian7.ItemView {
     inp.placeholder = "\u0442\u0435\u04331, \u0442\u0435\u04332, \u0442\u0435\u04333\u2026";
     inp.onchange = () => this.commitProp(entity, "tags", inp.value.trim() || null);
   }
-  /** Поле ссылок на заметки. */
+  /** Поле ссылок на заметки — чипы в стиле тегов. */
   renderBacklinksProp(section, entity) {
+    const rawVal = entity.props["backlinks"] ? String(entity.props["backlinks"]) : "";
+    const links = [];
+    const re = /\[\[([^\]]+)\]\]/g;
+    let m;
+    while ((m = re.exec(rawVal)) !== null)
+      links.push(m[1]);
     const row = section.createDiv("scenarist-prop");
     row.createEl("div", { cls: "scenarist-prop-label", text: "\u0421\u0441\u044B\u043B\u043A\u0438 \u043D\u0430 \u0437\u0430\u043C\u0435\u0442\u043A\u0438" });
     const valWrap = row.createDiv("scenarist-prop-value");
-    const ta = valWrap.createEl("textarea", { cls: "scenarist-prop-textarea" });
-    ta.value = entity.props["backlinks"] ? String(entity.props["backlinks"]) : "";
-    ta.placeholder = "[[\u0417\u0430\u043C\u0435\u0442\u043A\u0430 1]], [[\u0417\u0430\u043C\u0435\u0442\u043A\u0430 2]]\u2026";
-    ta.rows = 2;
-    this.autoGrow(ta);
-    ta.oninput = () => this.autoGrow(ta);
-    ta.onchange = () => this.commitProp(entity, "backlinks", ta.value.trim() || null);
+    const chipRow = valWrap.createDiv("scenarist-card-tags scenarist-link-chips");
+    chipRow.style.margin = "0";
+    const commitLinks = (newLinks) => {
+      const val = newLinks.length ? newLinks.map((l) => `[[${l}]]`).join(", ") : null;
+      this.commitProp(entity, "backlinks", val);
+    };
+    for (const link of links) {
+      const chip = chipRow.createEl("span", { cls: "scenarist-link-chip" });
+      const text = chip.createEl("span", {
+        cls: "scenarist-tag-chip-text",
+        text: `[[${link}]]`
+      });
+      text.title = `\u041E\u0442\u043A\u0440\u044B\u0442\u044C: ${link}`;
+      text.onclick = (e) => {
+        e.stopPropagation();
+        this.openObsidianLink(link);
+      };
+      const x = chip.createEl("span", { cls: "scenarist-tag-chip-x", text: "\xD7" });
+      x.onclick = (e) => {
+        e.stopPropagation();
+        commitLinks(links.filter((l) => l !== link));
+      };
+    }
+    const addBtn = chipRow.createEl("button", { cls: "scenarist-tag-add", text: "+ \u0441\u0441\u044B\u043B\u043A\u0430" });
+    addBtn.onclick = () => {
+      addBtn.style.display = "none";
+      const inp = chipRow.createEl("input", { cls: "scenarist-tag-input" });
+      inp.placeholder = "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0437\u0430\u043C\u0435\u0442\u043A\u0438\u2026";
+      inp.style.width = "160px";
+      inp.focus();
+      const commit = () => {
+        let val = inp.value.trim().replace(/^\[\[|\]\]$/g, "");
+        if (val && !links.includes(val))
+          commitLinks([...links, val]);
+      };
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Enter")
+          commit();
+        if (e.key === "Escape") {
+          inp.remove();
+          addBtn.style.display = "";
+        }
+      });
+      inp.addEventListener("blur", commit);
+    };
+  }
+  /** Открыть wikilink через Obsidian. */
+  openObsidianLink(linkText) {
+    this.app.workspace.openLinkText(linkText, "", false);
   }
   renderFieldControl(wrap, entity, field) {
+    var _a, _b;
     const val = entity.props[field.key];
+    if (field.type === "multiselect") {
+      const selected = val ? String(val).split(",").map((v) => v.trim()).filter(Boolean) : [];
+      const settingsOpts = ((_a = this.plugin.settings.genreOptions) == null ? void 0 : _a.length) ? this.plugin.settings.genreOptions : (field.options || []).map((o) => o.value);
+      const optMap = new Map((field.options || []).map((o) => [o.value, o.color]));
+      const chipRow = wrap.createDiv("scenarist-card-tags scenarist-genre-chips");
+      chipRow.style.margin = "0";
+      const commitGenres = (next) => this.commitProp(entity, field.key, next.length ? next.join(", ") : null);
+      const renderChips = () => {
+        chipRow.empty();
+        for (const v of selected) {
+          const color = optMap.get(v) || "#888";
+          const chip = chipRow.createEl("span", { cls: "scenarist-genre-chip" });
+          chip.style.setProperty("--chip-color", color);
+          chip.createEl("span", { text: v });
+          const x = chip.createEl("span", { cls: "scenarist-tag-chip-x", text: "\xD7" });
+          x.onclick = () => commitGenres(selected.filter((s) => s !== v));
+        }
+        const available = settingsOpts.filter((o) => !selected.includes(o));
+        const sel = chipRow.createEl("select", { cls: "scenarist-genre-add" });
+        sel.createEl("option", { value: "", text: "\uFF0B \u0436\u0430\u043D\u0440\u2026" });
+        available.forEach((o) => sel.createEl("option", { value: o, text: o }));
+        sel.createEl("option", { value: "__new__", text: "\uFF0B \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0441\u0432\u043E\u0439\u2026" });
+        sel.onchange = async () => {
+          if (!sel.value)
+            return;
+          if (sel.value === "__new__") {
+            sel.style.display = "none";
+            const inp = chipRow.createEl("input", { cls: "scenarist-tag-input" });
+            inp.placeholder = "\u041D\u043E\u0432\u044B\u0439 \u0436\u0430\u043D\u0440\u2026";
+            inp.focus();
+            const doAdd = async () => {
+              const newG = inp.value.trim();
+              if (newG) {
+                if (!this.plugin.settings.genreOptions.includes(newG)) {
+                  this.plugin.settings.genreOptions.push(newG);
+                  await this.plugin.saveSettings();
+                }
+                if (!selected.includes(newG)) {
+                  selected.push(newG);
+                  optMap.set(newG, "#888");
+                  commitGenres(selected);
+                }
+              } else {
+                sel.value = "";
+                sel.style.display = "";
+                renderChips();
+              }
+            };
+            inp.addEventListener("keydown", (e) => {
+              if (e.key === "Enter") {
+                doAdd();
+              }
+              if (e.key === "Escape") {
+                inp.remove();
+                sel.style.display = "";
+                sel.value = "";
+              }
+            });
+            inp.addEventListener("blur", doAdd);
+          } else {
+            selected.push(sel.value);
+            commitGenres(selected);
+          }
+        };
+      };
+      renderChips();
+      return;
+    }
     if (field.type === "select" || field.type === "status") {
       const sel = wrap.createEl("select", { cls: "scenarist-prop-select" });
-      sel.createEl("option", { value: "", text: "\u2014" });
+      if (!field.required)
+        sel.createEl("option", { value: "", text: "\u2014" });
       (field.options || []).forEach((o) => {
         const opt = sel.createEl("option", { value: o.value, text: o.value });
         if (o.value === val)
           opt.selected = true;
       });
+      if (field.required && !val && ((_b = field.options) == null ? void 0 : _b.length)) {
+        sel.value = field.options[0].value;
+        queueMicrotask(() => this.commitProp(entity, field.key, field.options[0].value));
+      }
       sel.onchange = () => this.commitProp(entity, field.key, sel.value || null);
     } else if (field.type === "checkbox") {
       const cb = wrap.createEl("input", { cls: "scenarist-prop-check" });

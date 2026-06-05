@@ -18,7 +18,7 @@ export type EntityKind =
 export type WorkFormat = 'series' | 'oneshot';
 export type CategoryPreset = 'organization' | 'location' | 'language' | 'custom';
 
-export type FieldType = 'select' | 'status' | 'number' | 'text' | 'checkbox' | 'date';
+export type FieldType = 'select' | 'status' | 'multiselect' | 'number' | 'text' | 'checkbox' | 'date';
 
 export interface FieldOption {
 	value: string;
@@ -30,6 +30,8 @@ export interface FieldDef {
 	label: string;
 	type: FieldType;
 	options?: FieldOption[];
+	/** Нельзя оставить пустым — первый вариант выбирается по умолчанию. */
+	required?: boolean;
 }
 
 export interface LinkDef {

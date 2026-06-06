@@ -13,7 +13,7 @@ export class CreateWorkModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 		contentEl.addClass('scenarist-modal');
-		contentEl.createEl('h2', { text: '🎨 Новое произведение', cls: 'scenarist-modal-title' });
+		contentEl.createEl('h2', { text: 'Новое произведение', cls: 'scenarist-modal-title' });
 
 		// формат: серия / ваншот
 		const fmtRow = contentEl.createDiv('scenarist-form-row');

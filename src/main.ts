@@ -19,12 +19,19 @@ export default class ScenaristPlugin extends Plugin {
 	timelineWorkId: string | null = null;
 	private selectListeners: Array<() => void> = [];
 	private history: string[] = [];
+	private selectionSaveTimer: number | null = null;
 
 	async onload() {
 		await this.loadSettings();
 		this.store = new ScenaristStore(this);
 		this.sync = new SyncEngine(this);
 		await this.store.load();
+
+		// Восстанавливаем последний открытый элемент
+		if (this.settings.lastSelectedId) {
+			const restored = this.store.get(this.settings.lastSelectedId);
+			if (restored) this.selectedId = this.settings.lastSelectedId;
+		}
 
 		this.registerView(NAVIGATOR_VIEW, (leaf) => new NavigatorView(leaf, this));
 		this.registerView(CARD_VIEW, (leaf) => new CardView(leaf, this));
@@ -77,14 +84,30 @@ export default class ScenaristPlugin extends Plugin {
 	}
 
 	onunload() {
+		// Flush any pending selection save synchronously before unload
+		if (this.selectionSaveTimer !== null) {
+			window.clearTimeout(this.selectionSaveTimer);
+			this.selectionSaveTimer = null;
+		}
 		this.store.save();
+		void this.saveSettings();
 	}
 
 	// ---- выбор и навигация ----
 	select(id: string | null) {
 		this.selectedId = id;
+		this.settings.lastSelectedId = id ?? undefined;
+		this.debounceSaveSelection();
 		if (id) void this.ensureCard();
 		this.selectListeners.forEach((fn) => fn());
+	}
+
+	private debounceSaveSelection() {
+		if (this.selectionSaveTimer !== null) window.clearTimeout(this.selectionSaveTimer);
+		this.selectionSaveTimer = window.setTimeout(() => {
+			this.selectionSaveTimer = null;
+			this.saveSettings();
+		}, 800);
 	}
 	navigateTo(id: string) {
 		if (this.selectedId && this.selectedId !== id) this.history.push(this.selectedId);

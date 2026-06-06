@@ -16,7 +16,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'project',
 		label: 'Проект',
 		labelPlural: 'Проекты',
-		icon: '📁',
+		icon: 'folder',
 		folder: '',
 		layer: 'project',
 		titleField: 'Name',
@@ -28,7 +28,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'work',
 		label: 'Произведение',
 		labelPlural: 'Произведения',
-		icon: '🎨',
+		icon: 'pen-line',
 		folder: '',
 		layer: 'text',
 		titleField: 'Name',
@@ -77,7 +77,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'book',
 		label: 'Книга',
 		labelPlural: 'Книги',
-		icon: '📗',
+		icon: 'book-open',
 		folder: 'Книги',
 		layer: 'text',
 		titleField: 'Name',
@@ -124,7 +124,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'arc',
 		label: 'Арка',
 		labelPlural: 'Арки',
-		icon: '🌉',
+		icon: 'git-branch',
 		folder: 'Арки',
 		layer: 'text',
 		titleField: 'Name',
@@ -145,7 +145,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'anchor',
 		label: 'Якорь',
 		labelPlural: 'Якоря',
-		icon: '⚓',
+		icon: 'anchor',
 		folder: 'Якоря',
 		layer: 'text',
 		titleField: 'Name',
@@ -166,7 +166,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'chapter',
 		label: 'Глава',
 		labelPlural: 'Главы',
-		icon: '📖',
+		icon: 'scroll',
 		folder: 'Главы',
 		layer: 'text',
 		titleField: 'Название',
@@ -198,7 +198,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'page',
 		label: 'Страница',
 		labelPlural: 'Страницы',
-		icon: '📄',
+		icon: 'file-text',
 		folder: 'Страницы',
 		layer: 'text',
 		titleField: 'Name',
@@ -213,7 +213,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'character',
 		label: 'Персонаж',
 		labelPlural: 'Персонажи',
-		icon: '👤',
+		icon: 'user',
 		folder: 'Персонажи',
 		layer: 'world',
 		titleField: 'Name',
@@ -258,7 +258,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'category',
 		label: 'Категория',
 		labelPlural: 'Категории',
-		icon: '🗂',
+		icon: 'tag',
 		folder: '',
 		layer: 'world',
 		titleField: 'Name',
@@ -271,7 +271,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		kind: 'categoryItem',
 		label: 'Элемент',
 		labelPlural: 'Элементы',
-		icon: '⬡',
+		icon: 'circle-dot',
 		folder: '',
 		layer: 'world',
 		titleField: 'Name',
@@ -299,7 +299,7 @@ export const KINDS: EntityKind[] = [
 
 export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 	organization: {
-		icon: '♛',
+		icon: 'building-2',
 		preset: 'organization',
 		fields: [
 			{
@@ -323,7 +323,7 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 		],
 	},
 	location: {
-		icon: '📍',
+		icon: 'map-pin',
 		preset: 'location',
 		fields: [
 			{
@@ -343,7 +343,7 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 		linkDefs: [],
 	},
 	language: {
-		icon: '🌐',
+		icon: 'languages',
 		preset: 'language',
 		fields: [
 			{
@@ -364,7 +364,7 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 	},
 
 	custom: {
-		icon: '⬡',
+		icon: 'shapes',
 		preset: 'custom',
 		fields: [{ key: 'summary', label: 'Описание', type: 'text' }],
 		linkDefs: [],

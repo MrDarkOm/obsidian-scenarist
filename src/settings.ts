@@ -18,6 +18,8 @@ export interface ScenaristSettings {
 	categoryQuickTypes: QuickCategoryType[];
 	/** Список доступных жанров (расширяется пользователем). */
 	genreOptions: string[];
+	/** Последний открытый entity — восстанавливается при следующем запуске. */
+	lastSelectedId?: string;
 }
 
 export const DEFAULT_QUICK_TYPES: QuickCategoryType[] = [

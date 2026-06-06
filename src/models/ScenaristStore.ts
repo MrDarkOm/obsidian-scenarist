@@ -264,10 +264,33 @@ export class ScenaristStore {
 				this.entities.set(e.id, e);
 			});
 			this.activeProjectId = data.activeProjectId || NO_PROJECT;
+			this.migrateCategoryIcons();
 		} catch {
 			/* первого запуска ещё нет файла */
 		}
 		this.notify();
+	}
+
+	/** Мигрирует старые emoji-иконки в categorySchema.icon → Lucide-имена. */
+	private migrateCategoryIcons() {
+		const emojiMap: Record<string, string> = {
+			'♛': 'building-2',
+			'📍': 'map-pin',
+			'🌐': 'languages',
+			'⬡': 'shapes',
+			'🗂': 'tag',
+		};
+		let changed = false;
+		for (const entity of this.entities.values()) {
+			if (entity.kind === 'category' && entity.categorySchema) {
+				const mapped = emojiMap[entity.categorySchema.icon];
+				if (mapped) {
+					entity.categorySchema.icon = mapped;
+					changed = true;
+				}
+			}
+		}
+		if (changed) this.scheduleSave();
 	}
 
 	private scheduleSave() {

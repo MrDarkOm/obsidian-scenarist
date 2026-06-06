@@ -25,7 +25,7 @@ export class CreateCategoryModal extends Modal {
 		const def = fixedPreset ? CATEGORY_PRESETS[fixedPreset] : null;
 
 		contentEl.createEl('h2', {
-			text: def ? `${def.icon} Новая категория: ${PRESET_LABELS[fixedPreset!]}` : '🗂 Новая категория',
+			text: def ? `Новая категория: ${PRESET_LABELS[fixedPreset!]}` : 'Новая категория',
 			cls: 'scenarist-modal-title',
 		});
 

@@ -40,7 +40,7 @@ export class NavigatorView extends ItemView {
 
 	getViewType() { return NAVIGATOR_VIEW; }
 	getDisplayText() { return 'Scenarist'; }
-	getIcon() { return 'layers'; }
+	getIcon() { return 'film'; }
 
 	async onOpen() {
 		this.unsub.push(this.plugin.store.onChange(() => this.render()));

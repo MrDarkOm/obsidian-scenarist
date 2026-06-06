@@ -310,7 +310,7 @@ var SCHEMAS = {
     kind: "project",
     label: "\u041F\u0440\u043E\u0435\u043A\u0442",
     labelPlural: "\u041F\u0440\u043E\u0435\u043A\u0442\u044B",
-    icon: "\u{1F4C1}",
+    icon: "folder",
     folder: "",
     layer: "project",
     titleField: "Name",
@@ -321,7 +321,7 @@ var SCHEMAS = {
     kind: "work",
     label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435",
     labelPlural: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
-    icon: "\u{1F3A8}",
+    icon: "pen-line",
     folder: "",
     layer: "text",
     titleField: "Name",
@@ -369,7 +369,7 @@ var SCHEMAS = {
     kind: "book",
     label: "\u041A\u043D\u0438\u0433\u0430",
     labelPlural: "\u041A\u043D\u0438\u0433\u0438",
-    icon: "\u{1F4D7}",
+    icon: "book-open",
     folder: "\u041A\u043D\u0438\u0433\u0438",
     layer: "text",
     titleField: "Name",
@@ -415,7 +415,7 @@ var SCHEMAS = {
     kind: "arc",
     label: "\u0410\u0440\u043A\u0430",
     labelPlural: "\u0410\u0440\u043A\u0438",
-    icon: "\u{1F309}",
+    icon: "git-branch",
     folder: "\u0410\u0440\u043A\u0438",
     layer: "text",
     titleField: "Name",
@@ -435,7 +435,7 @@ var SCHEMAS = {
     kind: "anchor",
     label: "\u042F\u043A\u043E\u0440\u044C",
     labelPlural: "\u042F\u043A\u043E\u0440\u044F",
-    icon: "\u2693",
+    icon: "anchor",
     folder: "\u042F\u043A\u043E\u0440\u044F",
     layer: "text",
     titleField: "Name",
@@ -455,7 +455,7 @@ var SCHEMAS = {
     kind: "chapter",
     label: "\u0413\u043B\u0430\u0432\u0430",
     labelPlural: "\u0413\u043B\u0430\u0432\u044B",
-    icon: "\u{1F4D6}",
+    icon: "scroll",
     folder: "\u0413\u043B\u0430\u0432\u044B",
     layer: "text",
     titleField: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
@@ -486,7 +486,7 @@ var SCHEMAS = {
     kind: "page",
     label: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430",
     labelPlural: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u044B",
-    icon: "\u{1F4C4}",
+    icon: "file-text",
     folder: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u044B",
     layer: "text",
     titleField: "Name",
@@ -500,7 +500,7 @@ var SCHEMAS = {
     kind: "character",
     label: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436",
     labelPlural: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
-    icon: "\u{1F464}",
+    icon: "user",
     folder: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
     layer: "world",
     titleField: "Name",
@@ -544,7 +544,7 @@ var SCHEMAS = {
     kind: "category",
     label: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
     labelPlural: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
-    icon: "\u{1F5C2}",
+    icon: "tag",
     folder: "",
     layer: "world",
     titleField: "Name",
@@ -556,7 +556,7 @@ var SCHEMAS = {
     kind: "categoryItem",
     label: "\u042D\u043B\u0435\u043C\u0435\u043D\u0442",
     labelPlural: "\u042D\u043B\u0435\u043C\u0435\u043D\u0442\u044B",
-    icon: "\u2B21",
+    icon: "circle-dot",
     folder: "",
     layer: "world",
     titleField: "Name",
@@ -566,7 +566,7 @@ var SCHEMAS = {
 };
 var CATEGORY_PRESETS = {
   organization: {
-    icon: "\u265B",
+    icon: "building-2",
     preset: "organization",
     fields: [
       {
@@ -590,7 +590,7 @@ var CATEGORY_PRESETS = {
     ]
   },
   location: {
-    icon: "\u{1F4CD}",
+    icon: "map-pin",
     preset: "location",
     fields: [
       {
@@ -610,7 +610,7 @@ var CATEGORY_PRESETS = {
     linkDefs: []
   },
   language: {
-    icon: "\u{1F310}",
+    icon: "languages",
     preset: "language",
     fields: [
       {
@@ -630,7 +630,7 @@ var CATEGORY_PRESETS = {
     linkDefs: []
   },
   custom: {
-    icon: "\u2B21",
+    icon: "shapes",
     preset: "custom",
     fields: [{ key: "summary", label: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }],
     linkDefs: []
@@ -912,9 +912,32 @@ var ScenaristStore = class {
         this.entities.set(e.id, e);
       });
       this.activeProjectId = data.activeProjectId || NO_PROJECT;
+      this.migrateCategoryIcons();
     } catch (e) {
     }
     this.notify();
+  }
+  /** Мигрирует старые emoji-иконки в categorySchema.icon → Lucide-имена. */
+  migrateCategoryIcons() {
+    const emojiMap = {
+      "\u265B": "building-2",
+      "\u{1F4CD}": "map-pin",
+      "\u{1F310}": "languages",
+      "\u2B21": "shapes",
+      "\u{1F5C2}": "tag"
+    };
+    let changed = false;
+    for (const entity of this.entities.values()) {
+      if (entity.kind === "category" && entity.categorySchema) {
+        const mapped = emojiMap[entity.categorySchema.icon];
+        if (mapped) {
+          entity.categorySchema.icon = mapped;
+          changed = true;
+        }
+      }
+    }
+    if (changed)
+      this.scheduleSave();
   }
   scheduleSave() {
     if (this.saveTimer !== null)
@@ -1405,7 +1428,7 @@ var CreateWorkModal = class extends import_obsidian4.Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.addClass("scenarist-modal");
-    contentEl.createEl("h2", { text: "\u{1F3A8} \u041D\u043E\u0432\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", cls: "scenarist-modal-title" });
+    contentEl.createEl("h2", { text: "\u041D\u043E\u0432\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", cls: "scenarist-modal-title" });
     const fmtRow = contentEl.createDiv("scenarist-form-row");
     fmtRow.createEl("label", { text: "\u0424\u043E\u0440\u043C\u0430\u0442", cls: "scenarist-label" });
     const fmtWrap = fmtRow.createDiv("scenarist-choice");
@@ -1485,7 +1508,7 @@ var CreateCategoryModal = class extends import_obsidian5.Modal {
     const fixedPreset = this.defaultPreset;
     const def = fixedPreset ? CATEGORY_PRESETS[fixedPreset] : null;
     contentEl.createEl("h2", {
-      text: def ? `${def.icon} \u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F: ${PRESET_LABELS[fixedPreset]}` : "\u{1F5C2} \u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+      text: def ? `\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F: ${PRESET_LABELS[fixedPreset]}` : "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
       cls: "scenarist-modal-title"
     });
     let preset = fixedPreset || "organization";
@@ -1582,7 +1605,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     return "Scenarist";
   }
   getIcon() {
-    return "layers";
+    return "film";
   }
   async onOpen() {
     this.unsub.push(this.plugin.store.onChange(() => this.render()));
@@ -2083,6 +2106,8 @@ var CardView = class extends import_obsidian7.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.unsub = [];
+    this._rendering = false;
+    this._renderPending = false;
     this.plugin = plugin;
   }
   getViewType() {
@@ -2093,15 +2118,23 @@ var CardView = class extends import_obsidian7.ItemView {
     return ((_a = this.current()) == null ? void 0 : _a.name) || "Scenarist";
   }
   getIcon() {
-    return "file-text";
+    return "film";
   }
   async onOpen() {
-    this.unsub.push(this.plugin.store.onChange(() => this.render()));
-    this.unsub.push(this.plugin.onSelect(() => this.render()));
+    this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
+    this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
     this.render();
   }
   async onClose() {
     this.unsub.forEach((u) => u());
+  }
+  /** Debounced re-entrant-safe render scheduler. */
+  scheduleRender() {
+    if (this._rendering) {
+      this._renderPending = true;
+      return;
+    }
+    this.render();
   }
   current() {
     const id = this.plugin.selectedId;
@@ -2112,24 +2145,47 @@ var CardView = class extends import_obsidian7.ItemView {
       return null;
     return this.plugin.store.get(ids[0]);
   }
+  // ── Render Lucide icon or emoji into element ─────────────────────────────
+  renderIconInto(el, iconStr) {
+    if ([...iconStr].length <= 2) {
+      el.textContent = iconStr;
+    } else {
+      (0, import_obsidian7.setIcon)(el, iconStr);
+    }
+  }
   async render() {
-    const root = this.containerEl.children[1];
-    root.empty();
-    root.addClass("scenarist-card-view");
-    const entity = this.current();
-    if (!entity) {
-      root.createDiv("scenarist-empty").createEl("p", {
-        text: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0443\u0449\u043D\u043E\u0441\u0442\u044C \u0432 \u0434\u0435\u0440\u0435\u0432\u0435 \u0441\u043B\u0435\u0432\u0430"
-      });
+    if (this._rendering) {
+      this._renderPending = true;
       return;
     }
-    const card = root.createDiv("scenarist-card");
-    this.renderHeader(card, entity);
-    this.renderProps(card, entity);
-    if (entity.kind === "category")
-      this.renderCategoryItems(card, entity);
-    this.renderRelations(card, entity);
-    await this.renderBody(card, entity);
+    this._rendering = true;
+    try {
+      const root = this.containerEl.children[1];
+      root.empty();
+      root.addClass("scenarist-card-view");
+      const entity = this.current();
+      if (!entity) {
+        const empty = root.createDiv("scenarist-empty");
+        const iconBox = empty.createDiv("scenarist-empty-icon");
+        (0, import_obsidian7.setIcon)(iconBox, "layers");
+        empty.createEl("p", { text: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u044D\u043B\u0435\u043C\u0435\u043D\u0442 \u0432 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0435" });
+        empty.createEl("p", { cls: "scenarist-empty-hint", text: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435, \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430 \u0438\u043B\u0438 \u0433\u043B\u0430\u0432\u0443 \u0441\u043B\u0435\u0432\u0430" });
+        return;
+      }
+      const card = root.createDiv("scenarist-card");
+      this.renderHeader(card, entity);
+      this.renderProps(card, entity);
+      if (entity.kind === "category")
+        this.renderCategoryItems(card, entity);
+      this.renderRelations(card, entity);
+      await this.renderBody(card, entity);
+    } finally {
+      this._rendering = false;
+      if (this._renderPending) {
+        this._renderPending = false;
+        setTimeout(() => this.render(), 0);
+      }
+    }
   }
   // ---- шапка + крошки ----
   parentOf(e) {
@@ -2156,8 +2212,8 @@ var CardView = class extends import_obsidian7.ItemView {
     const schema = this.plugin.store.resolved(entity);
     const top = card.createDiv("scenarist-card-top");
     if (this.plugin.canGoBack()) {
-      const back = top.createEl("button", { cls: "scenarist-card-back", text: "\u2190" });
-      back.title = "\u041D\u0430\u0437\u0430\u0434";
+      const back = top.createEl("button", { cls: "scenarist-card-back", attr: { title: "\u041D\u0430\u0437\u0430\u0434" } });
+      (0, import_obsidian7.setIcon)(back, "arrow-left");
       back.onclick = () => this.plugin.back();
     }
     const crumbs = [];
@@ -2169,20 +2225,24 @@ var CardView = class extends import_obsidian7.ItemView {
     }
     const trail = top.createDiv("scenarist-crumbs");
     crumbs.forEach((cr) => {
-      const a = trail.createEl("span", {
-        cls: "scenarist-crumb",
-        text: `${this.plugin.store.resolved(cr).icon} ${cr.name}`
-      });
+      const crSchema = this.plugin.store.resolved(cr);
+      const a = trail.createEl("span", { cls: "scenarist-crumb" });
+      const iconSpan = a.createEl("span", { cls: "scenarist-crumb-icon" });
+      this.renderIconInto(iconSpan, crSchema.icon);
+      a.createEl("span", { text: cr.name });
       a.onclick = () => this.plugin.navigateTo(cr.id);
       trail.createEl("span", { cls: "scenarist-crumb-sep", text: "/" });
     });
     trail.createEl("span", { cls: "scenarist-crumb current", text: schema.label });
     const spacer = top.createDiv();
     spacer.style.flex = "1";
-    const openBtn = top.createEl("button", { cls: "scenarist-card-note-btn", text: "\u2197 \u0417\u0430\u043C\u0435\u0442\u043A\u0430" });
+    const openBtn = top.createEl("button", { cls: "scenarist-card-note-btn", attr: { title: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443" } });
+    (0, import_obsidian7.setIcon)(openBtn, "external-link");
+    openBtn.createEl("span", { text: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430" });
     openBtn.onclick = () => this.plugin.sync.openNote(entity);
     const titleRow = card.createDiv("scenarist-card-titlerow");
-    titleRow.createEl("span", { cls: "scenarist-card-icon", text: schema.icon });
+    const iconBox = titleRow.createEl("span", { cls: "scenarist-card-icon" });
+    this.renderIconInto(iconBox, schema.icon);
     const title = titleRow.createEl("input", { cls: "scenarist-card-title" });
     title.value = entity.name;
     title.placeholder = "\u0411\u0435\u0437 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044F";
@@ -2195,7 +2255,7 @@ var CardView = class extends import_obsidian7.ItemView {
     };
     this.renderTagsHeader(card, entity);
   }
-  /** Строка тегов под заголовком (интерактивная). */
+  /** Строка тегов под заголовком. */
   renderTagsHeader(card, entity) {
     const rawTags = entity.props["tags"];
     const tags = rawTags ? String(rawTags).split(",").map((t) => t.trim()).filter(Boolean) : [];
@@ -2252,17 +2312,7 @@ var CardView = class extends import_obsidian7.ItemView {
     }
     this.renderBacklinksProp(section, entity);
   }
-  /** Поле тегов в секции свойств (comma-separated текст). */
-  renderTagsProp(section, entity) {
-    const row = section.createDiv("scenarist-prop");
-    row.createEl("div", { cls: "scenarist-prop-label", text: "\u0422\u0435\u0433\u0438" });
-    const valWrap = row.createDiv("scenarist-prop-value");
-    const inp = valWrap.createEl("input", { cls: "scenarist-prop-input scenarist-tags-input" });
-    inp.value = entity.props["tags"] ? String(entity.props["tags"]) : "";
-    inp.placeholder = "\u0442\u0435\u04331, \u0442\u0435\u04332, \u0442\u0435\u04333\u2026";
-    inp.onchange = () => this.commitProp(entity, "tags", inp.value.trim() || null);
-  }
-  /** Поле ссылок на заметки — чипы в стиле тегов. */
+  /** Поле ссылок на заметки — чипы. */
   renderBacklinksProp(section, entity) {
     const rawVal = entity.props["backlinks"] ? String(entity.props["backlinks"]) : "";
     const links = [];
@@ -2281,10 +2331,7 @@ var CardView = class extends import_obsidian7.ItemView {
     };
     for (const link of links) {
       const chip = chipRow.createEl("span", { cls: "scenarist-link-chip" });
-      const text = chip.createEl("span", {
-        cls: "scenarist-tag-chip-text",
-        text: `[[${link}]]`
-      });
+      const text = chip.createEl("span", { cls: "scenarist-tag-chip-text", text: `[[${link}]]` });
       text.title = `\u041E\u0442\u043A\u0440\u044B\u0442\u044C: ${link}`;
       text.onclick = (e) => {
         e.stopPropagation();
@@ -2395,7 +2442,9 @@ var CardView = class extends import_obsidian7.ItemView {
       return;
     }
     if (field.type === "select" || field.type === "status") {
-      const sel = wrap.createEl("select", { cls: "scenarist-prop-select" });
+      const selWrap = wrap.createDiv("scenarist-select-wrap");
+      const dot = selWrap.createDiv("scenarist-select-dot");
+      const sel = selWrap.createEl("select", { cls: "scenarist-prop-select" });
       if (!field.required)
         sel.createEl("option", { value: "", text: "\u2014" });
       (field.options || []).forEach((o) => {
@@ -2407,13 +2456,31 @@ var CardView = class extends import_obsidian7.ItemView {
         sel.value = field.options[0].value;
         queueMicrotask(() => this.commitProp(entity, field.key, field.options[0].value));
       }
-      sel.onchange = () => this.commitProp(entity, field.key, sel.value || null);
-    } else if (field.type === "checkbox") {
+      const updateDot = () => {
+        const opt = (field.options || []).find((o) => o.value === sel.value);
+        if (opt) {
+          dot.style.background = opt.color;
+          dot.style.opacity = "1";
+        } else {
+          dot.style.background = "transparent";
+          dot.style.opacity = "0";
+        }
+      };
+      updateDot();
+      sel.onchange = () => {
+        updateDot();
+        this.commitProp(entity, field.key, sel.value || null);
+      };
+      return;
+    }
+    if (field.type === "checkbox") {
       const cb = wrap.createEl("input", { cls: "scenarist-prop-check" });
       cb.type = "checkbox";
       cb.checked = val === true;
       cb.onchange = () => this.commitProp(entity, field.key, cb.checked);
-    } else if (field.type === "number") {
+      return;
+    }
+    if (field.type === "number") {
       const inp = wrap.createEl("input", { cls: "scenarist-prop-input" });
       inp.type = "number";
       inp.value = val != null ? String(val) : "";
@@ -2421,15 +2488,15 @@ var CardView = class extends import_obsidian7.ItemView {
         const n = parseFloat(inp.value);
         this.commitProp(entity, field.key, isNaN(n) ? null : n);
       };
-    } else {
-      const ta = wrap.createEl("textarea", { cls: "scenarist-prop-textarea" });
-      ta.value = val != null ? String(val) : "";
-      ta.placeholder = "\u2014";
-      ta.rows = LONG_FIELDS.has(field.key) ? 3 : 1;
-      this.autoGrow(ta);
-      ta.oninput = () => this.autoGrow(ta);
-      ta.onchange = () => this.commitProp(entity, field.key, ta.value || null);
+      return;
     }
+    const ta = wrap.createEl("textarea", { cls: "scenarist-prop-textarea" });
+    ta.value = val != null ? String(val) : "";
+    ta.placeholder = "\u2014";
+    ta.rows = LONG_FIELDS.has(field.key) ? 3 : 1;
+    this.autoGrow(ta);
+    ta.oninput = () => this.autoGrow(ta);
+    ta.onchange = () => this.commitProp(entity, field.key, ta.value || null);
   }
   autoGrow(ta) {
     ta.style.height = "auto";
@@ -2458,10 +2525,10 @@ var CardView = class extends import_obsidian7.ItemView {
       chips.createEl("span", { cls: "scenarist-muted", text: "\u041F\u043E\u043A\u0430 \u043F\u0443\u0441\u0442\u043E." });
     }
     for (const it of items) {
-      const chip = chips.createEl("span", {
-        cls: "scenarist-rel-chip",
-        text: `${this.plugin.store.resolved(it).icon} ${it.name}`
-      });
+      const chip = chips.createEl("span", { cls: "scenarist-rel-chip" });
+      const chipIcon = chip.createEl("span", { cls: "scenarist-rel-chip-icon" });
+      this.renderIconInto(chipIcon, this.plugin.store.resolved(it).icon);
+      chip.createEl("span", { text: it.name });
       chip.onclick = () => this.plugin.navigateTo(it.id);
     }
   }
@@ -2508,10 +2575,10 @@ var CardView = class extends import_obsidian7.ItemView {
       const t = this.plugin.store.get(tid);
       if (!t)
         continue;
-      const chip = chips.createEl("span", {
-        cls: "scenarist-rel-chip",
-        text: `${this.plugin.store.resolved(t).icon} ${t.name}`
-      });
+      const chip = chips.createEl("span", { cls: "scenarist-rel-chip" });
+      const chipIcon = chip.createEl("span", { cls: "scenarist-rel-chip-icon" });
+      this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
+      chip.createEl("span", { text: t.name });
       chip.onclick = () => this.plugin.navigateTo(tid);
       const x = chip.createEl("span", { cls: "scenarist-rel-x", text: "\xD7" });
       x.onclick = (e) => {
@@ -2543,10 +2610,10 @@ var CardView = class extends import_obsidian7.ItemView {
       const t = this.plugin.store.get(id);
       if (!t)
         continue;
-      const chip = chips.createEl("span", {
-        cls: "scenarist-rel-chip readonly",
-        text: `${this.plugin.store.resolved(t).icon} ${t.name}`
-      });
+      const chip = chips.createEl("span", { cls: "scenarist-rel-chip readonly" });
+      const chipIcon = chip.createEl("span", { cls: "scenarist-rel-chip-icon" });
+      this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
+      chip.createEl("span", { text: t.name });
       chip.onclick = () => this.plugin.navigateTo(id);
     }
     return wrap;
@@ -2556,10 +2623,9 @@ var CardView = class extends import_obsidian7.ItemView {
     const section = card.createDiv("scenarist-card-section scenarist-card-body");
     const head = section.createDiv("scenarist-card-body-head");
     head.createEl("div", { cls: "scenarist-card-section-title", text: "\u0422\u0435\u043A\u0441\u0442" });
-    const editBtn = head.createEl("button", {
-      cls: "scenarist-card-edit-btn",
-      text: "\u270F\uFE0F \u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0442\u0435\u043A\u0441\u0442"
-    });
+    const editBtn = head.createEl("button", { cls: "scenarist-card-edit-btn" });
+    (0, import_obsidian7.setIcon)(editBtn, "pencil");
+    editBtn.createEl("span", { text: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C" });
     editBtn.onclick = () => this.plugin.sync.openNote(entity);
     const file = entity.filePath ? this.plugin.app.vault.getAbstractFileByPath(entity.filePath) : null;
     const target = section.createDiv("scenarist-card-body-render markdown-rendered");
@@ -2574,7 +2640,7 @@ var CardView = class extends import_obsidian7.ItemView {
     } else {
       target.createEl("p", {
         cls: "scenarist-muted",
-        text: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430 \u0435\u0449\u0451 \u043D\u0435 \u0441\u043E\u0437\u0434\u0430\u043D\u0430 \u2014 \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \xAB\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0442\u0435\u043A\u0441\u0442\xBB."
+        text: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430 \u0435\u0449\u0451 \u043D\u0435 \u0441\u043E\u0437\u0434\u0430\u043D\u0430 \u2014 \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \xAB\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C\xBB."
       });
     }
   }
@@ -3034,12 +3100,18 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     this.timelineWorkId = null;
     this.selectListeners = [];
     this.history = [];
+    this.selectionSaveTimer = null;
   }
   async onload() {
     await this.loadSettings();
     this.store = new ScenaristStore(this);
     this.sync = new SyncEngine(this);
     await this.store.load();
+    if (this.settings.lastSelectedId) {
+      const restored = this.store.get(this.settings.lastSelectedId);
+      if (restored)
+        this.selectedId = this.settings.lastSelectedId;
+    }
     this.registerView(NAVIGATOR_VIEW, (leaf) => new NavigatorView(leaf, this));
     this.registerView(CARD_VIEW, (leaf) => new CardView(leaf, this));
     this.registerView(BOARD_VIEW, (leaf) => new BoardView(leaf, this));
@@ -3088,14 +3160,29 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     });
   }
   onunload() {
+    if (this.selectionSaveTimer !== null) {
+      window.clearTimeout(this.selectionSaveTimer);
+      this.selectionSaveTimer = null;
+    }
     this.store.save();
+    void this.saveSettings();
   }
   // ---- выбор и навигация ----
   select(id) {
     this.selectedId = id;
+    this.settings.lastSelectedId = id != null ? id : void 0;
+    this.debounceSaveSelection();
     if (id)
       void this.ensureCard();
     this.selectListeners.forEach((fn) => fn());
+  }
+  debounceSaveSelection() {
+    if (this.selectionSaveTimer !== null)
+      window.clearTimeout(this.selectionSaveTimer);
+    this.selectionSaveTimer = window.setTimeout(() => {
+      this.selectionSaveTimer = null;
+      this.saveSettings();
+    }, 800);
   }
   navigateTo(id) {
     if (this.selectedId && this.selectedId !== id)

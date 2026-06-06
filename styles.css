@@ -1,6 +1,6 @@
-/* ============================================
-   SCENARIST PLUGIN — Styles
-   ============================================ */
+/* ============================================================
+   SCENARIST PLUGIN — Styles v0.3.2
+   ============================================================ */
 
 /* ---- PANEL BASE ---- */
 .scenarist-panel {
@@ -13,45 +13,7 @@
   overflow: hidden;
 }
 
-.scenarist-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px 8px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  flex-shrink: 0;
-}
-
-.scenarist-panel-title {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: var(--text-normal);
-}
-
-.scenarist-header-controls {
-  display: flex;
-  gap: 4px;
-}
-
 /* ---- BUTTONS ---- */
-.scenarist-icon-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 16px;
-  line-height: 1;
-  transition: background 0.15s, color 0.15s;
-}
-.scenarist-icon-btn:hover,
-.scenarist-icon-btn.active {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-
 .scenarist-btn {
   padding: 6px 14px;
   border-radius: 6px;
@@ -60,11 +22,12 @@
   color: var(--text-normal);
   cursor: pointer;
   font-size: 13px;
+  transition: background 0.15s;
 }
 .scenarist-btn:hover { background: var(--background-modifier-hover); }
 
 .scenarist-btn-primary {
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: 6px;
   border: none;
   background: var(--interactive-accent);
@@ -72,8 +35,9 @@
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
+  transition: opacity 0.15s;
 }
-.scenarist-btn-primary:hover { opacity: 0.9; }
+.scenarist-btn-primary:hover { opacity: 0.88; }
 
 /* ---- SEARCH ---- */
 .scenarist-search-wrap {
@@ -83,572 +47,662 @@
 .scenarist-search {
   width: 100%;
   padding: 5px 10px;
-  border-radius: 6px;
+  border-radius: 7px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
   color: var(--text-normal);
   font-size: 12px;
   box-sizing: border-box;
+  transition: border-color 0.15s;
 }
 .scenarist-search:focus {
   outline: none;
   border-color: var(--interactive-accent);
-}
-
-/* ---- PROJECT BADGE ---- */
-.scenarist-project-badge {
-  margin: 6px 10px 2px;
-  padding: 3px 8px;
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  display: inline-block;
-  opacity: 0.85;
-}
-
-/* ---- TREE ---- */
-.scenarist-tree {
-  flex: 1;
-  overflow-y: auto;
-  padding: 4px 0;
-}
-
-.scenarist-tree-section {
-  margin-bottom: 2px;
-}
-
-.scenarist-tree-section-header {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  margin: 1px 4px;
-  user-select: none;
-}
-.scenarist-tree-section-header:hover {
-  background: var(--background-modifier-hover);
-}
-
-.scenarist-chevron {
-  font-size: 10px;
-  color: var(--text-muted);
-  width: 10px;
-}
-
-.scenarist-type-icon {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  color: var(--text-muted);
-}
-.scenarist-type-icon svg {
-  width: 14px;
-  height: 14px;
-  stroke-width: 1.75;
-}
-
-.scenarist-type-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-normal);
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.scenarist-count-badge {
-  flex: 0 0 auto;
-  font-size: 10px;
-  color: var(--text-faint);
-  background: var(--background-modifier-border);
-  border-radius: 10px;
-  padding: 1px 6px;
-  min-width: 18px;
-  text-align: center;
-  margin-left: 4px;
-}
-
-.scenarist-add-type-btn {
-  flex: 0 0 auto;
-  background: none;
-  border: none;
-  color: var(--text-faint);
-  cursor: pointer;
-  padding: 0 4px;
-  font-size: 15px;
-  line-height: 1;
-  border-radius: 3px;
-  opacity: 0.45;
-  transition: opacity 0.15s, color 0.15s;
-}
-.scenarist-tree-section-header:hover .scenarist-add-type-btn { opacity: 1; }
-.scenarist-add-type-btn:hover { color: var(--interactive-accent); opacity: 1; }
-
-.scenarist-tree-list {
-  padding: 2px 4px 4px 24px;
-}
-
-.scenarist-tree-empty {
-  font-size: 11px;
-  color: var(--text-faint);
-  padding: 4px 8px;
-  font-style: italic;
-}
-
-/* ---- OBJECT ITEMS ---- */
-.scenarist-tree-item {
-  padding: 6px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 1px 0;
-  transition: background 0.1s;
-}
-.scenarist-tree-item:hover {
-  background: var(--background-modifier-hover);
-}
-
-.scenarist-item-name {
-  font-size: 13px;
-  color: var(--text-normal);
-  display: block;
-}
-
-.scenarist-item-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-  margin-top: 3px;
-}
-
-.scenarist-tag {
-  font-size: 9px;
-  padding: 1px 5px;
-  border-radius: 3px;
-  background: var(--tag-background);
-  color: var(--tag-color);
-  text-transform: lowercase;
-}
-
-/* ---- EVENTS PANEL ---- */
-.scenarist-stats-bar {
-  padding: 8px 12px 4px;
-  font-size: 11px;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.scenarist-progress-bar {
-  height: 3px;
-  background: var(--background-modifier-border);
-  border-radius: 2px;
-  margin-top: 4px;
-  overflow: hidden;
-}
-
-.scenarist-progress-fill {
-  height: 100%;
-  background: var(--interactive-accent);
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-.scenarist-act-section {
-  margin-bottom: 4px;
-}
-
-.scenarist-act-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  flex-shrink: 0;
-}
-
-.scenarist-act-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  flex: 1;
-}
-
-.scenarist-events-list {
-  padding: 2px 0;
-}
-
-/* ---- EVENT ITEMS ---- */
-.scenarist-event-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  margin: 1px 4px;
-  transition: background 0.1s;
-}
-.scenarist-event-item:hover { background: var(--background-modifier-hover); }
-
-.scenarist-status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 5px;
-}
-
-.scenarist-event-content { flex: 1; min-width: 0; }
-
-.scenarist-event-title-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.scenarist-scene-num {
-  font-size: 10px;
-  color: var(--text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.scenarist-event-title {
-  font-size: 12px;
-  color: var(--text-normal);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.scenarist-event-meta {
-  display: flex;
-  gap: 8px;
-  margin-top: 3px;
-  flex-wrap: wrap;
-}
-
-.scenarist-meta-chars,
-.scenarist-meta-locs {
-  font-size: 10px;
-  color: var(--text-faint);
-}
-
-.scenarist-status-select {
-  font-size: 10px;
-  background: var(--background-secondary);
-  color: var(--text-muted);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 3px;
-  padding: 1px 3px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-/* ---- TIMELINE VIEW ---- */
-.scenarist-timeline {
-  padding: 8px 12px;
-}
-
-.scenarist-timeline-item {
-  display: flex;
-  gap: 10px;
-  padding: 4px 0;
-}
-
-.scenarist-timeline-line {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 16px;
-  flex-shrink: 0;
-}
-
-.scenarist-timeline-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid var(--interactive-accent);
-  background: var(--background-primary);
-  flex-shrink: 0;
-}
-
-.scenarist-timeline-card {
-  flex: 1;
-  padding: 6px 10px;
-  background: var(--background-secondary);
-  border-radius: 6px;
-  margin-bottom: 6px;
-}
-
-.scenarist-event-desc {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 2px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 14%, transparent);
 }
 
 /* ---- EMPTY STATE ---- */
-.scenarist-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 150px;
-  gap: 10px;
+.scenarist-tree-empty {
+  font-size: 11px;
   color: var(--text-faint);
-  font-size: 13px;
-  text-align: center;
-  padding: 20px;
+  padding: 6px 10px;
+  font-style: italic;
 }
 
 /* ---- MODALS ---- */
 .scenarist-modal-title {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   font-size: 18px;
+  font-weight: 700;
 }
-
 .scenarist-form-row {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
-
 .scenarist-form-row--split {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-
 .scenarist-label {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
-
 .scenarist-input,
 .scenarist-select,
 .scenarist-textarea {
   width: 100%;
   padding: 7px 10px;
   border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
+  border-radius: 7px;
   background: var(--background-secondary);
   color: var(--text-normal);
   font-size: 13px;
   box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .scenarist-input:focus,
 .scenarist-select:focus,
 .scenarist-textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 14%, transparent);
 }
 .scenarist-input.error { border-color: var(--color-red); }
-
 .scenarist-textarea {
   min-height: 70px;
   resize: vertical;
   font-family: var(--font-text);
 }
-
 .scenarist-hint {
   font-size: 11px;
   color: var(--text-faint);
   font-style: italic;
 }
-
 .scenarist-modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: 22px;
 }
 
-/* ---- WORK SELECT + TABS ---- */
+/* ---- CHOICE BUTTONS (modal presets) ---- */
+.scenarist-choice { display: flex; gap: 8px; flex-wrap: wrap; }
+.scenarist-choice-btn {
+  flex: 1 1 0;
+  min-width: 120px;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.scenarist-choice-btn:hover { border-color: color-mix(in srgb, var(--interactive-accent) 50%, transparent); }
+.scenarist-choice-btn.active {
+  border-color: var(--interactive-accent);
+  box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--interactive-accent) 10%, transparent);
+}
+.scenarist-choice-title { font-weight: 600; font-size: 13px; }
+.scenarist-choice-desc { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+/* ================================================================
+   NAVIGATOR
+   ================================================================ */
+
+.scenarist-navigator {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ---- project bar ---- */
+.scenarist-projbar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px 6px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+.scenarist-projbar .scenarist-work-select {
+  margin: 0;
+  flex: 1;
+}
+.scenarist-proj-settings { color: var(--text-muted); }
+.scenarist-proj-settings:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+/* project select */
 .scenarist-work-select {
-  margin: 6px 10px 4px;
   width: calc(100% - 20px);
   padding: 5px 8px;
-  border-radius: 6px;
+  border-radius: 7px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
   color: var(--text-normal);
   font-size: 12px;
   font-weight: 600;
   box-sizing: border-box;
-}
-
-.scenarist-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 4px 10px 6px;
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-.scenarist-tab {
-  flex: 1;
-  padding: 5px 8px;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  background: var(--background-secondary);
-  color: var(--text-muted);
   cursor: pointer;
-  font-size: 12px;
-}
-.scenarist-tab:hover { background: var(--background-modifier-hover); }
-.scenarist-tab.active {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  font-weight: 600;
 }
 
-/* ---- TREE TWEAKS ---- */
-.scenarist-chevron.mini { width: 12px; display: inline-block; cursor: pointer; }
-.scenarist-chevron.mini.empty { cursor: default; }
-.scenarist-tree-item {
+/* ---- icon tabs ---- */
+.scenarist-tabs-icons {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 8px 7px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+.scenarist-tab-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
 }
-.scenarist-tree-item.selected {
-  background: var(--background-modifier-active-hover, var(--background-modifier-hover));
-  box-shadow: inset 2px 0 0 var(--interactive-accent);
+.scenarist-tab-icon.is-active {
+  color: var(--interactive-accent) !important;
+  background: color-mix(in srgb, var(--interactive-accent) 13%, transparent) !important;
 }
-.scenarist-tree-item .scenarist-item-name { display: inline; }
 
-/* ============================================
-   CARD VIEW — основная карточка сущности
-   ============================================ */
+/* ---- nav body ---- */
+.scenarist-nav-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0 16px;
+  scrollbar-width: thin;
+}
+
+.scenarist-tab-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 4px;
+}
+.scenarist-tab-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  font-weight: 700;
+}
+
+/* ---- search section divider ---- */
+.scenarist-search-section {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  padding: 10px 12px 3px;
+}
+.scenarist-search-section:first-child { padding-top: 4px; }
+
+/* ---- work block ---- */
+.scenarist-work-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 7px;
+  margin: 1px 5px;
+  transition: background 0.12s;
+}
+.scenarist-work-head:hover { background: var(--background-modifier-hover); }
+.scenarist-work-title {
+  flex: 1;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scenarist-work-inner { padding-left: 6px; }
+
+/* ---- group header (books, arcs, etc.) ---- */
+.scenarist-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin: 1px 6px;
+  transition: background 0.12s;
+}
+.scenarist-group-header:hover { background: var(--background-modifier-hover); }
+.scenarist-group-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scenarist-group-title.linkable:hover {
+  color: var(--interactive-accent);
+  text-decoration: underline;
+}
+
+/* ---- chevron ---- */
+.scenarist-chevron {
+  font-size: 10px;
+  color: var(--text-muted);
+  width: 10px;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+.scenarist-chevron.mini { width: 12px; display: inline-block; cursor: pointer; }
+
+/* ---- type icon ---- */
+.scenarist-type-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  color: var(--text-muted);
+}
+.scenarist-type-icon svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 1.75;
+}
+
+/* ---- count badge ---- */
+.scenarist-count-badge {
+  flex: 0 0 auto;
+  font-size: 10px;
+  color: var(--text-faint);
+  background: var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
+  margin-left: 2px;
+}
+
+/* ---- pills (chapters, chars, category items) ---- */
+.scenarist-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 4px 10px 8px 28px;
+}
+.scenarist-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 12px;
+  cursor: pointer;
+  max-width: 100%;
+  transition: background 0.12s, border-color 0.12s;
+}
+.scenarist-pill:hover { background: var(--background-modifier-hover); }
+.scenarist-pill.selected {
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 10%, transparent);
+  color: var(--interactive-accent);
+}
+.scenarist-pill.add {
+  color: var(--text-faint);
+  border-style: dashed;
+  padding: 4px 8px;
+}
+.scenarist-pill.add svg { width: 12px; height: 12px; }
+.scenarist-pill.add:hover {
+  color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 8%, transparent);
+}
+.scenarist-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+/* ---- category quick buttons ---- */
+.scenarist-cat-quick-btn {
+  background: none;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 3px 6px;
+  color: var(--text-muted);
+  transition: background 0.15s, border-color 0.15s;
+}
+.scenarist-cat-quick-btn:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+/* ================================================================
+   CARD VIEW
+   ================================================================ */
+
 .scenarist-card-view {
   height: 100%;
   overflow-y: auto;
   background: var(--background-primary);
+  scrollbar-width: thin;
 }
 .scenarist-card {
-  max-width: 720px;
+  max-width: 740px;
   margin: 0 auto;
-  padding: 40px 48px 80px;
+  padding: 32px 48px 80px;
   box-sizing: border-box;
 }
 
-/* верхняя строка: назад / тип / открыть заметку */
+/* ---- empty state ---- */
+.scenarist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 55%;
+  gap: 10px;
+  color: var(--text-faint);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px;
+}
+.scenarist-empty-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+.scenarist-empty-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.5;
+}
+.scenarist-empty p { margin: 0; }
+.scenarist-empty-hint {
+  font-size: 12px;
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+
+/* ---- top row: back + crumbs + note button ---- */
 .scenarist-card-top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 .scenarist-card-back {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 18px;
-  line-height: 1;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 0;
   border-radius: 6px;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
 }
 .scenarist-card-back:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
-.scenarist-card-kind {
+.scenarist-card-back svg { width: 15px; height: 15px; }
+
+/* breadcrumbs */
+.scenarist-crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px;
   font-size: 12px;
   color: var(--text-muted);
-  letter-spacing: 0.04em;
+  flex: 1;
+  min-width: 0;
 }
+.scenarist-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 4px;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+.scenarist-crumb:not(.current):hover {
+  color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 8%, transparent);
+}
+.scenarist-crumb-icon {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.8;
+}
+.scenarist-crumb-icon svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2;
+}
+.scenarist-crumb-sep { color: var(--text-faint); padding: 0 1px; }
+.scenarist-crumb.current { color: var(--text-faint); cursor: default; }
+
+/* note button */
 .scenarist-card-note-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   background: none;
   border: 1px solid var(--background-modifier-border);
   color: var(--text-muted);
   font-size: 12px;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: 7px;
   cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
-.scenarist-card-note-btn:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+.scenarist-card-note-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: color-mix(in srgb, var(--interactive-accent) 40%, transparent);
+}
+.scenarist-card-note-btn svg { width: 12px; height: 12px; }
 
-/* заголовок */
+/* ---- title row ---- */
 .scenarist-card-titlerow {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
+  gap: 14px;
+  margin-bottom: 8px;
 }
-.scenarist-card-icon { font-size: 34px; line-height: 1; flex: 0 0 auto; }
+
+/* icon box — accent-tinted rounded square with Lucide SVG */
+.scenarist-card-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  flex: 0 0 auto;
+  font-size: 22px; /* emoji fallback */
+  line-height: 1;
+  background: color-mix(in srgb, var(--interactive-accent) 14%, var(--background-secondary));
+  color: var(--interactive-accent);
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 24%, transparent);
+}
+.scenarist-card-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.75;
+}
+
 .scenarist-card-title {
   flex: 1;
   min-width: 0;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 800;
   border: none;
   background: transparent;
   color: var(--text-normal);
   padding: 2px 0;
+  letter-spacing: -0.02em;
 }
 .scenarist-card-title:focus { outline: none; }
 .scenarist-card-title::placeholder { color: var(--text-faint); }
 
-.scenarist-card-summary {
+/* ---- tags row (below title) ---- */
+.scenarist-card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 4px 46px;
+  align-items: center;
+  gap: 5px;
+  margin: 3px 0 2px 60px; /* icon 46px + gap 14px = 60px */
+  min-height: 24px;
 }
 
-/* цветной бейдж статуса/типа */
-.scenarist-badge {
+/* tag chips */
+.scenarist-tag-chip {
   display: inline-flex;
   align-items: center;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 10px;
+  gap: 4px;
+  padding: 3px 8px 3px 9px;
   border-radius: 12px;
-  color: var(--text-normal);
-  background: var(--background-modifier-border);
-  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--interactive-accent) 11%, transparent);
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 28%, transparent);
+  font-size: 12px;
+  color: var(--interactive-accent);
+  white-space: nowrap;
 }
-.scenarist-badge[style*="--badge-color"] {
-  border-color: var(--badge-color);
-  box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--badge-color) 16%, transparent);
+.scenarist-tag-chip-text {
+  font-weight: 500;
+  cursor: pointer;
+}
+.scenarist-tag-chip-text:hover { text-decoration: underline; }
+.scenarist-tag-chip-x {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--interactive-accent);
+  opacity: 0.45;
+  line-height: 1;
+  padding-left: 1px;
+  transition: opacity 0.12s;
+}
+.scenarist-tag-chip-x:hover { opacity: 1; }
+
+/* tag add button */
+.scenarist-tag-add {
+  background: none;
+  border: 1px dashed color-mix(in srgb, var(--background-modifier-border) 80%, transparent);
+  border-radius: 12px;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 9px;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.scenarist-tag-add:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 6%, transparent);
 }
 
-/* секции */
+/* tag input field */
+.scenarist-tag-input {
+  border: 1px solid var(--interactive-accent);
+  border-radius: 12px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 12px;
+  padding: 2px 10px;
+  width: 100px;
+  outline: none;
+}
+
+/* ---- SECTIONS ---- */
 .scenarist-card-section {
-  margin-top: 22px;
+  margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid var(--background-modifier-border);
 }
 .scenarist-card-section-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-  margin-bottom: 12px;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
 }
 
-/* строки свойств */
+/* ---- PROPERTIES ---- */
 .scenarist-prop {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 6px 0;
-  min-height: 30px;
+  padding: 5px 0;
+  min-height: 32px;
 }
 .scenarist-prop-label {
-  flex: 0 0 150px;
-  font-size: 13px;
-  color: var(--text-muted);
-  padding-top: 5px;
+  flex: 0 0 140px;
+  font-size: 12px;
+  color: var(--text-faint);
+  padding-top: 6px;
+  font-weight: 500;
 }
 .scenarist-prop-value { flex: 1; min-width: 0; }
+
+/* select wrapper with colored dot */
+.scenarist-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.scenarist-select-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  transition: background 0.2s;
+}
+.scenarist-select-wrap .scenarist-prop-select {
+  flex: 1;
+}
+
+/* field controls */
 .scenarist-prop-select,
 .scenarist-prop-input,
 .scenarist-prop-textarea {
@@ -657,24 +711,30 @@
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   color: var(--text-normal);
-  border-radius: 6px;
+  border-radius: 7px;
   padding: 5px 9px;
   font-size: 13px;
   font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .scenarist-prop-select:focus,
 .scenarist-prop-input:focus,
-.scenarist-prop-textarea:focus { outline: none; border-color: var(--interactive-accent); }
-.scenarist-prop-textarea { resize: none; overflow: hidden; line-height: 1.5; }
-.scenarist-prop-check { width: 16px; height: 16px; margin-top: 6px; }
+.scenarist-prop-textarea:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+}
+.scenarist-prop-textarea { resize: none; overflow: hidden; line-height: 1.5; min-height: 28px; }
+.scenarist-prop-check { width: 16px; height: 16px; margin-top: 6px; cursor: pointer; }
 
-/* связи */
-.scenarist-rel-group { margin-bottom: 14px; }
-.scenarist-rel-group.backlinks { opacity: 0.9; }
+/* ---- RELATIONS ---- */
+.scenarist-rel-group { margin-bottom: 16px; }
+.scenarist-rel-group.backlinks { opacity: 0.85; }
 .scenarist-rel-label {
   font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+  color: var(--text-faint);
+  margin-bottom: 7px;
+  font-weight: 500;
 }
 .scenarist-rel-chips {
   display: flex;
@@ -685,51 +745,136 @@
 .scenarist-rel-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  padding: 3px 10px;
-  border-radius: 14px;
+  gap: 5px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   color: var(--link-color, var(--text-accent));
   cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
 }
 .scenarist-rel-chip:hover { background: var(--background-modifier-hover); }
-.scenarist-rel-chip.readonly { color: var(--text-normal); cursor: pointer; }
-.scenarist-rel-x { color: var(--text-faint); font-weight: 700; padding-left: 2px; }
-.scenarist-rel-x:hover { color: var(--text-error, #e0533d); }
+.scenarist-rel-chip.readonly { color: var(--text-normal); }
+.scenarist-rel-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.65;
+  flex: 0 0 auto;
+}
+.scenarist-rel-chip-icon svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 1.75;
+}
+.scenarist-rel-x {
+  color: var(--text-faint);
+  font-weight: 700;
+  padding-left: 3px;
+  font-size: 13px;
+  transition: color 0.12s;
+  cursor: pointer;
+}
+.scenarist-rel-x:hover { color: var(--color-red, #e0533d); }
 .scenarist-rel-add {
   font-size: 12px;
-  padding: 3px 8px;
+  padding: 4px 8px;
   border-radius: 8px;
   background: var(--background-secondary);
   border: 1px dashed var(--background-modifier-border);
   color: var(--text-muted);
   cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.scenarist-rel-add:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
 }
 
-/* тело-текст */
+/* ---- BODY TEXT section ---- */
 .scenarist-card-body-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .scenarist-card-body-head .scenarist-card-section-title { margin-bottom: 0; }
 .scenarist-card-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   background: none;
   border: 1px solid var(--background-modifier-border);
   color: var(--text-muted);
   font-size: 12px;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: 7px;
   cursor: pointer;
+  transition: background 0.12s, color 0.12s;
 }
+.scenarist-card-edit-btn svg { width: 12px; height: 12px; }
 .scenarist-card-edit-btn:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
-.scenarist-card-body-render { font-size: 15px; line-height: 1.6; }
+.scenarist-card-body-render { font-size: 15px; line-height: 1.65; }
 .scenarist-muted { color: var(--text-faint); font-style: italic; }
 
-/* ---- BOARD (KANBAN) ---- */
+/* ================================================================
+   GENRES multi-select
+   ================================================================ */
+.scenarist-genre-chips {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.scenarist-genre-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 9px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--chip-color, #888) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--chip-color, #888) 38%, transparent);
+  color: color-mix(in srgb, var(--chip-color, #888) 90%, var(--text-normal));
+}
+.scenarist-genre-add {
+  font-size: 12px;
+  padding: 3px 7px;
+  border-radius: 12px;
+  background: var(--background-secondary);
+  border: 1px dashed var(--background-modifier-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  max-width: 120px;
+  transition: border-color 0.15s;
+}
+.scenarist-genre-add:focus { outline: none; border-color: var(--interactive-accent); }
+
+/* ================================================================
+   LINK CHIPS (note links)
+   ================================================================ */
+.scenarist-link-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 9px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--link-color, #4a9eff) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--link-color, #4a9eff) 28%, transparent);
+  font-size: 12px;
+  color: var(--link-color, #4a9eff);
+  white-space: nowrap;
+}
+.scenarist-link-chip .scenarist-tag-chip-text { font-weight: 500; cursor: pointer; }
+.scenarist-link-chip .scenarist-tag-chip-text:hover { text-decoration: underline; }
+.scenarist-link-chip .scenarist-tag-chip-x { color: var(--link-color, #4a9eff); opacity: 0.45; }
+.scenarist-link-chip .scenarist-tag-chip-x:hover { opacity: 1; }
+
+/* ================================================================
+   BOARD (KANBAN)
+   ================================================================ */
 .scenarist-board { overflow: hidden; }
 .scenarist-board-columns {
   display: flex;
@@ -743,7 +888,7 @@
   min-width: 200px;
   max-width: 240px;
   background: var(--background-secondary);
-  border-radius: 8px;
+  border-radius: 9px;
   padding: 8px;
   flex-shrink: 0;
 }
@@ -756,22 +901,31 @@
   margin-bottom: 8px;
   padding: 0 2px;
 }
-.scenarist-board-col-head .scenarist-status-dot { margin-top: 0; }
+.scenarist-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0;
+}
 .scenarist-board-drop { min-height: 40px; display: flex; flex-direction: column; gap: 6px; }
 .scenarist-board-drop.dragover { outline: 2px dashed var(--interactive-accent); border-radius: 6px; }
 .scenarist-board-card {
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
+  border-radius: 7px;
   padding: 8px 10px;
   cursor: grab;
+  transition: border-color 0.12s;
 }
 .scenarist-board-card:hover { border-color: var(--interactive-accent); }
 .scenarist-board-card.dragging { opacity: 0.5; }
 .scenarist-board-card-title { font-size: 13px; color: var(--text-normal); }
 .scenarist-board-card-desc { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 
-/* ---- GRAPH ---- */
+/* ================================================================
+   GRAPH
+   ================================================================ */
 .scenarist-graph { padding: 8px; }
 .scenarist-graph-svg {
   width: 100%;
@@ -798,177 +952,10 @@
   color: var(--text-muted);
 }
 .scenarist-legend-item { display: flex; align-items: center; gap: 5px; }
-.scenarist-legend-item .scenarist-status-dot { margin-top: 0; }
 
-/* ============================================
-   0.3.0 — проект, быстрые кнопки, крошки, таймлайн
-   ============================================ */
-
-/* проектная панель */
-.scenarist-projbar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px 6px;
-}
-.scenarist-projbar .scenarist-work-select { margin: 0; flex: 1; }
-
-/* вкладки-иконки */
-.scenarist-tabs-icons {
-  display: flex;
-  justify-content: center;
-  gap: 2px;
-  padding: 4px 10px 8px;
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-
-/* Active-стейт для всех вкладок — базовый вид даёт clickable-icon */
-.scenarist-tab-icon.is-active {
-  color: var(--interactive-accent) !important;
-  background: var(--background-modifier-hover);
-}
-
-/* тело вкладки */
-.scenarist-nav-body { flex: 1; overflow-y: auto; padding: 4px 0 12px; }
-.scenarist-tab-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px 4px;
-}
-.scenarist-tab-title {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-faint);
-  font-weight: 700;
-}
-
-/* блок произведения */
-.scenarist-work-head {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  border-radius: 6px;
-  margin: 1px 6px;
-}
-.scenarist-work-head:hover { background: var(--background-modifier-hover); }
-.scenarist-work-title { flex: 1; font-weight: 700; font-size: 14px; }
-.scenarist-work-inner { padding-left: 6px; }
-
-/* заголовок группы */
-.scenarist-group-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 6px;
-  margin: 1px 6px;
-}
-.scenarist-group-header:hover { background: var(--background-modifier-hover); }
-.scenarist-group-title { flex: 1; font-weight: 600; font-size: 13px; color: var(--text-normal); }
-.scenarist-group-title.linkable:hover { color: var(--interactive-accent); text-decoration: underline; }
-
-/* плитки */
-.scenarist-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 4px 12px 10px 30px;
-}
-.scenarist-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  font-size: 13px;
-  cursor: pointer;
-  max-width: 100%;
-}
-.scenarist-pill:hover { background: var(--background-modifier-hover); }
-.scenarist-pill.selected { border-color: var(--interactive-accent); color: var(--interactive-accent); }
-.scenarist-pill.add {
-  color: var(--text-muted);
-  border-style: dashed;
-  padding: 4px 10px;
-}
-.scenarist-pill.add svg { width: 13px; height: 13px; }
-.scenarist-pill.add:hover { color: var(--interactive-accent); border-color: var(--interactive-accent); }
-.scenarist-pill-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
-
-/* старые быстрые кнопки (не используются, оставлены для совместимости) */
-.scenarist-quick-create {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 6px 10px 4px;
-}
-.scenarist-quick-btn {
-  flex: 1 1 auto;
-  padding: 6px 8px;
-  font-size: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  cursor: pointer;
-  white-space: nowrap;
-}
-.scenarist-quick-btn:hover { background: var(--interactive-accent); color: var(--text-on-accent); border-color: transparent; }
-
-/* под-заголовки внутри произведения */
-.scenarist-sub-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-faint);
-  padding: 6px 8px 2px;
-}
-.scenarist-tl-row { color: var(--text-muted); }
-
-/* выбор в модалках (Серия/Ваншот, пресеты) */
-.scenarist-choice { display: flex; gap: 8px; flex-wrap: wrap; }
-.scenarist-choice-btn {
-  flex: 1 1 0;
-  min-width: 120px;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  cursor: pointer;
-}
-.scenarist-choice-btn:hover { border-color: var(--interactive-accent); }
-.scenarist-choice-btn.active {
-  border-color: var(--interactive-accent);
-  box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--interactive-accent) 12%, transparent);
-}
-.scenarist-choice-title { font-weight: 600; font-size: 13px; }
-.scenarist-choice-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-/* хлебные крошки в карточке */
-.scenarist-crumbs {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.scenarist-crumb { cursor: pointer; }
-.scenarist-crumb:not(.current):hover { color: var(--text-normal); text-decoration: underline; }
-.scenarist-crumb-sep { color: var(--text-faint); }
-.scenarist-crumb.current { color: var(--text-faint); cursor: default; }
-
-/* TIMELINE VIEW */
+/* ================================================================
+   TIMELINE
+   ================================================================ */
 .scenarist-timeline-view { overflow: auto; }
 .scenarist-tl-rail {
   display: flex;
@@ -1014,10 +1001,11 @@
 .scenarist-tl-card {
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
+  border-radius: 9px;
   padding: 8px 10px;
   width: 160px;
   cursor: pointer;
+  transition: border-color 0.12s;
 }
 .scenarist-tl-card:hover { border-color: var(--interactive-accent); }
 .scenarist-tl-title { font-size: 13px; font-weight: 600; }
@@ -1025,131 +1013,11 @@
 .scenarist-tl-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 .scenarist-tl-node.dragging { opacity: 0.5; }
 
-/* ============================================
-   0.4.0 — настройки, теги, беклинки, быстрые категории
-   ============================================ */
+/* ================================================================
+   SETTINGS
+   ================================================================ */
 
-/* Разделитель секций при поиске */
-.scenarist-search-section {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-faint);
-  padding: 10px 12px 3px;
-}
-.scenarist-search-section:first-child { padding-top: 4px; }
-
-/* Кнопка настроек в проектной панели */
-.scenarist-proj-settings {
-  flex: 0 0 auto;
-  color: var(--text-muted);
-}
-.scenarist-proj-settings:hover {
-  color: var(--text-normal);
-  background: var(--background-modifier-hover);
-}
-
-/* Кнопки быстрого создания категорий */
-.scenarist-cat-quick-btn {
-  background: none;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  padding: 3px 6px;
-  color: var(--text-muted);
-  transition: background 0.15s, border-color 0.15s;
-}
-.scenarist-cat-quick-btn:hover {
-  background: var(--background-modifier-hover);
-  border-color: var(--interactive-accent);
-  color: var(--text-normal);
-}
-
-/* ---- Теги в шапке карточки ---- */
-.scenarist-card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin: 4px 0 2px 46px;  /* выровнено с названием (иконка 34px + gap 12px) */
-  min-height: 26px;
-}
-
-.scenarist-tag-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px 3px 9px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--interactive-accent) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--interactive-accent) 35%, transparent);
-  font-size: 12px;
-  color: var(--interactive-accent);
-  white-space: nowrap;
-}
-
-.scenarist-tag-chip-text {
-  font-weight: 500;
-  cursor: pointer;
-}
-.scenarist-tag-chip-text:hover {
-  text-decoration: underline;
-}
-
-.scenarist-tag-chip-x {
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--interactive-accent);
-  opacity: 0.5;
-  line-height: 1;
-  padding-left: 2px;
-}
-.scenarist-tag-chip-x:hover { opacity: 1; }
-
-/* Кнопка «+ тег» */
-.scenarist-tag-add {
-  background: none;
-  border: 1px dashed var(--background-modifier-border);
-  border-radius: 12px;
-  color: var(--text-faint);
-  cursor: pointer;
-  font-size: 12px;
-  padding: 2px 10px;
-  transition: border-color 0.15s, color 0.15s;
-}
-.scenarist-tag-add:hover {
-  border-color: var(--interactive-accent);
-  color: var(--interactive-accent);
-}
-
-/* Поле ввода нового тега */
-.scenarist-tag-input {
-  border: 1px solid var(--interactive-accent);
-  border-radius: 12px;
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  font-size: 12px;
-  padding: 2px 10px;
-  width: 100px;
-  outline: none;
-}
-
-/* Поле тегов в секции свойств */
-.scenarist-tags-input {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-style: italic;
-}
-.scenarist-tags-input:focus {
-  color: var(--text-normal);
-  font-style: normal;
-}
-
-/* Иконка в строке настроек */
+/* Icon in setting row */
 .scenarist-setting-icon {
   display: inline-flex;
   align-items: center;
@@ -1159,34 +1027,31 @@
 }
 .scenarist-setting-icon svg { width: 15px; height: 15px; }
 
-/* ---- Пикер иконок (AddQuickTypeModal) ---- */
+/* ---- Icon picker ---- */
 .scenarist-icon-picker {
   display: flex;
   align-items: flex-start;
   gap: 12px;
 }
-
 .scenarist-icon-preview {
   flex: 0 0 auto;
   width: 44px;
   height: 44px;
   border: 2px solid var(--interactive-accent);
-  border-radius: 10px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--background-secondary);
+  background: color-mix(in srgb, var(--interactive-accent) 12%, var(--background-secondary));
   color: var(--interactive-accent);
 }
 .scenarist-icon-preview svg { width: 22px; height: 22px; }
-
 .scenarist-icon-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   max-width: 320px;
 }
-
 .scenarist-icon-cell {
   width: 34px;
   height: 34px;
@@ -1205,68 +1070,56 @@
 .scenarist-icon-cell:hover {
   border-color: var(--background-modifier-border);
   background: var(--background-modifier-hover);
+  color: var(--text-normal);
 }
 .scenarist-icon-cell.selected {
   border-color: var(--interactive-accent);
-  background: color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+  background: color-mix(in srgb, var(--interactive-accent) 13%, transparent);
+  color: var(--interactive-accent);
 }
 
-/* ---- Мульти-выбор жанров ---- */
-.scenarist-genre-chips {
+/* ================================================================
+   BREADCRUMBS in card
+   ================================================================ */
+/* (defined inline above in card section) */
+
+/* ================================================================
+   LEGACY / compatibility stubs (kept for older data)
+   ================================================================ */
+.scenarist-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: var(--text-normal);
+  background: var(--background-modifier-border);
+  border: 1px solid transparent;
+}
+.scenarist-badge[style*="--badge-color"] {
+  border-color: var(--badge-color);
+  box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--badge-color) 16%, transparent);
+}
+.scenarist-quick-create {
+  display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
+  padding: 6px 10px 4px;
 }
-
-.scenarist-genre-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px 3px 9px;
-  border-radius: 12px;
+.scenarist-quick-btn {
+  flex: 1 1 auto;
+  padding: 6px 8px;
   font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  background: color-mix(in srgb, var(--chip-color, #888) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--chip-color, #888) 40%, transparent);
-  color: color-mix(in srgb, var(--chip-color, #888) 90%, var(--text-normal));
-}
-
-.scenarist-genre-add {
-  font-size: 12px;
-  padding: 3px 7px;
-  border-radius: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
-  border: 1px dashed var(--background-modifier-border);
-  color: var(--text-muted);
+  color: var(--text-normal);
   cursor: pointer;
-  max-width: 120px;
-}
-.scenarist-genre-add:focus { outline: none; border-color: var(--interactive-accent); }
-
-/* ---- Ссылки на заметки (link-chips) ---- */
-.scenarist-link-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px 3px 9px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--link-color, #4a9eff) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--link-color, #4a9eff) 30%, transparent);
-  font-size: 12px;
-  color: var(--link-color, #4a9eff);
   white-space: nowrap;
 }
-.scenarist-link-chip .scenarist-tag-chip-text { font-weight: 500; cursor: pointer; }
-.scenarist-link-chip .scenarist-tag-chip-text:hover { text-decoration: underline; }
-.scenarist-link-chip .scenarist-tag-chip-x { color: var(--link-color, #4a9eff); opacity: 0.5; }
-.scenarist-link-chip .scenarist-tag-chip-x:hover { opacity: 1; }
-
-/* Большие textarea (summary/synopsis/description) */
-.scenarist-prop-textarea {
-  min-height: 28px;
-  line-height: 1.5;
+.scenarist-quick-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: transparent;
 }
-
-/* Примечание: глобальное screenplay-форматирование убрано в 0.2.0 —
-   оно применялось ко ВСЕМ заметкам vault. Вернётся позже,
-   ограниченное контейнером только для заметок-глав. */

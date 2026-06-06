@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, MarkdownRenderer, TFile } from 'obsidian';
+import { ItemView, WorkspaceLeaf, MarkdownRenderer, TFile, setIcon } from 'obsidian';
 import { Entity, EntityKind } from '../models/types';
 import { CreateEntityModal } from '../modals/CreateEntityModal';
 import type ScenaristPlugin from '../main';
@@ -26,6 +26,8 @@ const LONG_FIELDS = new Set([
 export class CardView extends ItemView {
 	private plugin: ScenaristPlugin;
 	private unsub: Array<() => void> = [];
+	private _rendering = false;
+	private _renderPending = false;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -34,14 +36,23 @@ export class CardView extends ItemView {
 
 	getViewType() { return CARD_VIEW; }
 	getDisplayText() { return this.current()?.name || 'Scenarist'; }
-	getIcon() { return 'file-text'; }
+	getIcon() { return 'film'; }
 
 	async onOpen() {
-		this.unsub.push(this.plugin.store.onChange(() => this.render()));
-		this.unsub.push(this.plugin.onSelect(() => this.render()));
+		this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
+		this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
 		this.render();
 	}
 	async onClose() { this.unsub.forEach((u) => u()); }
+
+	/** Debounced re-entrant-safe render scheduler. */
+	private scheduleRender() {
+		if (this._rendering) {
+			this._renderPending = true;
+			return;
+		}
+		this.render();
+	}
 
 	private current(): Entity | null {
 		const id = this.plugin.selectedId;
@@ -52,16 +63,30 @@ export class CardView extends ItemView {
 		return this.plugin.store.get(ids[0]);
 	}
 
+	// ── Render Lucide icon or emoji into element ─────────────────────────────
+	private renderIconInto(el: HTMLElement, iconStr: string) {
+		if ([...iconStr].length <= 2) {
+			el.textContent = iconStr; // emoji fallback
+		} else {
+			setIcon(el, iconStr);
+		}
+	}
+
 	private async render() {
+		if (this._rendering) { this._renderPending = true; return; }
+		this._rendering = true;
+		try {
 		const root = this.containerEl.children[1] as HTMLElement;
 		root.empty();
 		root.addClass('scenarist-card-view');
 
 		const entity = this.current();
 		if (!entity) {
-			root.createDiv('scenarist-empty').createEl('p', {
-				text: 'Выберите сущность в дереве слева',
-			});
+			const empty = root.createDiv('scenarist-empty');
+			const iconBox = empty.createDiv('scenarist-empty-icon');
+			setIcon(iconBox, 'layers');
+			empty.createEl('p', { text: 'Выберите элемент в навигаторе' });
+			empty.createEl('p', { cls: 'scenarist-empty-hint', text: 'Нажмите на произведение, персонажа или главу слева' });
 			return;
 		}
 
@@ -71,6 +96,13 @@ export class CardView extends ItemView {
 		if (entity.kind === 'category') this.renderCategoryItems(card, entity);
 		this.renderRelations(card, entity);
 		await this.renderBody(card, entity);
+		} finally {
+			this._rendering = false;
+			if (this._renderPending) {
+				this._renderPending = false;
+				setTimeout(() => this.render(), 0);
+			}
+		}
 	}
 
 	// ---- шапка + крошки ----
@@ -94,12 +126,12 @@ export class CardView extends ItemView {
 
 		const top = card.createDiv('scenarist-card-top');
 		if (this.plugin.canGoBack()) {
-			const back = top.createEl('button', { cls: 'scenarist-card-back', text: '←' });
-			back.title = 'Назад';
+			const back = top.createEl('button', { cls: 'scenarist-card-back', attr: { title: 'Назад' } });
+			setIcon(back, 'arrow-left');
 			back.onclick = () => this.plugin.back();
 		}
 
-		// хлебные крошки
+		// Хлебные крошки
 		const crumbs: Entity[] = [];
 		let p = this.parentOf(entity);
 		let guard = 0;
@@ -109,10 +141,11 @@ export class CardView extends ItemView {
 		}
 		const trail = top.createDiv('scenarist-crumbs');
 		crumbs.forEach((cr) => {
-			const a = trail.createEl('span', {
-				cls: 'scenarist-crumb',
-				text: `${this.plugin.store.resolved(cr).icon} ${cr.name}`,
-			});
+			const crSchema = this.plugin.store.resolved(cr);
+			const a = trail.createEl('span', { cls: 'scenarist-crumb' });
+			const iconSpan = a.createEl('span', { cls: 'scenarist-crumb-icon' });
+			this.renderIconInto(iconSpan, crSchema.icon);
+			a.createEl('span', { text: cr.name });
 			a.onclick = () => this.plugin.navigateTo(cr.id);
 			trail.createEl('span', { cls: 'scenarist-crumb-sep', text: '/' });
 		});
@@ -120,12 +153,17 @@ export class CardView extends ItemView {
 
 		const spacer = top.createDiv();
 		spacer.style.flex = '1';
-		const openBtn = top.createEl('button', { cls: 'scenarist-card-note-btn', text: '↗ Заметка' });
+
+		const openBtn = top.createEl('button', { cls: 'scenarist-card-note-btn', attr: { title: 'Открыть заметку' } });
+		setIcon(openBtn, 'external-link');
+		openBtn.createEl('span', { text: 'Заметка' });
 		openBtn.onclick = () => this.plugin.sync.openNote(entity);
 
-		// Заголовок (иконка + название)
+		// Заголовок (иконка-бокс + название)
 		const titleRow = card.createDiv('scenarist-card-titlerow');
-		titleRow.createEl('span', { cls: 'scenarist-card-icon', text: schema.icon });
+		const iconBox = titleRow.createEl('span', { cls: 'scenarist-card-icon' });
+		this.renderIconInto(iconBox, schema.icon);
+
 		const title = titleRow.createEl('input', { cls: 'scenarist-card-title' });
 		title.value = entity.name;
 		title.placeholder = 'Без названия';
@@ -137,11 +175,11 @@ export class CardView extends ItemView {
 			}
 		};
 
-		// Теги (заменяют бейджи формата/типа)
+		// Теги
 		this.renderTagsHeader(card, entity);
 	}
 
-	/** Строка тегов под заголовком (интерактивная). */
+	/** Строка тегов под заголовком. */
 	private renderTagsHeader(card: HTMLElement, entity: Entity) {
 		const rawTags = entity.props['tags'];
 		const tags = rawTags
@@ -150,18 +188,14 @@ export class CardView extends ItemView {
 
 		const row = card.createDiv('scenarist-card-tags');
 
-		// Чипы существующих тегов
 		for (const tag of tags) {
 			const chip = row.createEl('span', { cls: 'scenarist-tag-chip' });
-
-			// Клик по тексту → встроенный поиск Obsidian по тегу
 			const text = chip.createEl('span', { cls: 'scenarist-tag-chip-text', text: '#' + tag });
 			text.title = `Найти #${tag} в vault`;
 			text.onclick = (e) => {
 				e.stopPropagation();
 				this.openTagSearch(tag);
 			};
-
 			const x = chip.createEl('span', { cls: 'scenarist-tag-chip-x', text: '×' });
 			x.title = 'Удалить тег';
 			x.onclick = (e) => {
@@ -171,7 +205,6 @@ export class CardView extends ItemView {
 			};
 		}
 
-		// Кнопка «+ тег»
 		const addBtn = row.createEl('button', { cls: 'scenarist-tag-add', text: '+ тег' });
 		addBtn.onclick = () => {
 			addBtn.style.display = 'none';
@@ -183,7 +216,6 @@ export class CardView extends ItemView {
 				if (val && !tags.includes(val)) {
 					this.commitProp(entity, 'tags', [...tags, val].join(', '));
 				}
-				// render вызовется через commitProp → onChange
 			};
 			inp.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') { commit(); }
@@ -205,25 +237,12 @@ export class CardView extends ItemView {
 			this.renderFieldControl(valWrap, entity, field);
 		}
 
-		// Универсальное поле «Ссылки на заметки»
 		this.renderBacklinksProp(section, entity);
 	}
 
-	/** Поле тегов в секции свойств (comma-separated текст). */
-	private renderTagsProp(section: HTMLElement, entity: Entity) {
-		const row = section.createDiv('scenarist-prop');
-		row.createEl('div', { cls: 'scenarist-prop-label', text: 'Теги' });
-		const valWrap = row.createDiv('scenarist-prop-value');
-		const inp = valWrap.createEl('input', { cls: 'scenarist-prop-input scenarist-tags-input' });
-		inp.value = entity.props['tags'] ? String(entity.props['tags']) : '';
-		inp.placeholder = 'тег1, тег2, тег3…';
-		inp.onchange = () => this.commitProp(entity, 'tags', inp.value.trim() || null);
-	}
-
-	/** Поле ссылок на заметки — чипы в стиле тегов. */
+	/** Поле ссылок на заметки — чипы. */
 	private renderBacklinksProp(section: HTMLElement, entity: Entity) {
 		const rawVal = entity.props['backlinks'] ? String(entity.props['backlinks']) : '';
-		// Парсим [[...]] конструкции
 		const links: string[] = [];
 		const re = /\[\[([^\]]+)\]\]/g;
 		let m: RegExpExecArray | null;
@@ -242,10 +261,7 @@ export class CardView extends ItemView {
 
 		for (const link of links) {
 			const chip = chipRow.createEl('span', { cls: 'scenarist-link-chip' });
-			const text = chip.createEl('span', {
-				cls: 'scenarist-tag-chip-text',
-				text: `[[${link}]]`,
-			});
+			const text = chip.createEl('span', { cls: 'scenarist-tag-chip-text', text: `[[${link}]]` });
 			text.title = `Открыть: ${link}`;
 			text.onclick = (e) => { e.stopPropagation(); this.openObsidianLink(link); };
 			const x = chip.createEl('span', { cls: 'scenarist-tag-chip-x', text: '×' });
@@ -282,7 +298,6 @@ export class CardView extends ItemView {
 		// ── Мульти-выбор (жанры) ────────────────────────────────────────────────
 		if (field.type === 'multiselect') {
 			const selected = val ? String(val).split(',').map((v) => v.trim()).filter(Boolean) : [];
-			// Список из настроек (пользователь может расширять)
 			const settingsOpts: string[] = this.plugin.settings.genreOptions?.length
 				? this.plugin.settings.genreOptions
 				: (field.options || []).map((o) => o.value);
@@ -294,7 +309,6 @@ export class CardView extends ItemView {
 			const commitGenres = (next: string[]) =>
 				this.commitProp(entity, field.key, next.length ? next.join(', ') : null);
 
-			// Чипы выбранных жанров
 			const renderChips = () => {
 				chipRow.empty();
 				for (const v of selected) {
@@ -305,7 +319,6 @@ export class CardView extends ItemView {
 					const x = chip.createEl('span', { cls: 'scenarist-tag-chip-x', text: '×' });
 					x.onclick = () => commitGenres(selected.filter((s) => s !== v));
 				}
-				// Выпадающий список для добавления
 				const available = settingsOpts.filter((o) => !selected.includes(o));
 				const sel = chipRow.createEl('select', { cls: 'scenarist-genre-add' });
 				sel.createEl('option', { value: '', text: '＋ жанр…' });
@@ -348,25 +361,53 @@ export class CardView extends ItemView {
 			return;
 		}
 
+		// ── Select / Status — с цветной точкой ─────────────────────────────────
 		if (field.type === 'select' || field.type === 'status') {
-			const sel = wrap.createEl('select', { cls: 'scenarist-prop-select' });
+			const selWrap = wrap.createDiv('scenarist-select-wrap');
+			const dot = selWrap.createDiv('scenarist-select-dot');
+			const sel = selWrap.createEl('select', { cls: 'scenarist-prop-select' });
+
 			if (!field.required) sel.createEl('option', { value: '', text: '—' });
 			(field.options || []).forEach((o) => {
 				const opt = sel.createEl('option', { value: o.value, text: o.value });
 				if (o.value === val) opt.selected = true;
 			});
-			// Обязательное поле: установить первый вариант если пусто
+
 			if (field.required && !val && field.options?.length) {
 				sel.value = field.options[0].value;
 				queueMicrotask(() => this.commitProp(entity, field.key, field.options![0].value));
 			}
-			sel.onchange = () => this.commitProp(entity, field.key, sel.value || null);
-		} else if (field.type === 'checkbox') {
+
+			const updateDot = () => {
+				const opt = (field.options || []).find((o) => o.value === sel.value);
+				if (opt) {
+					dot.style.background = opt.color;
+					dot.style.opacity = '1';
+				} else {
+					dot.style.background = 'transparent';
+					dot.style.opacity = '0';
+				}
+			};
+			updateDot();
+
+			sel.onchange = () => {
+				updateDot();
+				this.commitProp(entity, field.key, sel.value || null);
+			};
+			return;
+		}
+
+		// ── Checkbox ────────────────────────────────────────────────────────────
+		if (field.type === 'checkbox') {
 			const cb = wrap.createEl('input', { cls: 'scenarist-prop-check' });
 			cb.type = 'checkbox';
 			cb.checked = val === true;
 			cb.onchange = () => this.commitProp(entity, field.key, cb.checked);
-		} else if (field.type === 'number') {
+			return;
+		}
+
+		// ── Number ──────────────────────────────────────────────────────────────
+		if (field.type === 'number') {
 			const inp = wrap.createEl('input', { cls: 'scenarist-prop-input' });
 			inp.type = 'number';
 			inp.value = val != null ? String(val) : '';
@@ -374,17 +415,17 @@ export class CardView extends ItemView {
 				const n = parseFloat(inp.value);
 				this.commitProp(entity, field.key, isNaN(n) ? null : n);
 			};
-		} else {
-			// text/date → textarea
-			const ta = wrap.createEl('textarea', { cls: 'scenarist-prop-textarea' });
-			ta.value = val != null ? String(val) : '';
-			ta.placeholder = '—';
-			// Поля с длинным контентом — минимум 3 строки
-			ta.rows = LONG_FIELDS.has(field.key) ? 3 : 1;
-			this.autoGrow(ta);
-			ta.oninput = () => this.autoGrow(ta);
-			ta.onchange = () => this.commitProp(entity, field.key, ta.value || null);
+			return;
 		}
+
+		// ── Text / date → textarea ───────────────────────────────────────────────
+		const ta = wrap.createEl('textarea', { cls: 'scenarist-prop-textarea' });
+		ta.value = val != null ? String(val) : '';
+		ta.placeholder = '—';
+		ta.rows = LONG_FIELDS.has(field.key) ? 3 : 1;
+		this.autoGrow(ta);
+		ta.oninput = () => this.autoGrow(ta);
+		ta.onchange = () => this.commitProp(entity, field.key, ta.value || null);
 	}
 
 	private autoGrow(ta: HTMLTextAreaElement) {
@@ -418,10 +459,10 @@ export class CardView extends ItemView {
 			chips.createEl('span', { cls: 'scenarist-muted', text: 'Пока пусто.' });
 		}
 		for (const it of items) {
-			const chip = chips.createEl('span', {
-				cls: 'scenarist-rel-chip',
-				text: `${this.plugin.store.resolved(it).icon} ${it.name}`,
-			});
+			const chip = chips.createEl('span', { cls: 'scenarist-rel-chip' });
+			const chipIcon = chip.createEl('span', { cls: 'scenarist-rel-chip-icon' });
+			this.renderIconInto(chipIcon, this.plugin.store.resolved(it).icon);
+			chip.createEl('span', { text: it.name });
 			chip.onclick = () => this.plugin.navigateTo(it.id);
 		}
 	}
@@ -475,10 +516,10 @@ export class CardView extends ItemView {
 		for (const tid of current) {
 			const t = this.plugin.store.get(tid);
 			if (!t) continue;
-			const chip = chips.createEl('span', {
-				cls: 'scenarist-rel-chip',
-				text: `${this.plugin.store.resolved(t).icon} ${t.name}`,
-			});
+			const chip = chips.createEl('span', { cls: 'scenarist-rel-chip' });
+			const chipIcon = chip.createEl('span', { cls: 'scenarist-rel-chip-icon' });
+			this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
+			chip.createEl('span', { text: t.name });
 			chip.onclick = () => this.plugin.navigateTo(tid);
 			const x = chip.createEl('span', { cls: 'scenarist-rel-x', text: '×' });
 			x.onclick = (e) => {
@@ -510,10 +551,10 @@ export class CardView extends ItemView {
 		for (const id of ids) {
 			const t = this.plugin.store.get(id);
 			if (!t) continue;
-			const chip = chips.createEl('span', {
-				cls: 'scenarist-rel-chip readonly',
-				text: `${this.plugin.store.resolved(t).icon} ${t.name}`,
-			});
+			const chip = chips.createEl('span', { cls: 'scenarist-rel-chip readonly' });
+			const chipIcon = chip.createEl('span', { cls: 'scenarist-rel-chip-icon' });
+			this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
+			chip.createEl('span', { text: t.name });
 			chip.onclick = () => this.plugin.navigateTo(id);
 		}
 		return wrap;
@@ -524,10 +565,9 @@ export class CardView extends ItemView {
 		const section = card.createDiv('scenarist-card-section scenarist-card-body');
 		const head = section.createDiv('scenarist-card-body-head');
 		head.createEl('div', { cls: 'scenarist-card-section-title', text: 'Текст' });
-		const editBtn = head.createEl('button', {
-			cls: 'scenarist-card-edit-btn',
-			text: '✏️ Редактировать текст',
-		});
+		const editBtn = head.createEl('button', { cls: 'scenarist-card-edit-btn' });
+		setIcon(editBtn, 'pencil');
+		editBtn.createEl('span', { text: 'Редактировать' });
 		editBtn.onclick = () => this.plugin.sync.openNote(entity);
 
 		const file = entity.filePath
@@ -546,7 +586,7 @@ export class CardView extends ItemView {
 		} else {
 			target.createEl('p', {
 				cls: 'scenarist-muted',
-				text: 'Заметка ещё не создана — нажмите «Редактировать текст».',
+				text: 'Заметка ещё не создана — нажмите «Редактировать».',
 			});
 		}
 	}
@@ -554,13 +594,11 @@ export class CardView extends ItemView {
 	/** Открыть встроенный поиск Obsidian с фильтром по тегу. */
 	private openTagSearch(tag: string) {
 		const query = `tag:#${tag}`;
-		// Пробуем через internal plugin «global-search»
 		const search = (this.app as any).internalPlugins?.getPluginById?.('global-search');
 		if (search?.enabled && search.instance?.openGlobalSearch) {
 			search.instance.openGlobalSearch(query);
 			return;
 		}
-		// Fallback: открываем поиск командой workspace
 		(this.app as any).commands?.executeCommandById?.('global-search:open');
 	}
 

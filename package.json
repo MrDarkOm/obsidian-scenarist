@@ -1,6 +1,6 @@
 {
   "name": "obsidian-scenarist",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Scenarist plugin for Obsidian",
   "main": "main.js",
   "scripts": {

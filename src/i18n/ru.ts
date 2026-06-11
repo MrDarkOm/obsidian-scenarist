@@ -68,6 +68,12 @@ export const ru = {
 				age: 'Возраст',
 				activity: 'Деятельность',
 				summary: 'Краткое описание',
+				biography: 'Биография',
+				height: 'Рост',
+				build: 'Телосложение',
+				hairColor: 'Цвет волос',
+				eyeColor: 'Цвет глаз',
+				appearance: 'Описание внешности',
 			},
 			links: {
 				project: 'Проект',
@@ -157,6 +163,16 @@ export const ru = {
 		openNote: 'Открыть заметку',
 		noteLabel: 'Заметка',
 		noName: 'Без названия',
+		tab: {
+			characteristics: 'Характеристики',
+			biography: 'Биография',
+			appearance: 'Внешность',
+		},
+		avatar: {
+			set: 'Добавить фото',
+			tooltip: 'Нажмите чтобы задать аватар',
+			placeholder: 'путь/к/изображению.png',
+		},
 		addTag: '+ тег',
 		tagPlaceholder: 'тег…',
 		removeTag: 'Удалить тег',
@@ -246,6 +262,7 @@ export const ru = {
 	},
 	commands: {
 		openScenarist: 'Открыть Scenarist',
+		openInScenarist: 'Открыть в Scenarist',
 		openBoard: 'Открыть доску глав',
 		openGraph: 'Открыть граф связей',
 		newProject: 'Новый проект',

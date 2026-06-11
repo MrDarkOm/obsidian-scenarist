@@ -91,7 +91,11 @@ export default class ScenaristPlugin extends Plugin {
 
 		this.app.workspace.onLayoutReady(() => {
 			if (this.app.workspace.getLeavesOfType(NAVIGATOR_VIEW).length === 0) this.activateLayout();
+			this.injectMarkdownButtons();
 		});
+
+		this.registerEvent(this.app.workspace.on('active-leaf-change', () => this.injectMarkdownButtons()));
+		this.registerEvent(this.app.workspace.on('layout-change', () => this.injectMarkdownButtons()));
 	}
 
 	onunload() {
@@ -172,6 +176,28 @@ export default class ScenaristPlugin extends Plugin {
 		const leaf: WorkspaceLeaf = existing || this.app.workspace.getLeaf('tab');
 		await leaf.setViewState({ type, active: true });
 		this.app.workspace.revealLeaf(leaf);
+	}
+
+	injectMarkdownButtons() {
+		this.app.workspace.iterateAllLeaves((leaf) => {
+			if (leaf.view.getViewType() !== 'markdown') return;
+
+			const viewEl = leaf.view.containerEl;
+			const file: TFile | null = (leaf.view as any).file ?? null;
+
+			viewEl.querySelectorAll('.scenarist-md-open-btn').forEach((el) => el.remove());
+			if (!file) return;
+
+			const entity = this.store.findByPath(file.path);
+			if (!entity) return;
+
+			const btn = (leaf.view as any).addAction(
+				'film',
+				t('commands.openInScenarist'),
+				() => this.navigateTo(entity.id)
+			) as HTMLElement;
+			btn.addClass('scenarist-md-open-btn');
+		});
 	}
 
 	async loadSettings() {

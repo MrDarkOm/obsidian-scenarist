@@ -97,7 +97,13 @@ var ru = {
         role: "\u0420\u043E\u043B\u044C \u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438",
         age: "\u0412\u043E\u0437\u0440\u0430\u0441\u0442",
         activity: "\u0414\u0435\u044F\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C",
-        summary: "\u041A\u0440\u0430\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435"
+        summary: "\u041A\u0440\u0430\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+        biography: "\u0411\u0438\u043E\u0433\u0440\u0430\u0444\u0438\u044F",
+        height: "\u0420\u043E\u0441\u0442",
+        build: "\u0422\u0435\u043B\u043E\u0441\u043B\u043E\u0436\u0435\u043D\u0438\u0435",
+        hairColor: "\u0426\u0432\u0435\u0442 \u0432\u043E\u043B\u043E\u0441",
+        eyeColor: "\u0426\u0432\u0435\u0442 \u0433\u043B\u0430\u0437",
+        appearance: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0432\u043D\u0435\u0448\u043D\u043E\u0441\u0442\u0438"
       },
       links: {
         project: "\u041F\u0440\u043E\u0435\u043A\u0442",
@@ -187,6 +193,16 @@ var ru = {
     openNote: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
     noteLabel: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430",
     noName: "\u0411\u0435\u0437 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044F",
+    tab: {
+      characteristics: "\u0425\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043A\u0438",
+      biography: "\u0411\u0438\u043E\u0433\u0440\u0430\u0444\u0438\u044F",
+      appearance: "\u0412\u043D\u0435\u0448\u043D\u043E\u0441\u0442\u044C"
+    },
+    avatar: {
+      set: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0444\u043E\u0442\u043E",
+      tooltip: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0447\u0442\u043E\u0431\u044B \u0437\u0430\u0434\u0430\u0442\u044C \u0430\u0432\u0430\u0442\u0430\u0440",
+      placeholder: "\u043F\u0443\u0442\u044C/\u043A/\u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044E.png"
+    },
     addTag: "+ \u0442\u0435\u0433",
     tagPlaceholder: "\u0442\u0435\u0433\u2026",
     removeTag: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0442\u0435\u0433",
@@ -276,6 +292,7 @@ var ru = {
   },
   commands: {
     openScenarist: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C Scenarist",
+    openInScenarist: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0432 Scenarist",
     openBoard: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0434\u043E\u0441\u043A\u0443 \u0433\u043B\u0430\u0432",
     openGraph: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0433\u0440\u0430\u0444 \u0441\u0432\u044F\u0437\u0435\u0439",
     newProject: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442",
@@ -377,7 +394,13 @@ var en = {
         role: "Story role",
         age: "Age",
         activity: "Occupation",
-        summary: "Short description"
+        summary: "Short description",
+        biography: "Biography",
+        height: "Height",
+        build: "Build",
+        hairColor: "Hair colour",
+        eyeColor: "Eye colour",
+        appearance: "Appearance description"
       },
       links: {
         project: "Project",
@@ -467,6 +490,16 @@ var en = {
     openNote: "Open note",
     noteLabel: "Note",
     noName: "Untitled",
+    tab: {
+      characteristics: "Characteristics",
+      biography: "Biography",
+      appearance: "Appearance"
+    },
+    avatar: {
+      set: "Add photo",
+      tooltip: "Click to set avatar",
+      placeholder: "path/to/image.png"
+    },
     addTag: "+ tag",
     tagPlaceholder: "tag\u2026",
     removeTag: "Remove tag",
@@ -556,6 +589,7 @@ var en = {
   },
   commands: {
     openScenarist: "Open Scenarist",
+    openInScenarist: "Open in Scenarist",
     openBoard: "Open chapter board",
     openGraph: "Open relations graph",
     newProject: "New project",
@@ -1116,10 +1150,12 @@ var SCHEMAS = {
     layer: "world",
     titleField: "Name",
     fields: [
+      // Характеристики
       {
         key: "type",
         label: "schema.character.fields.type",
         type: "select",
+        tab: "characteristics",
         options: [
           { value: "\u041F\u0440\u043E\u0442\u0430\u0433\u043E\u043D\u0438\u0441\u0442", color: "#7ed321" },
           { value: "\u0410\u043D\u0442\u0430\u0433\u043E\u043D\u0438\u0441\u0442", color: "#c0392b" },
@@ -1132,6 +1168,7 @@ var SCHEMAS = {
         key: "role",
         label: "schema.character.fields.role",
         type: "select",
+        tab: "characteristics",
         options: [
           { value: "\u0413\u043B\u0430\u0432\u043D\u0430\u044F", color: "#7ed321" },
           { value: "\u041A\u043B\u044E\u0447\u0435\u0432\u0430\u044F", color: "#f5a623" },
@@ -1139,9 +1176,17 @@ var SCHEMAS = {
           { value: "\u042D\u043F\u0438\u0437\u043E\u0434\u0438\u0447\u0435\u0441\u043A\u0430\u044F", color: "#e84393" }
         ]
       },
-      { key: "age", label: "schema.character.fields.age", type: "number" },
-      { key: "activity", label: "schema.character.fields.activity", type: "text" },
-      { key: "summary", label: "schema.character.fields.summary", type: "text" }
+      { key: "age", label: "schema.character.fields.age", type: "number", tab: "characteristics" },
+      { key: "activity", label: "schema.character.fields.activity", type: "text", tab: "characteristics" },
+      { key: "summary", label: "schema.character.fields.summary", type: "text", tab: "characteristics" },
+      // Биография
+      { key: "biography", label: "schema.character.fields.biography", type: "text", tab: "biography" },
+      // Внешность
+      { key: "height", label: "schema.character.fields.height", type: "text", tab: "appearance" },
+      { key: "build", label: "schema.character.fields.build", type: "text", tab: "appearance" },
+      { key: "hairColor", label: "schema.character.fields.hairColor", type: "text", tab: "appearance" },
+      { key: "eyeColor", label: "schema.character.fields.eyeColor", type: "text", tab: "appearance" },
+      { key: "appearance", label: "schema.character.fields.appearance", type: "text", tab: "appearance" }
     ],
     links: [
       { key: "project", label: "schema.character.links.project", target: "project", single: true },
@@ -2849,6 +2894,7 @@ var CardView = class extends import_obsidian7.ItemView {
     this.unsub = [];
     this._rendering = false;
     this._renderPending = false;
+    this._charTab = "characteristics";
     this.plugin = plugin;
   }
   getViewType() {
@@ -2921,11 +2967,15 @@ var CardView = class extends import_obsidian7.ItemView {
       }
       const card = root.createDiv("scenarist-card");
       this.renderHeader(card, entity);
-      this.renderProps(card, entity);
-      if (entity.kind === "category")
-        this.renderCategoryItems(card, entity);
-      this.renderRelations(card, entity);
-      await this.renderBody(card, entity);
+      if (entity.kind === "character") {
+        await this.renderCharacterTabs(card, entity);
+      } else {
+        this.renderProps(card, entity);
+        if (entity.kind === "category")
+          this.renderCategoryItems(card, entity);
+        this.renderRelations(card, entity);
+        await this.renderBody(card, entity);
+      }
     } finally {
       this._rendering = false;
       if (this._renderPending) {
@@ -3000,6 +3050,10 @@ var CardView = class extends import_obsidian7.ItemView {
         this.plugin.sync.syncToNote(this.plugin.store.get(entity.id));
       }
     };
+    if (entity.kind === "character") {
+      titleRow.addClass("has-avatar");
+      this.renderAvatarBox(titleRow, entity);
+    }
     this.renderTagsHeader(card, entity);
   }
   /** Строка тегов под заголовком. */
@@ -3192,14 +3246,12 @@ var CardView = class extends import_obsidian7.ItemView {
       const selWrap = wrap.createDiv("scenarist-select-wrap");
       const dot = selWrap.createDiv("scenarist-select-dot");
       const sel = selWrap.createEl("select", { cls: "scenarist-prop-select" });
-      if (!field.required)
-        sel.createEl("option", { value: "", text: "\u2014" });
       (field.options || []).forEach((o) => {
         const opt = sel.createEl("option", { value: o.value, text: o.value });
         if (o.value === val)
           opt.selected = true;
       });
-      if (field.required && !val && ((_b = field.options) == null ? void 0 : _b.length)) {
+      if (!val && ((_b = field.options) == null ? void 0 : _b.length)) {
         sel.value = field.options[0].value;
         queueMicrotask(() => this.commitProp(entity, field.key, field.options[0].value));
       }
@@ -3374,6 +3426,110 @@ var CardView = class extends import_obsidian7.ItemView {
       chip.onclick = () => this.plugin.navigateTo(id);
     }
     return wrap;
+  }
+  // ---- аватар персонажа ----
+  renderAvatarBox(titleRow, entity) {
+    const avatarVal = entity.props["avatar"] ? String(entity.props["avatar"]) : null;
+    const box = titleRow.createDiv("scenarist-char-avatar");
+    const showContent = () => {
+      box.empty();
+      if (avatarVal) {
+        const file = this.plugin.app.vault.getAbstractFileByPath(avatarVal);
+        if (file instanceof import_obsidian7.TFile) {
+          const url = this.plugin.app.vault.getResourcePath(file);
+          box.createEl("img", {
+            cls: "scenarist-char-avatar-img",
+            attr: { src: url, alt: entity.name }
+          });
+          return;
+        }
+      }
+      const ph = box.createDiv("scenarist-char-avatar-ph");
+      (0, import_obsidian7.setIcon)(ph, "image");
+      box.createEl("span", { cls: "scenarist-char-avatar-hint", text: t("card.avatar.set") });
+    };
+    showContent();
+    box.title = t("card.avatar.tooltip");
+    box.onclick = () => {
+      box.empty();
+      const inp = box.createEl("input", { cls: "scenarist-char-avatar-inp" });
+      inp.placeholder = t("card.avatar.placeholder");
+      inp.value = avatarVal || "";
+      inp.focus();
+      inp.select();
+      const commit = () => {
+        const v = inp.value.trim();
+        this.commitProp(entity, "avatar", v || null);
+      };
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Enter")
+          commit();
+        if (e.key === "Escape") {
+          box.empty();
+          showContent();
+        }
+      });
+      inp.addEventListener("blur", commit);
+    };
+  }
+  // ---- вкладки персонажа ----
+  async renderCharacterTabs(card, entity) {
+    const allFields = this.plugin.store.resolved(entity).fields;
+    const charFields = allFields.filter((f) => !f.tab || f.tab === "characteristics");
+    const bioFields = allFields.filter((f) => f.tab === "biography");
+    const appFields = allFields.filter((f) => f.tab === "appearance");
+    const tabDefs = [
+      { id: "characteristics", label: t("card.tab.characteristics") },
+      { id: "biography", label: t("card.tab.biography") },
+      { id: "appearance", label: t("card.tab.appearance") }
+    ];
+    const tabBar = card.createDiv("scenarist-card-tabbar");
+    const sections = {};
+    for (const tab of tabDefs) {
+      sections[tab.id] = card.createDiv("scenarist-card-tab-section");
+    }
+    const setTab = (id) => {
+      this._charTab = id;
+      tabBar.querySelectorAll(".scenarist-card-tab-btn").forEach((el) => {
+        el.toggleClass("is-active", el.dataset.tab === id);
+      });
+      for (const [key, el] of Object.entries(sections)) {
+        el.style.display = key === id ? "" : "none";
+      }
+    };
+    for (const tab of tabDefs) {
+      const btn = tabBar.createEl("button", { cls: "scenarist-card-tab-btn", text: tab.label });
+      btn.dataset.tab = tab.id;
+      btn.onclick = () => setTab(tab.id);
+    }
+    if (charFields.length > 0) {
+      const sec = sections["characteristics"].createDiv("scenarist-card-section");
+      for (const field of charFields) {
+        const row = sec.createDiv("scenarist-prop");
+        row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
+        this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
+      }
+      this.renderBacklinksProp(sec, entity);
+    }
+    this.renderRelations(sections["characteristics"], entity);
+    if (bioFields.length > 0) {
+      const sec = sections["biography"].createDiv("scenarist-card-section");
+      for (const field of bioFields) {
+        const row = sec.createDiv("scenarist-prop");
+        row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
+        this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
+      }
+    }
+    await this.renderBody(sections["biography"], entity);
+    if (appFields.length > 0) {
+      const sec = sections["appearance"].createDiv("scenarist-card-section");
+      for (const field of appFields) {
+        const row = sec.createDiv("scenarist-prop");
+        row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
+        this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
+      }
+    }
+    setTab(this._charTab);
   }
   // ---- тело ----
   async renderBody(card, entity) {
@@ -3928,7 +4084,10 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     this.app.workspace.onLayoutReady(() => {
       if (this.app.workspace.getLeavesOfType(NAVIGATOR_VIEW).length === 0)
         this.activateLayout();
+      this.injectMarkdownButtons();
     });
+    this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.injectMarkdownButtons()));
+    this.registerEvent(this.app.workspace.on("layout-change", () => this.injectMarkdownButtons()));
   }
   onunload() {
     this.state.flushSave();
@@ -3998,6 +4157,27 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     const leaf = existing || this.app.workspace.getLeaf("tab");
     await leaf.setViewState({ type, active: true });
     this.app.workspace.revealLeaf(leaf);
+  }
+  injectMarkdownButtons() {
+    this.app.workspace.iterateAllLeaves((leaf) => {
+      var _a;
+      if (leaf.view.getViewType() !== "markdown")
+        return;
+      const viewEl = leaf.view.containerEl;
+      const file = (_a = leaf.view.file) != null ? _a : null;
+      viewEl.querySelectorAll(".scenarist-md-open-btn").forEach((el) => el.remove());
+      if (!file)
+        return;
+      const entity = this.store.findByPath(file.path);
+      if (!entity)
+        return;
+      const btn = leaf.view.addAction(
+        "film",
+        t("commands.openInScenarist"),
+        () => this.navigateTo(entity.id)
+      );
+      btn.addClass("scenarist-md-open-btn");
+    });
   }
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());

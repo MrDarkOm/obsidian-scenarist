@@ -211,10 +211,12 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		layer: 'world',
 		titleField: 'Name',
 		fields: [
+			// Характеристики
 			{
 				key: 'type',
 				label: 'schema.character.fields.type',
 				type: 'select',
+				tab: 'characteristics',
 				options: [
 					{ value: 'Протагонист', color: '#7ed321' },
 					{ value: 'Антагонист', color: '#c0392b' },
@@ -227,6 +229,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 				key: 'role',
 				label: 'schema.character.fields.role',
 				type: 'select',
+				tab: 'characteristics',
 				options: [
 					{ value: 'Главная', color: '#7ed321' },
 					{ value: 'Ключевая', color: '#f5a623' },
@@ -234,9 +237,17 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 					{ value: 'Эпизодическая', color: '#e84393' },
 				],
 			},
-			{ key: 'age', label: 'schema.character.fields.age', type: 'number' },
-			{ key: 'activity', label: 'schema.character.fields.activity', type: 'text' },
-			{ key: 'summary', label: 'schema.character.fields.summary', type: 'text' },
+			{ key: 'age', label: 'schema.character.fields.age', type: 'number', tab: 'characteristics' },
+			{ key: 'activity', label: 'schema.character.fields.activity', type: 'text', tab: 'characteristics' },
+			{ key: 'summary', label: 'schema.character.fields.summary', type: 'text', tab: 'characteristics' },
+			// Биография
+			{ key: 'biography', label: 'schema.character.fields.biography', type: 'text', tab: 'biography' },
+			// Внешность
+			{ key: 'height', label: 'schema.character.fields.height', type: 'text', tab: 'appearance' },
+			{ key: 'build', label: 'schema.character.fields.build', type: 'text', tab: 'appearance' },
+			{ key: 'hairColor', label: 'schema.character.fields.hairColor', type: 'text', tab: 'appearance' },
+			{ key: 'eyeColor', label: 'schema.character.fields.eyeColor', type: 'text', tab: 'appearance' },
+			{ key: 'appearance', label: 'schema.character.fields.appearance', type: 'text', tab: 'appearance' },
 		],
 		links: [
 			{ key: 'project', label: 'schema.character.links.project', target: 'project', single: true },

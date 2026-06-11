@@ -17,6 +17,7 @@ export class CardView extends ItemView {
 	private unsub: Array<() => void> = [];
 	private _rendering = false;
 	private _renderPending = false;
+	private _charTab = 'characteristics';
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -99,10 +100,14 @@ export class CardView extends ItemView {
 
 			const card = root.createDiv('scenarist-card');
 			this.renderHeader(card, entity);
-			this.renderProps(card, entity);
-			if (entity.kind === 'category') this.renderCategoryItems(card, entity);
-			this.renderRelations(card, entity);
-			await this.renderBody(card, entity);
+			if (entity.kind === 'character') {
+				await this.renderCharacterTabs(card, entity);
+			} else {
+				this.renderProps(card, entity);
+				if (entity.kind === 'category') this.renderCategoryItems(card, entity);
+				this.renderRelations(card, entity);
+				await this.renderBody(card, entity);
+			}
 		} finally {
 			this._rendering = false;
 			if (this._renderPending) {
@@ -187,6 +192,11 @@ export class CardView extends ItemView {
 				this.plugin.sync.syncToNote(this.plugin.store.get(entity.id)!);
 			}
 		};
+
+		if (entity.kind === 'character') {
+			titleRow.addClass('has-avatar');
+			this.renderAvatarBox(titleRow, entity);
+		}
 
 		// Теги
 		this.renderTagsHeader(card, entity);
@@ -422,13 +432,12 @@ export class CardView extends ItemView {
 			const dot = selWrap.createDiv('scenarist-select-dot');
 			const sel = selWrap.createEl('select', { cls: 'scenarist-prop-select' });
 
-			if (!field.required) sel.createEl('option', { value: '', text: '—' });
 			(field.options || []).forEach((o) => {
 				const opt = sel.createEl('option', { value: o.value, text: o.value });
 				if (o.value === val) opt.selected = true;
 			});
 
-			if (field.required && !val && field.options?.length) {
+			if (!val && field.options?.length) {
 				sel.value = field.options[0].value;
 				queueMicrotask(() => this.commitProp(entity, field.key, field.options![0].value));
 			}
@@ -623,6 +632,126 @@ export class CardView extends ItemView {
 			chip.onclick = () => this.plugin.navigateTo(id);
 		}
 		return wrap;
+	}
+
+	// ---- аватар персонажа ----
+	private renderAvatarBox(titleRow: HTMLElement, entity: Entity) {
+		const avatarVal = entity.props['avatar'] ? String(entity.props['avatar']) : null;
+		const box = titleRow.createDiv('scenarist-char-avatar');
+
+		const showContent = () => {
+			box.empty();
+			if (avatarVal) {
+				const file = this.plugin.app.vault.getAbstractFileByPath(avatarVal);
+				if (file instanceof TFile) {
+					const url = this.plugin.app.vault.getResourcePath(file);
+					box.createEl('img', {
+						cls: 'scenarist-char-avatar-img',
+						attr: { src: url, alt: entity.name },
+					});
+					return;
+				}
+			}
+			const ph = box.createDiv('scenarist-char-avatar-ph');
+			setIcon(ph, 'image');
+			box.createEl('span', { cls: 'scenarist-char-avatar-hint', text: t('card.avatar.set') });
+		};
+
+		showContent();
+
+		box.title = t('card.avatar.tooltip');
+		box.onclick = () => {
+			box.empty();
+			const inp = box.createEl('input', { cls: 'scenarist-char-avatar-inp' });
+			inp.placeholder = t('card.avatar.placeholder');
+			inp.value = avatarVal || '';
+			inp.focus();
+			inp.select();
+
+			const commit = () => {
+				const v = inp.value.trim();
+				this.commitProp(entity, 'avatar', v || null);
+			};
+			inp.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter') commit();
+				if (e.key === 'Escape') {
+					box.empty();
+					showContent();
+				}
+			});
+			inp.addEventListener('blur', commit);
+		};
+	}
+
+	// ---- вкладки персонажа ----
+	private async renderCharacterTabs(card: HTMLElement, entity: Entity): Promise<void> {
+		const allFields = this.plugin.store.resolved(entity).fields;
+		const charFields = allFields.filter((f) => !f.tab || f.tab === 'characteristics');
+		const bioFields = allFields.filter((f) => f.tab === 'biography');
+		const appFields = allFields.filter((f) => f.tab === 'appearance');
+
+		const tabDefs = [
+			{ id: 'characteristics', label: t('card.tab.characteristics') },
+			{ id: 'biography', label: t('card.tab.biography') },
+			{ id: 'appearance', label: t('card.tab.appearance') },
+		];
+
+		const tabBar = card.createDiv('scenarist-card-tabbar');
+		const sections: Record<string, HTMLElement> = {};
+		for (const tab of tabDefs) {
+			sections[tab.id] = card.createDiv('scenarist-card-tab-section');
+		}
+
+		const setTab = (id: string) => {
+			this._charTab = id;
+			tabBar.querySelectorAll('.scenarist-card-tab-btn').forEach((el) => {
+				(el as HTMLElement).toggleClass('is-active', (el as HTMLElement).dataset.tab === id);
+			});
+			for (const [key, el] of Object.entries(sections)) {
+				el.style.display = key === id ? '' : 'none';
+			}
+		};
+
+		for (const tab of tabDefs) {
+			const btn = tabBar.createEl('button', { cls: 'scenarist-card-tab-btn', text: tab.label });
+			btn.dataset.tab = tab.id;
+			btn.onclick = () => setTab(tab.id);
+		}
+
+		// === Характеристики ===
+		if (charFields.length > 0) {
+			const sec = sections['characteristics'].createDiv('scenarist-card-section');
+			for (const field of charFields) {
+				const row = sec.createDiv('scenarist-prop');
+				row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
+				this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
+			}
+			this.renderBacklinksProp(sec, entity);
+		}
+		this.renderRelations(sections['characteristics'], entity);
+
+		// === Биография ===
+		if (bioFields.length > 0) {
+			const sec = sections['biography'].createDiv('scenarist-card-section');
+			for (const field of bioFields) {
+				const row = sec.createDiv('scenarist-prop');
+				row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
+				this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
+			}
+		}
+		await this.renderBody(sections['biography'], entity);
+
+		// === Внешность ===
+		if (appFields.length > 0) {
+			const sec = sections['appearance'].createDiv('scenarist-card-section');
+			for (const field of appFields) {
+				const row = sec.createDiv('scenarist-prop');
+				row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
+				this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
+			}
+		}
+
+		setTab(this._charTab);
 	}
 
 	// ---- тело ----

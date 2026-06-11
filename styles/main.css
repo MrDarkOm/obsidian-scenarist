@@ -547,6 +547,7 @@
   align-items: center;
   gap: 14px;
   margin-bottom: 8px;
+  flex-wrap: nowrap;
 }
 
 /* icon box — accent-tinted rounded square with Lucide SVG */
@@ -583,6 +584,99 @@
 }
 .scenarist-card-title:focus { outline: none; }
 .scenarist-card-title::placeholder { color: var(--text-faint); }
+
+/* title row with avatar — align to top so avatar doesn't squish title */
+.scenarist-card-titlerow.has-avatar { align-items: flex-start; }
+
+/* ---- character avatar ---- */
+.scenarist-char-avatar {
+  flex: 0 0 auto;
+  width: 90px;
+  height: 90px;
+  border-radius: 14px;
+  border: 2px dashed var(--background-modifier-border);
+  background: var(--background-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.15s;
+  gap: 5px;
+  position: relative;
+}
+.scenarist-char-avatar:hover {
+  border-color: color-mix(in srgb, var(--interactive-accent) 60%, transparent);
+  background: color-mix(in srgb, var(--interactive-accent) 5%, var(--background-secondary));
+}
+.scenarist-char-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.scenarist-char-avatar-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+}
+.scenarist-char-avatar-ph svg { width: 24px; height: 24px; stroke-width: 1.5; }
+.scenarist-char-avatar-hint {
+  font-size: 10px;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 0 6px;
+  line-height: 1.3;
+}
+.scenarist-char-avatar-inp {
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  font-size: 10px;
+  box-sizing: border-box;
+  border: none;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  outline: none;
+  text-align: center;
+}
+
+/* ---- character tabs ---- */
+.scenarist-card-tabbar {
+  display: flex;
+  gap: 0;
+  margin-top: 20px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.scenarist-card-tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  font-weight: 500;
+  border-radius: 6px 6px 0 0;
+}
+.scenarist-card-tab-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+.scenarist-card-tab-btn.is-active {
+  color: var(--interactive-accent);
+  border-bottom-color: var(--interactive-accent);
+}
+/* Remove top border/margin from first section inside a tab */
+.scenarist-card-tab-section > .scenarist-card-section:first-child {
+  margin-top: 0;
+  padding-top: 16px;
+  border-top: none;
+}
 
 /* ---- tags row (below title) ---- */
 .scenarist-card-tags {

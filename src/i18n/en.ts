@@ -70,6 +70,12 @@ export const en: Locale = {
 				age: 'Age',
 				activity: 'Occupation',
 				summary: 'Short description',
+				biography: 'Biography',
+				height: 'Height',
+				build: 'Build',
+				hairColor: 'Hair colour',
+				eyeColor: 'Eye colour',
+				appearance: 'Appearance description',
 			},
 			links: {
 				project: 'Project',
@@ -159,6 +165,16 @@ export const en: Locale = {
 		openNote: 'Open note',
 		noteLabel: 'Note',
 		noName: 'Untitled',
+		tab: {
+			characteristics: 'Characteristics',
+			biography: 'Biography',
+			appearance: 'Appearance',
+		},
+		avatar: {
+			set: 'Add photo',
+			tooltip: 'Click to set avatar',
+			placeholder: 'path/to/image.png',
+		},
 		addTag: '+ tag',
 		tagPlaceholder: 'tag…',
 		removeTag: 'Remove tag',
@@ -248,6 +264,7 @@ export const en: Locale = {
 	},
 	commands: {
 		openScenarist: 'Open Scenarist',
+		openInScenarist: 'Open in Scenarist',
 		openBoard: 'Open chapter board',
 		openGraph: 'Open relations graph',
 		newProject: 'New project',

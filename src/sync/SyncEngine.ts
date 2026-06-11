@@ -172,6 +172,30 @@ export class SyncEngine {
 	}
 
 	/**
+	 * Удаляет сущность из Store и перемещает её .md-файл в корзину.
+	 * Для категорий удаляет файлы всех дочерних элементов тоже.
+	 */
+	async deleteEntity(id: string): Promise<void> {
+		const ids: string[] = [id];
+		const entity = this.store.get(id);
+		if (entity?.kind === 'category') {
+			for (const item of this.store.categoryItems(id)) ids.push(item.id);
+		}
+
+		for (const eid of ids) {
+			const e = this.store.get(eid);
+			if (e?.filePath) {
+				const file = this.vault.getAbstractFileByPath(e.filePath);
+				if (file instanceof TFile) {
+					await this.plugin.app.fileManager.trashFile(file);
+				}
+			}
+		}
+
+		this.store.delete(id);
+	}
+
+	/**
 	 * Обрабатывает внешнее изменение .md файла.
 	 * Читает frontmatter через MetadataCache и обновляет Store.
 	 */

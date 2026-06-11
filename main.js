@@ -1294,6 +1294,28 @@ var SyncEngine = class {
       await this.plugin.app.workspace.getLeaf(false).openFile(file);
   }
   /**
+   * Удаляет сущность из Store и перемещает её .md-файл в корзину.
+   * Для категорий удаляет файлы всех дочерних элементов тоже.
+   */
+  async deleteEntity(id) {
+    const ids = [id];
+    const entity = this.store.get(id);
+    if ((entity == null ? void 0 : entity.kind) === "category") {
+      for (const item of this.store.categoryItems(id))
+        ids.push(item.id);
+    }
+    for (const eid of ids) {
+      const e = this.store.get(eid);
+      if (e == null ? void 0 : e.filePath) {
+        const file = this.vault.getAbstractFileByPath(e.filePath);
+        if (file instanceof import_obsidian2.TFile) {
+          await this.plugin.app.fileManager.trashFile(file);
+        }
+      }
+    }
+    this.store.delete(id);
+  }
+  /**
    * Обрабатывает внешнее изменение .md файла.
    * Читает frontmatter через MetadataCache и обновляет Store.
    */
@@ -2205,8 +2227,8 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     );
     menu.addSeparator();
     menu.addItem(
-      (i) => i.setTitle("\u0423\u0434\u0430\u043B\u0438\u0442\u044C").setIcon("trash").onClick(() => {
-        this.store.delete(entity.id);
+      (i) => i.setTitle("\u0423\u0434\u0430\u043B\u0438\u0442\u044C").setIcon("trash").onClick(async () => {
+        await this.plugin.sync.deleteEntity(entity.id);
         new import_obsidian6.Notice(`\u0423\u0434\u0430\u043B\u0435\u043D\u043E: ${entity.name}`);
       })
     );

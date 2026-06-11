@@ -543,8 +543,8 @@ export class NavigatorView extends ItemView {
 			i
 				.setTitle('Удалить')
 				.setIcon('trash')
-				.onClick(() => {
-					this.store.delete(entity.id);
+				.onClick(async () => {
+					await this.plugin.sync.deleteEntity(entity.id);
 					new Notice(`Удалено: ${entity.name}`);
 				})
 		);

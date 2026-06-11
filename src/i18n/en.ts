@@ -310,6 +310,7 @@ export const en: Locale = {
 		newWork: 'New work (Series/One-shot)',
 		newCharacter: 'New character',
 		newCategory: 'New category',
+		rescanVault: 'Rescan vault (update file paths)',
 		ribbon: 'Scenarist',
 	},
 	board: {

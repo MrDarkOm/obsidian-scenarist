@@ -270,6 +270,18 @@ export class ScenaristStore {
 		this.notify();
 	}
 
+	/**
+	 * Вставить сущность с уже известным ID (восстановление из frontmatter).
+	 * Не привязывает к активному проекту — данные берутся как есть.
+	 */
+	importEntity(entity: Entity): void {
+		if (this.entities.has(entity.id)) return;
+		this.entities.set(entity.id, entity);
+		this.indexAdd(entity);
+		this.scheduleSave();
+		this.notify();
+	}
+
 	schema(kind: EntityKind) {
 		return SCHEMAS[kind];
 	}

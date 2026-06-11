@@ -372,6 +372,7 @@ var ru = {
     newWork: "\u041D\u043E\u0432\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435 (\u0421\u0435\u0440\u0438\u044F/\u0412\u0430\u043D\u0448\u043E\u0442)",
     newCharacter: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436",
     newCategory: "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+    rescanVault: "\u041F\u0435\u0440\u0435\u0441\u043A\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u0442\u044C vault (\u043E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u043F\u0443\u0442\u0438 \u0444\u0430\u0439\u043B\u043E\u0432)",
     ribbon: "Scenarist"
   },
   board: {
@@ -742,6 +743,7 @@ var en = {
     newWork: "New work (Series/One-shot)",
     newCharacter: "New character",
     newCategory: "New category",
+    rescanVault: "Rescan vault (update file paths)",
     ribbon: "Scenarist"
   },
   board: {
@@ -1423,6 +1425,18 @@ var SCHEMAS = {
     links: [{ key: "works", label: "schema.categoryItem.links.works", target: "work" }]
   }
 };
+var KINDS = [
+  "project",
+  "work",
+  "book",
+  "arc",
+  "anchor",
+  "chapter",
+  "page",
+  "character",
+  "category",
+  "categoryItem"
+];
 var CATEGORY_PRESETS = {
   organization: {
     icon: "building-2",
@@ -1768,6 +1782,18 @@ var ScenaristStore = class {
     this.entities.delete(id);
     if (this.activeProjectId === id)
       this.activeProjectId = NO_PROJECT;
+    this.scheduleSave();
+    this.notify();
+  }
+  /**
+   * Вставить сущность с уже известным ID (восстановление из frontmatter).
+   * Не привязывает к активному проекту — данные берутся как есть.
+   */
+  importEntity(entity) {
+    if (this.entities.has(entity.id))
+      return;
+    this.entities.set(entity.id, entity);
+    this.indexAdd(entity);
     this.scheduleSave();
     this.notify();
   }
@@ -2173,8 +2199,93 @@ var SyncEngine = class {
   }
   handleRename(file, oldPath) {
     const entity = this.store.findByPath(oldPath);
-    if (entity)
+    if (entity) {
       this.store.setFilePath(entity.id, file.path);
+      this.plugin.refreshViews();
+    }
+  }
+  /**
+   * Вызывается при создании файла в vault (например, скопирован снаружи).
+   * MetadataCache может ещё не проиндексировать файл, поэтому откладываем на 600 мс.
+   */
+  handleCreate(file) {
+    window.setTimeout(() => void this.processCreatedFile(file), 600);
+  }
+  /**
+   * Сканирует все .md-файлы vault:
+   * - обновляет filePath для сущностей, у которых путь устарел;
+   * - импортирует сущности из файлов с scenarist_id, которых нет в индексе.
+   */
+  async rescanVault() {
+    var _a;
+    const { metadataCache, vault } = this.plugin.app;
+    const files = vault.getMarkdownFiles();
+    let changed = false;
+    for (const file of files) {
+      const fm = (_a = metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
+      if (!(fm == null ? void 0 : fm.scenarist_id))
+        continue;
+      const id = String(fm.scenarist_id);
+      const existing = this.store.get(id);
+      if (existing) {
+        if (existing.filePath !== file.path) {
+          this.store.setFilePath(id, file.path);
+          changed = true;
+        }
+      } else if (fm.kind) {
+        this.importEntityFromFm(file, fm);
+        changed = true;
+      }
+    }
+    if (changed)
+      this.plugin.refreshViews();
+  }
+  // ---- private helpers ----
+  async processCreatedFile(file) {
+    var _a;
+    const fm = (_a = this.plugin.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
+    if (!(fm == null ? void 0 : fm.scenarist_id))
+      return;
+    const id = String(fm.scenarist_id);
+    const existing = this.store.get(id);
+    if (existing) {
+      if (existing.filePath !== file.path) {
+        this.store.setFilePath(id, file.path);
+        this.plugin.refreshViews();
+      }
+    } else if (fm.kind) {
+      this.importEntityFromFm(file, fm);
+      this.plugin.refreshViews();
+    }
+  }
+  /**
+   * Восстанавливает сущность из frontmatter файла и добавляет её в Store.
+   * Связи не восстанавливаются (требуют разрешения имён), поля — восстанавливаются.
+   */
+  importEntityFromFm(file, fm) {
+    const kind = fm.kind;
+    if (!KINDS.includes(kind))
+      return;
+    const id = String(fm.scenarist_id);
+    const schema = SCHEMAS[kind];
+    const props = {};
+    for (const field of schema.fields) {
+      const v = fm[field.key];
+      if (v !== void 0 && v !== null) {
+        props[field.key] = v;
+      }
+    }
+    const entity = {
+      id,
+      kind,
+      name: file.basename,
+      filePath: file.path,
+      props,
+      links: {},
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    this.store.importEntity(entity);
   }
   // ---- helpers ----
   async ensureFolder(filePath) {
@@ -4393,10 +4504,22 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
           this.sync.handleRename(file, oldPath);
       })
     );
+    this.registerEvent(
+      this.app.vault.on("create", (file) => {
+        if (file instanceof import_obsidian11.TFile)
+          this.sync.handleCreate(file);
+      })
+    );
+    this.addCommand({
+      id: "rescan-vault",
+      name: t("commands.rescanVault"),
+      callback: () => void this.sync.rescanVault()
+    });
     this.app.workspace.onLayoutReady(() => {
       if (this.app.workspace.getLeavesOfType(NAVIGATOR_VIEW).length === 0)
         this.activateLayout();
       this.injectMarkdownButtons();
+      void this.sync.rescanVault();
     });
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.injectMarkdownButtons()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.injectMarkdownButtons()));

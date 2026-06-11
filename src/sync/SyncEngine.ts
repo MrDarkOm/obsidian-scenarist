@@ -1,6 +1,6 @@
 import { TFile, normalizePath } from 'obsidian';
-import { Entity } from '../models/types';
-import { SCHEMAS } from '../models/schema';
+import { Entity, EntityKind } from '../models/types';
+import { KINDS, SCHEMAS } from '../models/schema';
 import { bodyTemplate } from '../templates';
 import type ScenaristPlugin from '../main';
 
@@ -224,7 +224,102 @@ export class SyncEngine {
 
 	handleRename(file: TFile, oldPath: string): void {
 		const entity = this.store.findByPath(oldPath);
-		if (entity) this.store.setFilePath(entity.id, file.path);
+		if (entity) {
+			this.store.setFilePath(entity.id, file.path);
+			this.plugin.refreshViews();
+		}
+	}
+
+	/**
+	 * Вызывается при создании файла в vault (например, скопирован снаружи).
+	 * MetadataCache может ещё не проиндексировать файл, поэтому откладываем на 600 мс.
+	 */
+	handleCreate(file: TFile): void {
+		window.setTimeout(() => void this.processCreatedFile(file), 600);
+	}
+
+	/**
+	 * Сканирует все .md-файлы vault:
+	 * - обновляет filePath для сущностей, у которых путь устарел;
+	 * - импортирует сущности из файлов с scenarist_id, которых нет в индексе.
+	 */
+	async rescanVault(): Promise<void> {
+		const { metadataCache, vault } = this.plugin.app;
+		const files = vault.getMarkdownFiles();
+		let changed = false;
+
+		for (const file of files) {
+			const fm = metadataCache.getFileCache(file)?.frontmatter;
+			if (!fm?.scenarist_id) continue;
+
+			const id = String(fm.scenarist_id);
+			const existing = this.store.get(id);
+
+			if (existing) {
+				if (existing.filePath !== file.path) {
+					this.store.setFilePath(id, file.path);
+					changed = true;
+				}
+			} else if (fm.kind) {
+				this.importEntityFromFm(file, fm as Record<string, unknown>);
+				changed = true;
+			}
+		}
+
+		if (changed) this.plugin.refreshViews();
+	}
+
+	// ---- private helpers ----
+
+	private async processCreatedFile(file: TFile): Promise<void> {
+		const fm = this.plugin.app.metadataCache.getFileCache(file)?.frontmatter;
+		if (!fm?.scenarist_id) return;
+
+		const id = String(fm.scenarist_id);
+		const existing = this.store.get(id);
+
+		if (existing) {
+			if (existing.filePath !== file.path) {
+				this.store.setFilePath(id, file.path);
+				this.plugin.refreshViews();
+			}
+		} else if (fm.kind) {
+			this.importEntityFromFm(file, fm as Record<string, unknown>);
+			this.plugin.refreshViews();
+		}
+	}
+
+	/**
+	 * Восстанавливает сущность из frontmatter файла и добавляет её в Store.
+	 * Связи не восстанавливаются (требуют разрешения имён), поля — восстанавливаются.
+	 */
+	private importEntityFromFm(file: TFile, fm: Record<string, unknown>): void {
+		const kind = fm.kind as EntityKind;
+		if (!KINDS.includes(kind)) return;
+
+		const id = String(fm.scenarist_id);
+		const schema = SCHEMAS[kind];
+
+		const props: Record<string, string | number | boolean | null> = {};
+		for (const field of schema.fields) {
+			const v = fm[field.key];
+			if (v !== undefined && v !== null) {
+				props[field.key] = v as string | number | boolean | null;
+			}
+		}
+
+		const entity: Entity = {
+			id,
+			kind,
+			name: file.basename,
+			filePath: file.path,
+			props,
+			links: {},
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
+		};
+
+		this.store.importEntity(entity);
 	}
 
 	// ---- helpers ----

@@ -308,6 +308,7 @@ export const ru = {
 		newWork: 'Новое произведение (Серия/Ваншот)',
 		newCharacter: 'Новый персонаж',
 		newCategory: 'Новая категория',
+		rescanVault: 'Пересканировать vault (обновить пути файлов)',
 		ribbon: 'Scenarist',
 	},
 	board: {

@@ -88,10 +88,22 @@ export default class ScenaristPlugin extends Plugin {
 				if (file instanceof TFile) this.sync.handleRename(file, oldPath);
 			})
 		);
+		this.registerEvent(
+			this.app.vault.on('create', (file: TAbstractFile) => {
+				if (file instanceof TFile) this.sync.handleCreate(file);
+			})
+		);
+
+		this.addCommand({
+			id: 'rescan-vault',
+			name: t('commands.rescanVault'),
+			callback: () => void this.sync.rescanVault(),
+		});
 
 		this.app.workspace.onLayoutReady(() => {
 			if (this.app.workspace.getLeavesOfType(NAVIGATOR_VIEW).length === 0) this.activateLayout();
 			this.injectMarkdownButtons();
+			void this.sync.rescanVault();
 		});
 
 		this.registerEvent(this.app.workspace.on('active-leaf-change', () => this.injectMarkdownButtons()));

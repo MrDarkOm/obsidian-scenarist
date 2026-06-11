@@ -11,7 +11,7 @@ import { TimelineView, TIMELINE_VIEW } from './views/TimelineView';
 import { CreateEntityModal } from './modals/CreateEntityModal';
 import { CreateWorkModal } from './modals/CreateWorkModal';
 import { CreateCategoryModal } from './modals/CreateCategoryModal';
-import { setLocale, t } from './i18n';
+import { setLocale, detectLang, t } from './i18n';
 
 export default class ScenaristPlugin extends Plugin {
 	settings: ScenaristSettings;
@@ -30,7 +30,7 @@ export default class ScenaristPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-		setLocale(this.settings.language || 'ru');
+		setLocale(detectLang());
 
 		this.store = new ScenaristStore(this);
 		this.sync = new SyncEngine(this);

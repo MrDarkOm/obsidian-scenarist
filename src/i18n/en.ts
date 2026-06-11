@@ -245,8 +245,6 @@ export const en: Locale = {
 		addCustomTypeBtn: '＋ Add',
 		editTooltip: 'Edit',
 		deleteTooltip: 'Delete',
-		language: 'Interface language',
-		languageDesc: 'Display language for the Scenarist plugin',
 	},
 	commands: {
 		openScenarist: 'Open Scenarist',

@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting, Modal, Notice, setIcon } from 'obsidian';
 import type ScenaristPlugin from './main';
 import { CategoryPreset } from './models/types';
-import { t, setLocale } from './i18n';
+import { t } from './i18n';
 
 export interface QuickCategoryType {
 	id: string;
@@ -21,8 +21,6 @@ export interface ScenaristSettings {
 	genreOptions: string[];
 	/** Последний открытый entity — восстанавливается при следующем запуске. */
 	lastSelectedId?: string;
-	/** Язык интерфейса плагина ('ru' | 'en'). */
-	language: string;
 }
 
 export const DEFAULT_QUICK_TYPES: QuickCategoryType[] = [
@@ -49,7 +47,6 @@ export const DEFAULT_SETTINGS: ScenaristSettings = {
 	autoCreateNotes: true,
 	categoryQuickTypes: DEFAULT_QUICK_TYPES.map((qt) => ({ ...qt })),
 	genreOptions: [...DEFAULT_GENRE_OPTIONS],
-	language: 'ru',
 };
 
 // -------------------------------------------------------
@@ -68,23 +65,6 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 		containerEl.createEl('h2', { text: t('settings.title') });
 
 		containerEl.createEl('h3', { text: t('settings.general') });
-
-		new Setting(containerEl)
-			.setName(t('settings.language'))
-			.setDesc(t('settings.languageDesc'))
-			.addDropdown((drop) =>
-				drop
-					.addOption('ru', 'Русский')
-					.addOption('en', 'English')
-					.setValue(this.plugin.settings.language || 'ru')
-					.onChange(async (value) => {
-						this.plugin.settings.language = value;
-						setLocale(value);
-						await this.plugin.saveSettings();
-						this.plugin.refreshAllViews();
-						this.display();
-					})
-			);
 
 		new Setting(containerEl)
 			.setName(t('settings.rootFolder'))

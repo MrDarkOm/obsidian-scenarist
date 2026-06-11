@@ -272,9 +272,7 @@ var ru = {
     addCustomTypeDesc: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0438\u043A\u043E\u043D\u043A\u0443 \u0438 \u0437\u0430\u0434\u0430\u0439\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
     addCustomTypeBtn: "\uFF0B \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
     editTooltip: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
-    deleteTooltip: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C",
-    language: "\u042F\u0437\u044B\u043A \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430",
-    languageDesc: "\u042F\u0437\u044B\u043A \u043E\u0442\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u043F\u043B\u0430\u0433\u0438\u043D\u0430 Scenarist"
+    deleteTooltip: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C"
   },
   commands: {
     openScenarist: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C Scenarist",
@@ -554,9 +552,7 @@ var en = {
     addCustomTypeDesc: "Choose an icon and set a name",
     addCustomTypeBtn: "\uFF0B Add",
     editTooltip: "Edit",
-    deleteTooltip: "Delete",
-    language: "Interface language",
-    languageDesc: "Display language for the Scenarist plugin"
+    deleteTooltip: "Delete"
   },
   commands: {
     openScenarist: "Open Scenarist",
@@ -595,6 +591,11 @@ var en = {
 var LOCALES = { ru, en };
 var translations = ru;
 var currentLang = "ru";
+function detectLang() {
+  var _a, _b, _c, _d;
+  const locale = (_c = (_b = (_a = window.moment) == null ? void 0 : _a.locale) == null ? void 0 : _b.call(_a)) != null ? _c : "en";
+  return (_d = Object.keys(LOCALES).find((l) => locale.startsWith(l))) != null ? _d : "en";
+}
 function setLocale(lang) {
   var _a;
   translations = (_a = LOCALES[lang]) != null ? _a : ru;
@@ -640,8 +641,7 @@ var DEFAULT_SETTINGS = {
   rootFolder: "Scenarist",
   autoCreateNotes: true,
   categoryQuickTypes: DEFAULT_QUICK_TYPES.map((qt) => ({ ...qt })),
-  genreOptions: [...DEFAULT_GENRE_OPTIONS],
-  language: "ru"
+  genreOptions: [...DEFAULT_GENRE_OPTIONS]
 };
 var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
@@ -653,15 +653,6 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
     containerEl.empty();
     containerEl.createEl("h2", { text: t("settings.title") });
     containerEl.createEl("h3", { text: t("settings.general") });
-    new import_obsidian.Setting(containerEl).setName(t("settings.language")).setDesc(t("settings.languageDesc")).addDropdown(
-      (drop) => drop.addOption("ru", "\u0420\u0443\u0441\u0441\u043A\u0438\u0439").addOption("en", "English").setValue(this.plugin.settings.language || "ru").onChange(async (value) => {
-        this.plugin.settings.language = value;
-        setLocale(value);
-        await this.plugin.saveSettings();
-        this.plugin.refreshAllViews();
-        this.display();
-      })
-    );
     new import_obsidian.Setting(containerEl).setName(t("settings.rootFolder")).setDesc(t("settings.rootFolderDesc")).addText(
       (text) => text.setPlaceholder("Scenarist").setValue(this.plugin.settings.rootFolder).onChange(async (value) => {
         this.plugin.settings.rootFolder = value.trim() || "Scenarist";
@@ -3882,7 +3873,7 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
   }
   async onload() {
     await this.loadSettings();
-    setLocale(this.settings.language || "ru");
+    setLocale(detectLang());
     this.store = new ScenaristStore(this);
     this.sync = new SyncEngine(this);
     this.state = new ScenaristState(this);

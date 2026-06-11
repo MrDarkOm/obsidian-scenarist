@@ -6,6 +6,12 @@ const LOCALES: Record<string, typeof ru> = { ru, en };
 let translations: typeof ru = ru;
 let currentLang = 'ru';
 
+/** Определяет язык по локали Obsidian (window.moment.locale()). */
+export function detectLang(): string {
+	const locale: string = (window as any).moment?.locale?.() ?? 'en';
+	return Object.keys(LOCALES).find((l) => locale.startsWith(l)) ?? 'en';
+}
+
 export function setLocale(lang: string): void {
 	translations = LOCALES[lang] ?? ru;
 	currentLang = LOCALES[lang] ? lang : 'ru';

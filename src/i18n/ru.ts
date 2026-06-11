@@ -243,8 +243,6 @@ export const ru = {
 		addCustomTypeBtn: '＋ Добавить',
 		editTooltip: 'Редактировать',
 		deleteTooltip: 'Удалить',
-		language: 'Язык интерфейса',
-		languageDesc: 'Язык отображения плагина Scenarist',
 	},
 	commands: {
 		openScenarist: 'Открыть Scenarist',

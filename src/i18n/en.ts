@@ -172,8 +172,13 @@ export const en: Locale = {
 		},
 		avatar: {
 			set: 'Add photo',
-			tooltip: 'Click to set avatar',
-			placeholder: 'path/to/image.png',
+			tooltip: 'Click to upload a photo',
+			remove: 'Remove avatar',
+		},
+		gallery: {
+			title: 'References & sketches',
+			add: 'Add',
+			empty: 'No images yet',
 		},
 		addTag: '+ tag',
 		tagPlaceholder: 'tag…',

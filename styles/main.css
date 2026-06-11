@@ -630,17 +630,91 @@
   padding: 0 6px;
   line-height: 1.3;
 }
-.scenarist-char-avatar-inp {
+/* delete button overlay on avatar */
+.scenarist-char-avatar-del {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  color: #fff;
+  z-index: 2;
+}
+.scenarist-char-avatar-del svg { width: 11px; height: 11px; }
+.scenarist-char-avatar:hover .scenarist-char-avatar-del { opacity: 1; }
+
+/* ---- image gallery ---- */
+.scenarist-img-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.scenarist-img-cell {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+.scenarist-img-cell:hover { border-color: var(--interactive-accent); }
+.scenarist-img-thumb {
   width: 100%;
   height: 100%;
-  padding: 6px;
-  font-size: 10px;
-  box-sizing: border-box;
-  border: none;
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  outline: none;
-  text-align: center;
+  object-fit: cover;
+  display: block;
+}
+.scenarist-img-del {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  color: #fff;
+  z-index: 2;
+}
+.scenarist-img-del svg { width: 11px; height: 11px; }
+.scenarist-img-cell:hover .scenarist-img-del { opacity: 1; }
+
+/* ---- lightbox ---- */
+.scenarist-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+.scenarist-lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 10px;
+  object-fit: contain;
+  cursor: default;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.6);
 }
 
 /* ---- character tabs ---- */

@@ -200,8 +200,13 @@ var ru = {
     },
     avatar: {
       set: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0444\u043E\u0442\u043E",
-      tooltip: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0447\u0442\u043E\u0431\u044B \u0437\u0430\u0434\u0430\u0442\u044C \u0430\u0432\u0430\u0442\u0430\u0440",
-      placeholder: "\u043F\u0443\u0442\u044C/\u043A/\u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044E.png"
+      tooltip: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0447\u0442\u043E\u0431\u044B \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0444\u043E\u0442\u043E",
+      remove: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0430\u0432\u0430\u0442\u0430\u0440"
+    },
+    gallery: {
+      title: "\u0420\u0435\u0444\u0435\u0440\u0435\u043D\u0441\u044B \u0438 \u043D\u0430\u0431\u0440\u043E\u0441\u043A\u0438",
+      add: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
+      empty: "\u041D\u0435\u0442 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439"
     },
     addTag: "+ \u0442\u0435\u0433",
     tagPlaceholder: "\u0442\u0435\u0433\u2026",
@@ -497,8 +502,13 @@ var en = {
     },
     avatar: {
       set: "Add photo",
-      tooltip: "Click to set avatar",
-      placeholder: "path/to/image.png"
+      tooltip: "Click to upload a photo",
+      remove: "Remove avatar"
+    },
+    gallery: {
+      title: "References & sketches",
+      add: "Add",
+      empty: "No images yet"
     },
     addTag: "+ tag",
     tagPlaceholder: "tag\u2026",
@@ -3431,46 +3441,142 @@ var CardView = class extends import_obsidian7.ItemView {
   renderAvatarBox(titleRow, entity) {
     const avatarVal = entity.props["avatar"] ? String(entity.props["avatar"]) : null;
     const box = titleRow.createDiv("scenarist-char-avatar");
-    const showContent = () => {
-      box.empty();
-      if (avatarVal) {
-        const file = this.plugin.app.vault.getAbstractFileByPath(avatarVal);
-        if (file instanceof import_obsidian7.TFile) {
-          const url = this.plugin.app.vault.getResourcePath(file);
-          box.createEl("img", {
-            cls: "scenarist-char-avatar-img",
-            attr: { src: url, alt: entity.name }
-          });
-          return;
-        }
+    if (avatarVal) {
+      const file = this.plugin.app.vault.getAbstractFileByPath(avatarVal);
+      if (file instanceof import_obsidian7.TFile) {
+        const url = this.plugin.app.vault.getResourcePath(file);
+        box.createEl("img", { cls: "scenarist-char-avatar-img", attr: { src: url, alt: entity.name } });
+        const del = box.createDiv("scenarist-char-avatar-del");
+        (0, import_obsidian7.setIcon)(del, "x");
+        del.title = t("card.avatar.remove");
+        del.onclick = (e) => {
+          e.stopPropagation();
+          this.commitProp(entity, "avatar", null);
+        };
+      } else {
+        this.renderAvatarPlaceholder(box);
       }
-      const ph = box.createDiv("scenarist-char-avatar-ph");
-      (0, import_obsidian7.setIcon)(ph, "image");
-      box.createEl("span", { cls: "scenarist-char-avatar-hint", text: t("card.avatar.set") });
-    };
-    showContent();
+    } else {
+      this.renderAvatarPlaceholder(box);
+    }
     box.title = t("card.avatar.tooltip");
-    box.onclick = () => {
-      box.empty();
-      const inp = box.createEl("input", { cls: "scenarist-char-avatar-inp" });
-      inp.placeholder = t("card.avatar.placeholder");
-      inp.value = avatarVal || "";
-      inp.focus();
-      inp.select();
-      const commit = () => {
-        const v = inp.value.trim();
-        this.commitProp(entity, "avatar", v || null);
+    box.onclick = (e) => {
+      if (e.target.closest(".scenarist-char-avatar-del"))
+        return;
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = async () => {
+        var _a;
+        const file = (_a = input.files) == null ? void 0 : _a[0];
+        if (!file)
+          return;
+        const path = await this.saveImageToVault(entity, file);
+        if (path)
+          this.commitProp(entity, "avatar", path);
       };
-      inp.addEventListener("keydown", (e) => {
-        if (e.key === "Enter")
-          commit();
-        if (e.key === "Escape") {
-          box.empty();
-          showContent();
-        }
-      });
-      inp.addEventListener("blur", commit);
+      input.click();
     };
+  }
+  renderAvatarPlaceholder(box) {
+    const ph = box.createDiv("scenarist-char-avatar-ph");
+    (0, import_obsidian7.setIcon)(ph, "image");
+    box.createEl("span", { cls: "scenarist-char-avatar-hint", text: t("card.avatar.set") });
+  }
+  // ---- сохранение изображения в vault ----
+  async saveImageToVault(entity, file) {
+    if (!entity.filePath)
+      return null;
+    try {
+      const folderPath = entity.filePath.replace(/\.md$/, "");
+      if (!this.plugin.app.vault.getAbstractFileByPath(folderPath)) {
+        await this.plugin.app.vault.createFolder(folderPath);
+      }
+      let destPath = `${folderPath}/${file.name}`;
+      if (this.plugin.app.vault.getAbstractFileByPath(destPath)) {
+        const dot = file.name.lastIndexOf(".");
+        const ext = dot !== -1 ? file.name.slice(dot) : "";
+        const base = dot !== -1 ? file.name.slice(0, dot) : file.name;
+        destPath = `${folderPath}/${base}_${Date.now()}${ext}`;
+      }
+      const buffer = await file.arrayBuffer();
+      await this.plugin.app.vault.createBinary(destPath, buffer);
+      return destPath;
+    } catch (e) {
+      return null;
+    }
+  }
+  // ---- лайтбокс ----
+  openLightbox(url) {
+    const overlay = document.createElement("div");
+    overlay.className = "scenarist-lightbox";
+    const close = () => {
+      overlay.remove();
+      document.removeEventListener("keydown", onKey);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape")
+        close();
+    };
+    overlay.onclick = close;
+    const img = document.createElement("img");
+    img.className = "scenarist-lightbox-img";
+    img.src = url;
+    img.onclick = (e) => e.stopPropagation();
+    overlay.appendChild(img);
+    document.addEventListener("keydown", onKey);
+    document.body.appendChild(overlay);
+  }
+  // ---- галерея изображений ----
+  renderImageGallery(container, entity) {
+    const rawVal = entity.props["references"] ? String(entity.props["references"]) : "";
+    const paths = rawVal.split(",").map((p) => p.trim()).filter(Boolean);
+    const section = container.createDiv("scenarist-card-section");
+    const head = section.createDiv("scenarist-card-body-head");
+    head.createEl("div", { cls: "scenarist-card-section-title", text: t("card.gallery.title") });
+    const addBtn = head.createEl("button", { cls: "scenarist-card-edit-btn" });
+    (0, import_obsidian7.setIcon)(addBtn, "plus");
+    addBtn.createEl("span", { text: t("card.gallery.add") });
+    addBtn.onclick = () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.multiple = true;
+      input.onchange = async () => {
+        const files = Array.from(input.files || []);
+        if (!files.length)
+          return;
+        const newPaths = [...paths];
+        for (const f of files) {
+          const p = await this.saveImageToVault(entity, f);
+          if (p)
+            newPaths.push(p);
+        }
+        this.commitProp(entity, "references", newPaths.join(", ") || null);
+      };
+      input.click();
+    };
+    const grid = section.createDiv("scenarist-img-gallery");
+    if (paths.length === 0) {
+      grid.createEl("span", { cls: "scenarist-muted", text: t("card.gallery.empty") });
+      return;
+    }
+    for (const imgPath of paths) {
+      const file = this.plugin.app.vault.getAbstractFileByPath(imgPath);
+      if (!(file instanceof import_obsidian7.TFile))
+        continue;
+      const url = this.plugin.app.vault.getResourcePath(file);
+      const cell = grid.createDiv("scenarist-img-cell");
+      const img = cell.createEl("img", { cls: "scenarist-img-thumb", attr: { src: url } });
+      img.onclick = () => this.openLightbox(url);
+      const del = cell.createDiv("scenarist-img-del");
+      (0, import_obsidian7.setIcon)(del, "x");
+      del.onclick = (e) => {
+        e.stopPropagation();
+        const next = paths.filter((p) => p !== imgPath);
+        this.commitProp(entity, "references", next.join(", ") || null);
+      };
+    }
   }
   // ---- вкладки персонажа ----
   async renderCharacterTabs(card, entity) {
@@ -3529,6 +3635,7 @@ var CardView = class extends import_obsidian7.ItemView {
         this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
       }
     }
+    this.renderImageGallery(sections["appearance"], entity);
     setTab(this._charTab);
   }
   // ---- тело ----

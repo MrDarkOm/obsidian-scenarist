@@ -639,48 +639,148 @@ export class CardView extends ItemView {
 		const avatarVal = entity.props['avatar'] ? String(entity.props['avatar']) : null;
 		const box = titleRow.createDiv('scenarist-char-avatar');
 
-		const showContent = () => {
-			box.empty();
-			if (avatarVal) {
-				const file = this.plugin.app.vault.getAbstractFileByPath(avatarVal);
-				if (file instanceof TFile) {
-					const url = this.plugin.app.vault.getResourcePath(file);
-					box.createEl('img', {
-						cls: 'scenarist-char-avatar-img',
-						attr: { src: url, alt: entity.name },
-					});
-					return;
-				}
+		if (avatarVal) {
+			const file = this.plugin.app.vault.getAbstractFileByPath(avatarVal);
+			if (file instanceof TFile) {
+				const url = this.plugin.app.vault.getResourcePath(file);
+				box.createEl('img', { cls: 'scenarist-char-avatar-img', attr: { src: url, alt: entity.name } });
+				const del = box.createDiv('scenarist-char-avatar-del');
+				setIcon(del, 'x');
+				del.title = t('card.avatar.remove');
+				del.onclick = (e) => {
+					e.stopPropagation();
+					this.commitProp(entity, 'avatar', null);
+				};
+			} else {
+				this.renderAvatarPlaceholder(box);
 			}
-			const ph = box.createDiv('scenarist-char-avatar-ph');
-			setIcon(ph, 'image');
-			box.createEl('span', { cls: 'scenarist-char-avatar-hint', text: t('card.avatar.set') });
-		};
-
-		showContent();
+		} else {
+			this.renderAvatarPlaceholder(box);
+		}
 
 		box.title = t('card.avatar.tooltip');
-		box.onclick = () => {
-			box.empty();
-			const inp = box.createEl('input', { cls: 'scenarist-char-avatar-inp' });
-			inp.placeholder = t('card.avatar.placeholder');
-			inp.value = avatarVal || '';
-			inp.focus();
-			inp.select();
-
-			const commit = () => {
-				const v = inp.value.trim();
-				this.commitProp(entity, 'avatar', v || null);
+		box.onclick = (e) => {
+			if ((e.target as HTMLElement).closest('.scenarist-char-avatar-del')) return;
+			const input = document.createElement('input');
+			input.type = 'file';
+			input.accept = 'image/*';
+			input.onchange = async () => {
+				const file = input.files?.[0];
+				if (!file) return;
+				const path = await this.saveImageToVault(entity, file);
+				if (path) this.commitProp(entity, 'avatar', path);
 			};
-			inp.addEventListener('keydown', (e) => {
-				if (e.key === 'Enter') commit();
-				if (e.key === 'Escape') {
-					box.empty();
-					showContent();
-				}
-			});
-			inp.addEventListener('blur', commit);
+			input.click();
 		};
+	}
+
+	private renderAvatarPlaceholder(box: HTMLElement) {
+		const ph = box.createDiv('scenarist-char-avatar-ph');
+		setIcon(ph, 'image');
+		box.createEl('span', { cls: 'scenarist-char-avatar-hint', text: t('card.avatar.set') });
+	}
+
+	// ---- сохранение изображения в vault ----
+	private async saveImageToVault(entity: Entity, file: File): Promise<string | null> {
+		if (!entity.filePath) return null;
+		try {
+			const folderPath = entity.filePath.replace(/\.md$/, '');
+			if (!this.plugin.app.vault.getAbstractFileByPath(folderPath)) {
+				await this.plugin.app.vault.createFolder(folderPath);
+			}
+			let destPath = `${folderPath}/${file.name}`;
+			if (this.plugin.app.vault.getAbstractFileByPath(destPath)) {
+				const dot = file.name.lastIndexOf('.');
+				const ext = dot !== -1 ? file.name.slice(dot) : '';
+				const base = dot !== -1 ? file.name.slice(0, dot) : file.name;
+				destPath = `${folderPath}/${base}_${Date.now()}${ext}`;
+			}
+			const buffer = await file.arrayBuffer();
+			await this.plugin.app.vault.createBinary(destPath, buffer);
+			return destPath;
+		} catch {
+			return null;
+		}
+	}
+
+	// ---- лайтбокс ----
+	private openLightbox(url: string) {
+		const overlay = document.createElement('div');
+		overlay.className = 'scenarist-lightbox';
+
+		const close = () => {
+			overlay.remove();
+			document.removeEventListener('keydown', onKey);
+		};
+		const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+
+		overlay.onclick = close;
+
+		const img = document.createElement('img');
+		img.className = 'scenarist-lightbox-img';
+		img.src = url;
+		img.onclick = (e) => e.stopPropagation();
+		overlay.appendChild(img);
+
+		document.addEventListener('keydown', onKey);
+		document.body.appendChild(overlay);
+	}
+
+	// ---- галерея изображений ----
+	private renderImageGallery(container: HTMLElement, entity: Entity) {
+		const rawVal = entity.props['references'] ? String(entity.props['references']) : '';
+		const paths = rawVal.split(',').map((p) => p.trim()).filter(Boolean);
+
+		const section = container.createDiv('scenarist-card-section');
+		const head = section.createDiv('scenarist-card-body-head');
+		head.createEl('div', { cls: 'scenarist-card-section-title', text: t('card.gallery.title') });
+
+		const addBtn = head.createEl('button', { cls: 'scenarist-card-edit-btn' });
+		setIcon(addBtn, 'plus');
+		addBtn.createEl('span', { text: t('card.gallery.add') });
+		addBtn.onclick = () => {
+			const input = document.createElement('input');
+			input.type = 'file';
+			input.accept = 'image/*';
+			input.multiple = true;
+			input.onchange = async () => {
+				const files = Array.from(input.files || []);
+				if (!files.length) return;
+				const newPaths = [...paths];
+				for (const f of files) {
+					const p = await this.saveImageToVault(entity, f);
+					if (p) newPaths.push(p);
+				}
+				this.commitProp(entity, 'references', newPaths.join(', ') || null);
+			};
+			input.click();
+		};
+
+		const grid = section.createDiv('scenarist-img-gallery');
+
+		if (paths.length === 0) {
+			grid.createEl('span', { cls: 'scenarist-muted', text: t('card.gallery.empty') });
+			return;
+		}
+
+		for (const imgPath of paths) {
+			const file = this.plugin.app.vault.getAbstractFileByPath(imgPath);
+			if (!(file instanceof TFile)) continue;
+
+			const url = this.plugin.app.vault.getResourcePath(file);
+			const cell = grid.createDiv('scenarist-img-cell');
+
+			const img = cell.createEl('img', { cls: 'scenarist-img-thumb', attr: { src: url } });
+			img.onclick = () => this.openLightbox(url);
+
+			const del = cell.createDiv('scenarist-img-del');
+			setIcon(del, 'x');
+			del.onclick = (e) => {
+				e.stopPropagation();
+				const next = paths.filter((p) => p !== imgPath);
+				this.commitProp(entity, 'references', next.join(', ') || null);
+			};
+		}
 	}
 
 	// ---- вкладки персонажа ----
@@ -750,6 +850,7 @@ export class CardView extends ItemView {
 				this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
 			}
 		}
+		this.renderImageGallery(sections['appearance'], entity);
 
 		setTab(this._charTab);
 	}

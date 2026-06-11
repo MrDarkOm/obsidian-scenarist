@@ -170,8 +170,13 @@ export const ru = {
 		},
 		avatar: {
 			set: 'Добавить фото',
-			tooltip: 'Нажмите чтобы задать аватар',
-			placeholder: 'путь/к/изображению.png',
+			tooltip: 'Нажмите чтобы загрузить фото',
+			remove: 'Удалить аватар',
+		},
+		gallery: {
+			title: 'Референсы и наброски',
+			add: 'Добавить',
+			empty: 'Нет изображений',
 		},
 		addTag: '+ тег',
 		tagPlaceholder: 'тег…',

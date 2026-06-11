@@ -26,6 +26,599 @@ var import_obsidian11 = require("obsidian");
 
 // src/settings.ts
 var import_obsidian = require("obsidian");
+
+// src/i18n/ru.ts
+var ru = {
+  schema: {
+    project: {
+      label: "\u041F\u0440\u043E\u0435\u043A\u0442",
+      labelPlural: "\u041F\u0440\u043E\u0435\u043A\u0442\u044B",
+      fields: { summary: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435" },
+      links: {}
+    },
+    work: {
+      label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435",
+      labelPlural: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
+      fields: { format: "\u0424\u043E\u0440\u043C\u0430\u0442", type: "\u0422\u0438\u043F", status: "\u0421\u0442\u0430\u0442\u0443\u0441", summary: "\u041A\u0440\u0430\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435" },
+      links: { project: "\u041F\u0440\u043E\u0435\u043A\u0442", books: "\u041A\u043D\u0438\u0433\u0438", arcs: "\u0410\u0440\u043A\u0438", anchors: "\u042F\u043A\u043E\u0440\u044F" }
+    },
+    book: {
+      label: "\u041A\u043D\u0438\u0433\u0430",
+      labelPlural: "\u041A\u043D\u0438\u0433\u0438",
+      fields: {
+        genre: "\u0416\u0430\u043D\u0440",
+        format: "\u0424\u043E\u0440\u043C\u0430\u0442",
+        audience: "\u0412\u043E\u0437\u0440\u0430\u0441\u0442\u043D\u0430\u044F \u0430\u0443\u0434\u0438\u0442\u043E\u0440\u0438\u044F",
+        idea: "\u0418\u0434\u0435\u044F",
+        synopsis: "\u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441",
+        completed: "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E"
+      },
+      links: { work: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", chapters: "\u0413\u043B\u0430\u0432\u044B" }
+    },
+    arc: {
+      label: "\u0410\u0440\u043A\u0430",
+      labelPlural: "\u0410\u0440\u043A\u0438",
+      fields: { goal: "\u0426\u0435\u043B\u044C", description: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435" },
+      links: {
+        work: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435",
+        books: "\u041A\u043D\u0438\u0433\u0438",
+        chapters: "\u0413\u043B\u0430\u0432\u044B",
+        anchors: "\u042F\u043A\u043E\u0440\u044F",
+        keyCharacters: "\u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438"
+      }
+    },
+    anchor: {
+      label: "\u042F\u043A\u043E\u0440\u044C",
+      labelPlural: "\u042F\u043A\u043E\u0440\u044F",
+      fields: {
+        description: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F",
+        date: "\u0414\u0430\u0442\u0430 / \u043C\u043E\u043C\u0435\u043D\u0442",
+        order: "\u041F\u043E\u0440\u044F\u0434\u043E\u043A \u043D\u0430 \u0442\u0430\u0439\u043C\u043B\u0430\u0439\u043D\u0435"
+      },
+      links: { work: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", arc: "\u0410\u0440\u043A\u0430", chapters: "\u0413\u043B\u0430\u0432\u044B", characters: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438" }
+    },
+    chapter: {
+      label: "\u0413\u043B\u0430\u0432\u0430",
+      labelPlural: "\u0413\u043B\u0430\u0432\u044B",
+      fields: { status: "\u0421\u0442\u0430\u0442\u0443\u0441", synopsis: "\u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441" },
+      links: { book: "\u041A\u043D\u0438\u0433\u0430", arc: "\u0410\u0440\u043A\u0430", anchors: "\u042F\u043A\u043E\u0440\u044F", characters: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438" }
+    },
+    page: {
+      label: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430",
+      labelPlural: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u044B",
+      fields: { archived: "\u0410\u0440\u0445\u0438\u0432" },
+      links: { chapter: "\u0413\u043B\u0430\u0432\u0430", characters: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438" }
+    },
+    character: {
+      label: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436",
+      labelPlural: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
+      fields: {
+        type: "\u0422\u0438\u043F",
+        role: "\u0420\u043E\u043B\u044C \u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438",
+        age: "\u0412\u043E\u0437\u0440\u0430\u0441\u0442",
+        activity: "\u0414\u0435\u044F\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C",
+        summary: "\u041A\u0440\u0430\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435"
+      },
+      links: {
+        project: "\u041F\u0440\u043E\u0435\u043A\u0442",
+        works: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
+        affiliation: "\u041F\u0440\u0438\u043D\u0430\u0434\u043B\u0435\u0436\u043D\u043E\u0441\u0442\u044C",
+        original: "\u041E\u0440\u0438\u0433\u0438\u043D\u0430\u043B",
+        otherVersions: "\u0412 \u0434\u0440\u0443\u0433\u0438\u0445 \u0438\u0441\u0442\u043E\u0440\u0438\u044F\u0445"
+      }
+    },
+    category: {
+      label: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+      labelPlural: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
+      fields: { summary: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438" },
+      links: { project: "\u041F\u0440\u043E\u0435\u043A\u0442" }
+    },
+    categoryItem: {
+      label: "\u042D\u043B\u0435\u043C\u0435\u043D\u0442",
+      labelPlural: "\u042D\u043B\u0435\u043C\u0435\u043D\u0442\u044B",
+      fields: {},
+      links: { works: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F" }
+    },
+    preset: {
+      organization: "\u041E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u044F",
+      location: "\u041B\u043E\u043A\u0430\u0446\u0438\u044F",
+      language: "\u042F\u0437\u044B\u043A",
+      custom: "\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0430\u044F"
+    },
+    categoryPreset: {
+      organization: {
+        type: "\u0422\u0438\u043F",
+        summary: "\u041A\u043E\u0440\u043E\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+        linkDefs: { leader: "\u041B\u0438\u0434\u0435\u0440", members: "\u0423\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u0438" }
+      },
+      location: {
+        type: "\u0422\u0438\u043F",
+        country: "\u0421\u0442\u0440\u0430\u043D\u0430",
+        summary: "\u041A\u043E\u0440\u043E\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+        linkDefs: {}
+      },
+      language: {
+        type: "\u0422\u0438\u043F",
+        region: "\u0420\u0435\u0433\u0438\u043E\u043D",
+        summary: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+        linkDefs: {}
+      },
+      custom: {
+        summary: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+        linkDefs: {}
+      }
+    }
+  },
+  nav: {
+    search: "\u041F\u043E\u0438\u0441\u043A\u2026",
+    works: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
+    characters: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
+    noWorks: "\u041D\u0435\u0442 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0439",
+    nothingFound: "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E",
+    noItems: "\u041D\u0435\u0442 {{label}}. \u041D\u0430\u0436\u043C\u0438\u0442\u0435 + \u0447\u0442\u043E\u0431\u044B \u0441\u043E\u0437\u0434\u0430\u0442\u044C.",
+    openSettings: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 Scenarist",
+    noProject: "\u2014 \u0411\u0435\u0437 \u043F\u0440\u043E\u0435\u043A\u0442\u0430",
+    createProject: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0440\u043E\u0435\u043A\u0442",
+    newProject: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442",
+    timeline: "\u0422\u0430\u0439\u043C\u043B\u0430\u0439\u043D",
+    add: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
+    openCard: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443",
+    openNote: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
+    delete: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C",
+    deleted: "\u0423\u0434\u0430\u043B\u0435\u043D\u043E: {{name}}",
+    createWork: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435",
+    createCharacter: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430",
+    createFor: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C: {{label}}",
+    newWork: "\u041D\u043E\u0432\u044B\u0439: {{name}}",
+    newChapter: "\u041D\u043E\u0432\u0430\u044F \u0433\u043B\u0430\u0432\u0430",
+    newArc: "\u041D\u043E\u0432\u0430\u044F \u0430\u0440\u043A\u0430",
+    newAnchor: "\u041D\u043E\u0432\u044B\u0439 \u044F\u043A\u043E\u0440\u044C",
+    arcs: "\u0410\u0440\u043A\u0438",
+    anchors: "\u042F\u043A\u043E\u0440\u044F",
+    book: "\u041A\u043D\u0438\u0433\u0430",
+    arc: "\u0410\u0440\u043A\u0430",
+    anchor: "\u042F\u043A\u043E\u0440\u044C",
+    noRole: "\u0411\u0435\u0437 \u0440\u043E\u043B\u0438"
+  },
+  card: {
+    empty: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u044D\u043B\u0435\u043C\u0435\u043D\u0442 \u0432 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0435",
+    emptyHint: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435, \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430 \u0438\u043B\u0438 \u0433\u043B\u0430\u0432\u0443 \u0441\u043B\u0435\u0432\u0430",
+    back: "\u041D\u0430\u0437\u0430\u0434",
+    openNote: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
+    noteLabel: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430",
+    noName: "\u0411\u0435\u0437 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044F",
+    addTag: "+ \u0442\u0435\u0433",
+    tagPlaceholder: "\u0442\u0435\u0433\u2026",
+    removeTag: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0442\u0435\u0433",
+    findTag: "\u041D\u0430\u0439\u0442\u0438 #{{tag}} \u0432 vault",
+    addLink: "+ \u0441\u0441\u044B\u043B\u043A\u0430",
+    linkPlaceholder: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0437\u0430\u043C\u0435\u0442\u043A\u0438\u2026",
+    openLink: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C: {{link}}",
+    noteLinks: "\u0421\u0441\u044B\u043B\u043A\u0438 \u043D\u0430 \u0437\u0430\u043C\u0435\u0442\u043A\u0438",
+    relations: "\u0421\u0432\u044F\u0437\u0438",
+    text: "\u0422\u0435\u043A\u0441\u0442",
+    edit: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
+    emptyBody: "\u041F\u0443\u0441\u0442\u043E.",
+    noteNotCreated: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430 \u0435\u0449\u0451 \u043D\u0435 \u0441\u043E\u0437\u0434\u0430\u043D\u0430 \u2014 \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \xAB\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C\xBB.",
+    addGenre: "\uFF0B \u0436\u0430\u043D\u0440\u2026",
+    addNewGenre: "\uFF0B \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0441\u0432\u043E\u0439\u2026",
+    newGenrePlaceholder: "\u041D\u043E\u0432\u044B\u0439 \u0436\u0430\u043D\u0440\u2026",
+    addRelation: "+ \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u044C\u2026",
+    items: "\u042D\u043B\u0435\u043C\u0435\u043D\u0442\u044B ({{count}})",
+    addItem: "\uFF0B \u044D\u043B\u0435\u043C\u0435\u043D\u0442",
+    emptyItems: "\u041F\u043E\u043A\u0430 \u043F\u0443\u0441\u0442\u043E.",
+    backlinks: {
+      chapters: "\u041F\u043E\u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0432 \u0433\u043B\u0430\u0432\u0430\u0445",
+      pages: "\u041F\u043E\u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043D\u0430 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0430\u0445",
+      members: "\u0423\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u0438",
+      arcs: "\u0410\u0440\u043A\u0438",
+      books: "\u041A\u043D\u0438\u0433\u0438",
+      anchors: "\u042F\u043A\u043E\u0440\u044F",
+      works: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F"
+    }
+  },
+  modal: {
+    cancel: "\u041E\u0442\u043C\u0435\u043D\u0430",
+    create: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C",
+    save: "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C",
+    add: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
+    name: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
+    namePlaceholder: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435\u2026",
+    newEntity: "\u041D\u043E\u0432\u044B\u0439: {{label}}",
+    created: "\u0421\u043E\u0437\u0434\u0430\u043D\u043E: {{name}}",
+    multipleHint: " (\u043C\u043E\u0436\u043D\u043E \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E)",
+    newWork: "\u041D\u043E\u0432\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435",
+    workFormat: "\u0424\u043E\u0440\u043C\u0430\u0442",
+    workType: "\u0422\u0438\u043F",
+    workName: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
+    workNamePlaceholder: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F\u2026",
+    series: "\u0421\u0435\u0440\u0438\u044F",
+    oneshot: "\u0412\u0430\u043D\u0448\u043E\u0442",
+    seriesDesc: "\u041D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u043A\u043D\u0438\u0433 (\u0442\u043E\u043C\u043E\u0432)",
+    oneshotDesc: "\u041E\u0434\u043D\u0430 \u043A\u043D\u0438\u0433\u0430",
+    story: "\u0420\u0430\u0441\u0441\u043A\u0430\u0437",
+    script: "\u0421\u0446\u0435\u043D\u0430\u0440\u0438\u0439",
+    workCreated: "\u0421\u043E\u0437\u0434\u0430\u043D\u043E \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435: {{name}}",
+    newCategory: "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+    newCategoryPreset: "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F: {{preset}}",
+    categoryType: "\u0422\u0438\u043F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
+    categoryName: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
+    categoryNamePlaceholder: "\u041D\u0430\u043F\u0440. \xAB{{preset}}\xBB\u2026",
+    categoryNameGenericPlaceholder: "\u041D\u0430\u043F\u0440. \xAB\u041E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u0438\xBB, \xAB\u041B\u043E\u043A\u0430\u0446\u0438\u0438\xBB\u2026",
+    categoryCreated: "\u0421\u043E\u0437\u0434\u0430\u043D\u0430 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F: {{name}}",
+    presets: {
+      organization: "\u041F\u043E\u043B\u044F: \u0442\u0438\u043F, \u043B\u0438\u0434\u0435\u0440, \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u0438",
+      location: "\u041F\u043E\u043B\u044F: \u0442\u0438\u043F, \u0441\u0442\u0440\u0430\u043D\u0430",
+      language: "\u041F\u043E\u043B\u044F: \u0442\u0438\u043F, \u0440\u0435\u0433\u0438\u043E\u043D",
+      custom: "\u041F\u0443\u0441\u0442\u0430\u044F, \u043F\u043E\u043B\u044F \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u0435 \u043F\u043E\u0437\u0436\u0435"
+    },
+    newCategoryType: "\u041D\u043E\u0432\u044B\u0439 \u0442\u0438\u043F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
+    icon: "\u0418\u043A\u043E\u043D\u043A\u0430",
+    typeName: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
+    typeNamePlaceholder: "\u041D\u0430\u043F\u0440\u0438\u043C\u0435\u0440: \u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442\u044B",
+    typeAdded: "\u0414\u043E\u0431\u0430\u0432\u043B\u0435\u043D \u0442\u0438\u043F: {{label}}",
+    editType: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0442\u0438\u043F"
+  },
+  settings: {
+    title: "Scenarist \u2014 \u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438",
+    general: "\u041E\u0431\u0449\u0438\u0435",
+    rootFolder: "\u041A\u043E\u0440\u043D\u0435\u0432\u0430\u044F \u043F\u0430\u043F\u043A\u0430",
+    rootFolderDesc: "\u041F\u0430\u043F\u043A\u0430 \u0432 vault, \u0433\u0434\u0435 Scenarist \u0445\u0440\u0430\u043D\u0438\u0442 \u0437\u0430\u043C\u0435\u0442\u043A\u0438",
+    autoCreate: "\u0410\u0432\u0442\u043E\u0441\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u0437\u0430\u043C\u0435\u0442\u043E\u043A",
+    autoCreateDesc: "\u0421\u043E\u0437\u0434\u0430\u0432\u0430\u0442\u044C .md-\u0437\u0430\u043C\u0435\u0442\u043A\u0443 \u043F\u0440\u0438 \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u0438 \u0441\u0443\u0449\u043D\u043E\u0441\u0442\u0438",
+    quickTypes: "\u0411\u044B\u0441\u0442\u0440\u044B\u0435 \u0442\u0438\u043F\u044B \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0439",
+    quickTypesDesc: "\u041A\u043D\u043E\u043F\u043A\u0438-\u0432\u043A\u043B\u0430\u0434\u043A\u0438 \u0432 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0435. \u0412\u043A\u043B\u044E\u0447\u0438\u0442\u0435 \u043D\u0443\u0436\u043D\u044B\u0435 \u0438\u043B\u0438 \u0434\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0441\u0432\u043E\u0439 \u0442\u0438\u043F.",
+    addCustomType: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0438\u0439 \u0442\u0438\u043F",
+    addCustomTypeDesc: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0438\u043A\u043E\u043D\u043A\u0443 \u0438 \u0437\u0430\u0434\u0430\u0439\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
+    addCustomTypeBtn: "\uFF0B \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
+    editTooltip: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
+    deleteTooltip: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C",
+    language: "\u042F\u0437\u044B\u043A \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430",
+    languageDesc: "\u042F\u0437\u044B\u043A \u043E\u0442\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u043F\u043B\u0430\u0433\u0438\u043D\u0430 Scenarist"
+  },
+  commands: {
+    openScenarist: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C Scenarist",
+    openBoard: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0434\u043E\u0441\u043A\u0443 \u0433\u043B\u0430\u0432",
+    openGraph: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0433\u0440\u0430\u0444 \u0441\u0432\u044F\u0437\u0435\u0439",
+    newProject: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442",
+    newWork: "\u041D\u043E\u0432\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435 (\u0421\u0435\u0440\u0438\u044F/\u0412\u0430\u043D\u0448\u043E\u0442)",
+    newCharacter: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436",
+    newCategory: "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+    ribbon: "Scenarist"
+  },
+  board: {
+    title: "\u0414\u043E\u0441\u043A\u0430 \u0433\u043B\u0430\u0432",
+    empty: "\u041D\u0435\u0442 \u0433\u043B\u0430\u0432 \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u043E\u043C \u043F\u0440\u043E\u0435\u043A\u0442\u0435",
+    noStatus: "\u0411\u0435\u0437 \u0441\u0442\u0430\u0442\u0443\u0441\u0430"
+  },
+  graph: {
+    empty: "\u041D\u0435\u0442 \u0441\u0443\u0449\u043D\u043E\u0441\u0442\u0435\u0439 \u0434\u043B\u044F \u0433\u0440\u0430\u0444\u0430 \u0432 \u044D\u0442\u043E\u043C \u043F\u0440\u043E\u0435\u043A\u0442\u0435",
+    legend: {
+      work: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
+      character: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
+      categoryItem: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
+      arc: "\u0410\u0440\u043A\u0438",
+      anchor: "\u042F\u043A\u043E\u0440\u044F"
+    }
+  },
+  timeline: {
+    title: "\u0422\u0430\u0439\u043C\u043B\u0430\u0439\u043D",
+    titleWork: "\u0422\u0430\u0439\u043C\u043B\u0430\u0439\u043D \u2014 {{name}}",
+    noWork: "\u041E\u0442\u043A\u0440\u043E\u0439\u0442\u0435 \u0442\u0430\u0439\u043C\u043B\u0430\u0439\u043D \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F \u0438\u0437 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0430",
+    noAnchors: "\u041D\u0435\u0442 \u044F\u043A\u043E\u0440\u0435\u0439. \u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F \u0447\u0435\u0440\u0435\u0437 \xAB\uFF0B\xBB \u0443 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F."
+  }
+};
+
+// src/i18n/en.ts
+var en = {
+  schema: {
+    project: {
+      label: "Project",
+      labelPlural: "Projects",
+      fields: { summary: "Description" },
+      links: {}
+    },
+    work: {
+      label: "Work",
+      labelPlural: "Works",
+      fields: { format: "Format", type: "Type", status: "Status", summary: "Short description" },
+      links: { project: "Project", books: "Books", arcs: "Arcs", anchors: "Anchors" }
+    },
+    book: {
+      label: "Book",
+      labelPlural: "Books",
+      fields: {
+        genre: "Genre",
+        format: "Format",
+        audience: "Target audience (age)",
+        idea: "Idea",
+        synopsis: "Synopsis",
+        completed: "Completed"
+      },
+      links: { work: "Work", chapters: "Chapters" }
+    },
+    arc: {
+      label: "Arc",
+      labelPlural: "Arcs",
+      fields: { goal: "Goal", description: "Description" },
+      links: {
+        work: "Work",
+        books: "Books",
+        chapters: "Chapters",
+        anchors: "Anchors",
+        keyCharacters: "Key characters"
+      }
+    },
+    anchor: {
+      label: "Anchor",
+      labelPlural: "Anchors",
+      fields: {
+        description: "Event description",
+        date: "Date / moment",
+        order: "Timeline order"
+      },
+      links: { work: "Work", arc: "Arc", chapters: "Chapters", characters: "Characters" }
+    },
+    chapter: {
+      label: "Chapter",
+      labelPlural: "Chapters",
+      fields: { status: "Status", synopsis: "Synopsis" },
+      links: { book: "Book", arc: "Arc", anchors: "Anchors", characters: "Characters" }
+    },
+    page: {
+      label: "Page",
+      labelPlural: "Pages",
+      fields: { archived: "Archive" },
+      links: { chapter: "Chapter", characters: "Characters" }
+    },
+    character: {
+      label: "Character",
+      labelPlural: "Characters",
+      fields: {
+        type: "Type",
+        role: "Story role",
+        age: "Age",
+        activity: "Occupation",
+        summary: "Short description"
+      },
+      links: {
+        project: "Project",
+        works: "Works",
+        affiliation: "Affiliation",
+        original: "Original",
+        otherVersions: "In other stories"
+      }
+    },
+    category: {
+      label: "Category",
+      labelPlural: "Categories",
+      fields: { summary: "Category description" },
+      links: { project: "Project" }
+    },
+    categoryItem: {
+      label: "Item",
+      labelPlural: "Items",
+      fields: {},
+      links: { works: "Works" }
+    },
+    preset: {
+      organization: "Organization",
+      location: "Location",
+      language: "Language",
+      custom: "Custom"
+    },
+    categoryPreset: {
+      organization: {
+        type: "Type",
+        summary: "Short description",
+        linkDefs: { leader: "Leader", members: "Members" }
+      },
+      location: {
+        type: "Type",
+        country: "Country",
+        summary: "Short description",
+        linkDefs: {}
+      },
+      language: {
+        type: "Type",
+        region: "Region",
+        summary: "Description",
+        linkDefs: {}
+      },
+      custom: {
+        summary: "Description",
+        linkDefs: {}
+      }
+    }
+  },
+  nav: {
+    search: "Search\u2026",
+    works: "Works",
+    characters: "Characters",
+    noWorks: "No works yet",
+    nothingFound: "Nothing found",
+    noItems: "No {{label}}. Click + to create.",
+    openSettings: "Scenarist settings",
+    noProject: "\u2014 No project",
+    createProject: "Create project",
+    newProject: "New project",
+    timeline: "Timeline",
+    add: "Add",
+    openCard: "Open card",
+    openNote: "Open note",
+    delete: "Delete",
+    deleted: "Deleted: {{name}}",
+    createWork: "Create work",
+    createCharacter: "Create character",
+    createFor: "Create: {{label}}",
+    newWork: "New: {{name}}",
+    newChapter: "New chapter",
+    newArc: "New arc",
+    newAnchor: "New anchor",
+    arcs: "Arcs",
+    anchors: "Anchors",
+    book: "Book",
+    arc: "Arc",
+    anchor: "Anchor",
+    noRole: "No role"
+  },
+  card: {
+    empty: "Select an item in the navigator",
+    emptyHint: "Click on a work, character or chapter on the left",
+    back: "Back",
+    openNote: "Open note",
+    noteLabel: "Note",
+    noName: "Untitled",
+    addTag: "+ tag",
+    tagPlaceholder: "tag\u2026",
+    removeTag: "Remove tag",
+    findTag: "Find #{{tag}} in vault",
+    addLink: "+ link",
+    linkPlaceholder: "Note name\u2026",
+    openLink: "Open: {{link}}",
+    noteLinks: "Note links",
+    relations: "Relations",
+    text: "Text",
+    edit: "Edit",
+    emptyBody: "Empty.",
+    noteNotCreated: "Note not created yet \u2014 click \xABEdit\xBB.",
+    addGenre: "\uFF0B genre\u2026",
+    addNewGenre: "\uFF0B Add custom\u2026",
+    newGenrePlaceholder: "New genre\u2026",
+    addRelation: "+ add\u2026",
+    items: "Items ({{count}})",
+    addItem: "\uFF0B item",
+    emptyItems: "Nothing yet.",
+    backlinks: {
+      chapters: "Appears in chapters",
+      pages: "Appears in pages",
+      members: "Members",
+      arcs: "Arcs",
+      books: "Books",
+      anchors: "Anchors",
+      works: "Works"
+    }
+  },
+  modal: {
+    cancel: "Cancel",
+    create: "Create",
+    save: "Save",
+    add: "Add",
+    name: "Name",
+    namePlaceholder: "Enter name\u2026",
+    newEntity: "New: {{label}}",
+    created: "Created: {{name}}",
+    multipleHint: " (multiple allowed)",
+    newWork: "New work",
+    workFormat: "Format",
+    workType: "Type",
+    workName: "Name",
+    workNamePlaceholder: "Work title\u2026",
+    series: "Series",
+    oneshot: "One-shot",
+    seriesDesc: "Multiple books (volumes)",
+    oneshotDesc: "Single book",
+    story: "Story",
+    script: "Script",
+    workCreated: "Work created: {{name}}",
+    newCategory: "New category",
+    newCategoryPreset: "New category: {{preset}}",
+    categoryType: "Category type",
+    categoryName: "Category name",
+    categoryNamePlaceholder: "E.g. \xAB{{preset}}\xBB\u2026",
+    categoryNameGenericPlaceholder: "E.g. \xABOrganizations\xBB, \xABLocations\xBB\u2026",
+    categoryCreated: "Category created: {{name}}",
+    presets: {
+      organization: "Fields: type, leader, members",
+      location: "Fields: type, country",
+      language: "Fields: type, region",
+      custom: "Empty, add fields later"
+    },
+    newCategoryType: "New category type",
+    icon: "Icon",
+    typeName: "Name",
+    typeNamePlaceholder: "E.g.: Artifacts",
+    typeAdded: "Type added: {{label}}",
+    editType: "Edit type"
+  },
+  settings: {
+    title: "Scenarist \u2014 Settings",
+    general: "General",
+    rootFolder: "Root folder",
+    rootFolderDesc: "Folder in vault where Scenarist stores notes",
+    autoCreate: "Auto-create notes",
+    autoCreateDesc: "Create a .md note when adding an entity",
+    quickTypes: "Quick category types",
+    quickTypesDesc: "Tab buttons in the navigator. Enable the ones you need or add a custom type.",
+    addCustomType: "Add custom type",
+    addCustomTypeDesc: "Choose an icon and set a name",
+    addCustomTypeBtn: "\uFF0B Add",
+    editTooltip: "Edit",
+    deleteTooltip: "Delete",
+    language: "Interface language",
+    languageDesc: "Display language for the Scenarist plugin"
+  },
+  commands: {
+    openScenarist: "Open Scenarist",
+    openBoard: "Open chapter board",
+    openGraph: "Open relations graph",
+    newProject: "New project",
+    newWork: "New work (Series/One-shot)",
+    newCharacter: "New character",
+    newCategory: "New category",
+    ribbon: "Scenarist"
+  },
+  board: {
+    title: "Chapter board",
+    empty: "No chapters in the active project",
+    noStatus: "No status"
+  },
+  graph: {
+    empty: "No entities for graph in this project",
+    legend: {
+      work: "Works",
+      character: "Characters",
+      categoryItem: "Categories",
+      arc: "Arcs",
+      anchor: "Anchors"
+    }
+  },
+  timeline: {
+    title: "Timeline",
+    titleWork: "Timeline \u2014 {{name}}",
+    noWork: "Open a work timeline from the navigator",
+    noAnchors: "No anchors. Add key events via \xAB\uFF0B\xBB in the navigator."
+  }
+};
+
+// src/i18n/index.ts
+var LOCALES = { ru, en };
+var translations = ru;
+var currentLang = "ru";
+function setLocale(lang) {
+  var _a;
+  translations = (_a = LOCALES[lang]) != null ? _a : ru;
+  currentLang = LOCALES[lang] ? lang : "ru";
+}
+function t(key, vars, fallback) {
+  const parts = key.split(".");
+  let node = translations;
+  for (const p of parts) {
+    if (node === null || node === void 0 || typeof node !== "object")
+      return fallback != null ? fallback : key;
+    node = node[p];
+  }
+  if (typeof node !== "string")
+    return fallback != null ? fallback : key;
+  if (vars === void 0)
+    return node;
+  return node.replace(/\{\{(\w+)\}\}/g, (_, k) => {
+    var _a;
+    return String((_a = vars[k]) != null ? _a : k);
+  });
+}
+
+// src/settings.ts
 var DEFAULT_QUICK_TYPES = [
   { id: "org", label: "\u041E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u0438", icon: "building-2", preset: "organization", enabled: true, isDefault: true },
   { id: "loc", label: "\u041B\u043E\u043A\u0430\u0446\u0438\u0438", icon: "map-pin", preset: "location", enabled: true, isDefault: true },
@@ -46,8 +639,9 @@ var DEFAULT_GENRE_OPTIONS = [
 var DEFAULT_SETTINGS = {
   rootFolder: "Scenarist",
   autoCreateNotes: true,
-  categoryQuickTypes: DEFAULT_QUICK_TYPES.map((t) => ({ ...t })),
-  genreOptions: [...DEFAULT_GENRE_OPTIONS]
+  categoryQuickTypes: DEFAULT_QUICK_TYPES.map((qt) => ({ ...qt })),
+  genreOptions: [...DEFAULT_GENRE_OPTIONS],
+  language: "ru"
 };
 var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
@@ -57,24 +651,33 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Scenarist \u2014 \u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438" });
-    containerEl.createEl("h3", { text: "\u041E\u0431\u0449\u0438\u0435" });
-    new import_obsidian.Setting(containerEl).setName("\u041A\u043E\u0440\u043D\u0435\u0432\u0430\u044F \u043F\u0430\u043F\u043A\u0430").setDesc("\u041F\u0430\u043F\u043A\u0430 \u0432 vault, \u0433\u0434\u0435 Scenarist \u0445\u0440\u0430\u043D\u0438\u0442 \u0437\u0430\u043C\u0435\u0442\u043A\u0438").addText(
+    containerEl.createEl("h2", { text: t("settings.title") });
+    containerEl.createEl("h3", { text: t("settings.general") });
+    new import_obsidian.Setting(containerEl).setName(t("settings.language")).setDesc(t("settings.languageDesc")).addDropdown(
+      (drop) => drop.addOption("ru", "\u0420\u0443\u0441\u0441\u043A\u0438\u0439").addOption("en", "English").setValue(this.plugin.settings.language || "ru").onChange(async (value) => {
+        this.plugin.settings.language = value;
+        setLocale(value);
+        await this.plugin.saveSettings();
+        this.plugin.refreshAllViews();
+        this.display();
+      })
+    );
+    new import_obsidian.Setting(containerEl).setName(t("settings.rootFolder")).setDesc(t("settings.rootFolderDesc")).addText(
       (text) => text.setPlaceholder("Scenarist").setValue(this.plugin.settings.rootFolder).onChange(async (value) => {
         this.plugin.settings.rootFolder = value.trim() || "Scenarist";
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("\u0410\u0432\u0442\u043E\u0441\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u0437\u0430\u043C\u0435\u0442\u043E\u043A").setDesc("\u0421\u043E\u0437\u0434\u0430\u0432\u0430\u0442\u044C .md-\u0437\u0430\u043C\u0435\u0442\u043A\u0443 \u043F\u0440\u0438 \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u0438 \u0441\u0443\u0449\u043D\u043E\u0441\u0442\u0438").addToggle(
+    new import_obsidian.Setting(containerEl).setName(t("settings.autoCreate")).setDesc(t("settings.autoCreateDesc")).addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.autoCreateNotes).onChange(async (value) => {
         this.plugin.settings.autoCreateNotes = value;
         await this.plugin.saveSettings();
       })
     );
-    containerEl.createEl("h3", { text: "\u0411\u044B\u0441\u0442\u0440\u044B\u0435 \u0442\u0438\u043F\u044B \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0439" });
+    containerEl.createEl("h3", { text: t("settings.quickTypes") });
     containerEl.createEl("p", {
       cls: "setting-item-description",
-      text: "\u041A\u043D\u043E\u043F\u043A\u0438-\u0432\u043A\u043B\u0430\u0434\u043A\u0438 \u0432 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0435. \u0412\u043A\u043B\u044E\u0447\u0438\u0442\u0435 \u043D\u0443\u0436\u043D\u044B\u0435 \u0438\u043B\u0438 \u0434\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0441\u0432\u043E\u0439 \u0442\u0438\u043F."
+      text: t("settings.quickTypesDesc")
     });
     this.renderQuickTypes(containerEl);
   }
@@ -96,7 +699,7 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
       s.nameEl.prepend(iconEl);
       if (!qt.isDefault) {
         s.addButton(
-          (btn) => btn.setIcon("pencil").setTooltip("\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C").onClick(() => {
+          (btn) => btn.setIcon("pencil").setTooltip(t("settings.editTooltip")).onClick(() => {
             new EditQuickTypeModal(this.app, qt.icon, qt.label, async (newIcon, newLabel) => {
               qt.icon = newIcon;
               qt.label = newLabel;
@@ -106,9 +709,9 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
           })
         );
         s.addButton(
-          (btn) => btn.setIcon("trash").setTooltip("\u0423\u0434\u0430\u043B\u0438\u0442\u044C").setWarning().onClick(async () => {
+          (btn) => btn.setIcon("trash").setTooltip(t("settings.deleteTooltip")).setWarning().onClick(async () => {
             this.plugin.settings.categoryQuickTypes = this.plugin.settings.categoryQuickTypes.filter(
-              (t) => t.id !== qt.id
+              (qt2) => qt2.id !== qt.id
             );
             await this.plugin.saveSettings();
             this.display();
@@ -116,8 +719,8 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
         );
       }
     }
-    new import_obsidian.Setting(containerEl).setName("\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0438\u0439 \u0442\u0438\u043F").setDesc("\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0438\u043A\u043E\u043D\u043A\u0443 \u0438 \u0437\u0430\u0434\u0430\u0439\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435").addButton(
-      (btn) => btn.setButtonText("\uFF0B \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C").setCta().onClick(() => new AddQuickTypeModal(this.app, this.plugin, () => this.display()).open())
+    new import_obsidian.Setting(containerEl).setName(t("settings.addCustomType")).setDesc(t("settings.addCustomTypeDesc")).addButton(
+      (btn) => btn.setButtonText(t("settings.addCustomTypeBtn")).setCta().onClick(() => new AddQuickTypeModal(this.app, this.plugin, () => this.display()).open())
     );
   }
 };
@@ -189,9 +792,9 @@ var AddQuickTypeModal = class extends import_obsidian.Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.addClass("scenarist-modal");
-    contentEl.createEl("h2", { text: "\u041D\u043E\u0432\u044B\u0439 \u0442\u0438\u043F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438", cls: "scenarist-modal-title" });
+    contentEl.createEl("h2", { text: t("modal.newCategoryType"), cls: "scenarist-modal-title" });
     const iconRow = contentEl.createDiv("scenarist-form-row");
-    iconRow.createEl("label", { text: "\u0418\u043A\u043E\u043D\u043A\u0430", cls: "scenarist-label" });
+    iconRow.createEl("label", { text: t("modal.icon"), cls: "scenarist-label" });
     const pickerWrap = iconRow.createDiv("scenarist-icon-picker");
     const preview = pickerWrap.createDiv("scenarist-icon-preview");
     (0, import_obsidian.setIcon)(preview, this.selectedIcon);
@@ -211,14 +814,14 @@ var AddQuickTypeModal = class extends import_obsidian.Modal {
       };
     }
     const nameRow = contentEl.createDiv("scenarist-form-row");
-    nameRow.createEl("label", { text: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435", cls: "scenarist-label" });
+    nameRow.createEl("label", { text: t("modal.typeName"), cls: "scenarist-label" });
     const nameInput = nameRow.createEl("input", {
       cls: "scenarist-input",
-      placeholder: "\u041D\u0430\u043F\u0440\u0438\u043C\u0435\u0440: \u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442\u044B"
+      placeholder: t("modal.typeNamePlaceholder")
     });
     const btns = contentEl.createDiv("scenarist-modal-buttons");
-    btns.createEl("button", { cls: "scenarist-btn", text: "\u041E\u0442\u043C\u0435\u043D\u0430" }).onclick = () => this.close();
-    const createBtn = btns.createEl("button", { cls: "scenarist-btn-primary", text: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C" });
+    btns.createEl("button", { cls: "scenarist-btn", text: t("modal.cancel") }).onclick = () => this.close();
+    const createBtn = btns.createEl("button", { cls: "scenarist-btn-primary", text: t("modal.add") });
     createBtn.onclick = async () => {
       const label = nameInput.value.trim();
       if (!label) {
@@ -234,7 +837,7 @@ var AddQuickTypeModal = class extends import_obsidian.Modal {
         isDefault: false
       });
       await this.plugin.saveSettings();
-      new import_obsidian.Notice(`\u0414\u043E\u0431\u0430\u0432\u043B\u0435\u043D \u0442\u0438\u043F: ${label}`);
+      new import_obsidian.Notice(t("modal.typeAdded", { label }));
       this.close();
       this.onDone();
     };
@@ -255,16 +858,16 @@ var EditQuickTypeModal = class extends import_obsidian.Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.addClass("scenarist-modal");
-    contentEl.createEl("h2", { text: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0442\u0438\u043F", cls: "scenarist-modal-title" });
+    contentEl.createEl("h2", { text: t("modal.editType"), cls: "scenarist-modal-title" });
     const nameRow = contentEl.createDiv("scenarist-form-row");
-    nameRow.createEl("label", { text: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435", cls: "scenarist-label" });
+    nameRow.createEl("label", { text: t("modal.typeName"), cls: "scenarist-label" });
     const nameInput = nameRow.createEl("input", {
       cls: "scenarist-input",
-      placeholder: "\u041D\u0430\u043F\u0440\u0438\u043C\u0435\u0440: \u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442\u044B"
+      placeholder: t("modal.typeNamePlaceholder")
     });
     nameInput.value = this.currentLabel;
     const iconRow = contentEl.createDiv("scenarist-form-row");
-    iconRow.createEl("label", { text: "\u0418\u043A\u043E\u043D\u043A\u0430", cls: "scenarist-label" });
+    iconRow.createEl("label", { text: t("modal.icon"), cls: "scenarist-label" });
     const pickerWrap = iconRow.createDiv("scenarist-icon-picker");
     const preview = pickerWrap.createDiv("scenarist-icon-preview");
     (0, import_obsidian.setIcon)(preview, this.selectedIcon);
@@ -284,8 +887,8 @@ var EditQuickTypeModal = class extends import_obsidian.Modal {
       };
     }
     const btns = contentEl.createDiv("scenarist-modal-buttons");
-    btns.createEl("button", { cls: "scenarist-btn", text: "\u041E\u0442\u043C\u0435\u043D\u0430" }).onclick = () => this.close();
-    const saveBtn = btns.createEl("button", { cls: "scenarist-btn-primary", text: "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C" });
+    btns.createEl("button", { cls: "scenarist-btn", text: t("modal.cancel") }).onclick = () => this.close();
+    const saveBtn = btns.createEl("button", { cls: "scenarist-btn-primary", text: t("modal.save") });
     saveBtn.onclick = () => {
       const label = nameInput.value.trim();
       if (!label) {
@@ -325,19 +928,19 @@ var NO_PROJECT = "__none__";
 var SCHEMAS = {
   project: {
     kind: "project",
-    label: "\u041F\u0440\u043E\u0435\u043A\u0442",
-    labelPlural: "\u041F\u0440\u043E\u0435\u043A\u0442\u044B",
+    label: "schema.project.label",
+    labelPlural: "schema.project.labelPlural",
     icon: "folder",
     folder: "",
     layer: "project",
     titleField: "Name",
-    fields: [{ key: "summary", label: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }],
+    fields: [{ key: "summary", label: "schema.project.fields.summary", type: "text" }],
     links: []
   },
   work: {
     kind: "work",
-    label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435",
-    labelPlural: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
+    label: "schema.work.label",
+    labelPlural: "schema.work.labelPlural",
     icon: "pen-line",
     folder: "",
     layer: "text",
@@ -345,7 +948,7 @@ var SCHEMAS = {
     fields: [
       {
         key: "format",
-        label: "\u0424\u043E\u0440\u043C\u0430\u0442",
+        label: "schema.work.fields.format",
         type: "select",
         required: true,
         options: [
@@ -355,7 +958,7 @@ var SCHEMAS = {
       },
       {
         key: "type",
-        label: "\u0422\u0438\u043F",
+        label: "schema.work.fields.type",
         type: "select",
         required: true,
         options: [
@@ -365,7 +968,7 @@ var SCHEMAS = {
       },
       {
         key: "status",
-        label: "\u0421\u0442\u0430\u0442\u0443\u0441",
+        label: "schema.work.fields.status",
         type: "status",
         options: [
           { value: "\u041E\u0431\u044B\u0447\u043D\u043E\u0435", color: "#888" },
@@ -373,19 +976,19 @@ var SCHEMAS = {
           { value: "\u0410\u0440\u0445\u0438\u0432", color: "#c0392b" }
         ]
       },
-      { key: "summary", label: "\u041A\u0440\u0430\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }
+      { key: "summary", label: "schema.work.fields.summary", type: "text" }
     ],
     links: [
-      { key: "project", label: "\u041F\u0440\u043E\u0435\u043A\u0442", target: "project", single: true },
-      { key: "books", label: "\u041A\u043D\u0438\u0433\u0438", target: "book", reverse: "work" },
-      { key: "arcs", label: "\u0410\u0440\u043A\u0438", target: "arc", reverse: "work" },
-      { key: "anchors", label: "\u042F\u043A\u043E\u0440\u044F", target: "anchor", reverse: "work" }
+      { key: "project", label: "schema.work.links.project", target: "project", single: true },
+      { key: "books", label: "schema.work.links.books", target: "book", reverse: "work" },
+      { key: "arcs", label: "schema.work.links.arcs", target: "arc", reverse: "work" },
+      { key: "anchors", label: "schema.work.links.anchors", target: "anchor", reverse: "work" }
     ]
   },
   book: {
     kind: "book",
-    label: "\u041A\u043D\u0438\u0433\u0430",
-    labelPlural: "\u041A\u043D\u0438\u0433\u0438",
+    label: "schema.book.label",
+    labelPlural: "schema.book.labelPlural",
     icon: "book-open",
     folder: "\u041A\u043D\u0438\u0433\u0438",
     layer: "text",
@@ -393,7 +996,7 @@ var SCHEMAS = {
     fields: [
       {
         key: "genre",
-        label: "\u0416\u0430\u043D\u0440",
+        label: "schema.book.fields.genre",
         type: "multiselect",
         options: [
           { value: "\u041F\u0440\u0438\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435", color: "#9b59b6" },
@@ -410,7 +1013,7 @@ var SCHEMAS = {
       },
       {
         key: "format",
-        label: "\u0424\u043E\u0440\u043C\u0430\u0442",
+        label: "schema.book.fields.format",
         type: "select",
         required: true,
         options: [
@@ -418,60 +1021,60 @@ var SCHEMAS = {
           { value: "WebToon", color: "#e67e22" }
         ]
       },
-      { key: "audience", label: "\u0412\u043E\u0437\u0440\u0430\u0441\u0442\u043D\u0430\u044F \u0430\u0443\u0434\u0438\u0442\u043E\u0440\u0438\u044F", type: "number" },
-      { key: "idea", label: "\u0418\u0434\u0435\u044F", type: "text" },
-      { key: "synopsis", label: "\u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441", type: "text" },
-      { key: "completed", label: "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E", type: "checkbox" }
+      { key: "audience", label: "schema.book.fields.audience", type: "number" },
+      { key: "idea", label: "schema.book.fields.idea", type: "text" },
+      { key: "synopsis", label: "schema.book.fields.synopsis", type: "text" },
+      { key: "completed", label: "schema.book.fields.completed", type: "checkbox" }
     ],
     links: [
-      { key: "work", label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", target: "work", single: true, reverse: "books" },
-      { key: "chapters", label: "\u0413\u043B\u0430\u0432\u044B", target: "chapter", reverse: "book" }
+      { key: "work", label: "schema.book.links.work", target: "work", single: true, reverse: "books" },
+      { key: "chapters", label: "schema.book.links.chapters", target: "chapter", reverse: "book" }
     ]
   },
   arc: {
     kind: "arc",
-    label: "\u0410\u0440\u043A\u0430",
-    labelPlural: "\u0410\u0440\u043A\u0438",
+    label: "schema.arc.label",
+    labelPlural: "schema.arc.labelPlural",
     icon: "git-branch",
     folder: "\u0410\u0440\u043A\u0438",
     layer: "text",
     titleField: "Name",
     fields: [
-      { key: "goal", label: "\u0426\u0435\u043B\u044C", type: "text" },
-      { key: "description", label: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }
+      { key: "goal", label: "schema.arc.fields.goal", type: "text" },
+      { key: "description", label: "schema.arc.fields.description", type: "text" }
     ],
     links: [
-      { key: "work", label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", target: "work", single: true, reverse: "arcs" },
-      { key: "books", label: "\u041A\u043D\u0438\u0433\u0438", target: "book" },
-      { key: "chapters", label: "\u0413\u043B\u0430\u0432\u044B", target: "chapter", reverse: "arc" },
-      { key: "anchors", label: "\u042F\u043A\u043E\u0440\u044F", target: "anchor", reverse: "arc" },
-      { key: "keyCharacters", label: "\u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438", target: "character" }
+      { key: "work", label: "schema.arc.links.work", target: "work", single: true, reverse: "arcs" },
+      { key: "books", label: "schema.arc.links.books", target: "book" },
+      { key: "chapters", label: "schema.arc.links.chapters", target: "chapter", reverse: "arc" },
+      { key: "anchors", label: "schema.arc.links.anchors", target: "anchor", reverse: "arc" },
+      { key: "keyCharacters", label: "schema.arc.links.keyCharacters", target: "character" }
     ]
   },
   anchor: {
     kind: "anchor",
-    label: "\u042F\u043A\u043E\u0440\u044C",
-    labelPlural: "\u042F\u043A\u043E\u0440\u044F",
+    label: "schema.anchor.label",
+    labelPlural: "schema.anchor.labelPlural",
     icon: "anchor",
     folder: "\u042F\u043A\u043E\u0440\u044F",
     layer: "text",
     titleField: "Name",
     fields: [
-      { key: "description", label: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F", type: "text" },
-      { key: "date", label: "\u0414\u0430\u0442\u0430 / \u043C\u043E\u043C\u0435\u043D\u0442", type: "text" },
-      { key: "order", label: "\u041F\u043E\u0440\u044F\u0434\u043E\u043A \u043D\u0430 \u0442\u0430\u0439\u043C\u043B\u0430\u0439\u043D\u0435", type: "number" }
+      { key: "description", label: "schema.anchor.fields.description", type: "text" },
+      { key: "date", label: "schema.anchor.fields.date", type: "text" },
+      { key: "order", label: "schema.anchor.fields.order", type: "number" }
     ],
     links: [
-      { key: "work", label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", target: "work", single: true, reverse: "anchors" },
-      { key: "arc", label: "\u0410\u0440\u043A\u0430", target: "arc", single: true, reverse: "anchors" },
-      { key: "chapters", label: "\u0413\u043B\u0430\u0432\u044B", target: "chapter", reverse: "anchors" },
-      { key: "characters", label: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438", target: "character" }
+      { key: "work", label: "schema.anchor.links.work", target: "work", single: true, reverse: "anchors" },
+      { key: "arc", label: "schema.anchor.links.arc", target: "arc", single: true, reverse: "anchors" },
+      { key: "chapters", label: "schema.anchor.links.chapters", target: "chapter", reverse: "anchors" },
+      { key: "characters", label: "schema.anchor.links.characters", target: "character" }
     ]
   },
   chapter: {
     kind: "chapter",
-    label: "\u0413\u043B\u0430\u0432\u0430",
-    labelPlural: "\u0413\u043B\u0430\u0432\u044B",
+    label: "schema.chapter.label",
+    labelPlural: "schema.chapter.labelPlural",
     icon: "scroll",
     folder: "\u0413\u043B\u0430\u0432\u044B",
     layer: "text",
@@ -479,7 +1082,7 @@ var SCHEMAS = {
     fields: [
       {
         key: "status",
-        label: "\u0421\u0442\u0430\u0442\u0443\u0441",
+        label: "schema.chapter.fields.status",
         type: "status",
         required: true,
         options: [
@@ -490,33 +1093,33 @@ var SCHEMAS = {
           { value: "\u0410\u0440\u0445\u0438\u0432", color: "#c0392b" }
         ]
       },
-      { key: "synopsis", label: "\u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441", type: "text" }
+      { key: "synopsis", label: "schema.chapter.fields.synopsis", type: "text" }
     ],
     links: [
-      { key: "book", label: "\u041A\u043D\u0438\u0433\u0430", target: "book", single: true, reverse: "chapters" },
-      { key: "arc", label: "\u0410\u0440\u043A\u0430", target: "arc", reverse: "chapters" },
-      { key: "anchors", label: "\u042F\u043A\u043E\u0440\u044F", target: "anchor", reverse: "chapters" },
-      { key: "characters", label: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438", target: "character", reverse: "chapters" }
+      { key: "book", label: "schema.chapter.links.book", target: "book", single: true, reverse: "chapters" },
+      { key: "arc", label: "schema.chapter.links.arc", target: "arc", reverse: "chapters" },
+      { key: "anchors", label: "schema.chapter.links.anchors", target: "anchor", reverse: "chapters" },
+      { key: "characters", label: "schema.chapter.links.characters", target: "character", reverse: "chapters" }
     ]
   },
   page: {
     kind: "page",
-    label: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430",
-    labelPlural: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u044B",
+    label: "schema.page.label",
+    labelPlural: "schema.page.labelPlural",
     icon: "file-text",
     folder: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u044B",
     layer: "text",
     titleField: "Name",
-    fields: [{ key: "archived", label: "\u0410\u0440\u0445\u0438\u0432", type: "checkbox" }],
+    fields: [{ key: "archived", label: "schema.page.fields.archived", type: "checkbox" }],
     links: [
-      { key: "chapter", label: "\u0413\u043B\u0430\u0432\u0430", target: "chapter", single: true, reverse: "pages" },
-      { key: "characters", label: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438", target: "character", reverse: "pages" }
+      { key: "chapter", label: "schema.page.links.chapter", target: "chapter", single: true, reverse: "pages" },
+      { key: "characters", label: "schema.page.links.characters", target: "character", reverse: "pages" }
     ]
   },
   character: {
     kind: "character",
-    label: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436",
-    labelPlural: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
+    label: "schema.character.label",
+    labelPlural: "schema.character.labelPlural",
     icon: "user",
     folder: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
     layer: "world",
@@ -524,7 +1127,7 @@ var SCHEMAS = {
     fields: [
       {
         key: "type",
-        label: "\u0422\u0438\u043F",
+        label: "schema.character.fields.type",
         type: "select",
         options: [
           { value: "\u041F\u0440\u043E\u0442\u0430\u0433\u043E\u043D\u0438\u0441\u0442", color: "#7ed321" },
@@ -536,7 +1139,7 @@ var SCHEMAS = {
       },
       {
         key: "role",
-        label: "\u0420\u043E\u043B\u044C \u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438",
+        label: "schema.character.fields.role",
         type: "select",
         options: [
           { value: "\u0413\u043B\u0430\u0432\u043D\u0430\u044F", color: "#7ed321" },
@@ -545,40 +1148,40 @@ var SCHEMAS = {
           { value: "\u042D\u043F\u0438\u0437\u043E\u0434\u0438\u0447\u0435\u0441\u043A\u0430\u044F", color: "#e84393" }
         ]
       },
-      { key: "age", label: "\u0412\u043E\u0437\u0440\u0430\u0441\u0442", type: "number" },
-      { key: "activity", label: "\u0414\u0435\u044F\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C", type: "text" },
-      { key: "summary", label: "\u041A\u0440\u0430\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }
+      { key: "age", label: "schema.character.fields.age", type: "number" },
+      { key: "activity", label: "schema.character.fields.activity", type: "text" },
+      { key: "summary", label: "schema.character.fields.summary", type: "text" }
     ],
     links: [
-      { key: "project", label: "\u041F\u0440\u043E\u0435\u043A\u0442", target: "project", single: true },
-      { key: "works", label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F", target: "work" },
-      { key: "affiliation", label: "\u041F\u0440\u0438\u043D\u0430\u0434\u043B\u0435\u0436\u043D\u043E\u0441\u0442\u044C", target: "categoryItem", reverse: "members" },
-      { key: "original", label: "\u041E\u0440\u0438\u0433\u0438\u043D\u0430\u043B", target: "character", single: true, reverse: "otherVersions" },
-      { key: "otherVersions", label: "\u0412 \u0434\u0440\u0443\u0433\u0438\u0445 \u0438\u0441\u0442\u043E\u0440\u0438\u044F\u0445", target: "character", reverse: "original" }
+      { key: "project", label: "schema.character.links.project", target: "project", single: true },
+      { key: "works", label: "schema.character.links.works", target: "work" },
+      { key: "affiliation", label: "schema.character.links.affiliation", target: "categoryItem", reverse: "members" },
+      { key: "original", label: "schema.character.links.original", target: "character", single: true, reverse: "otherVersions" },
+      { key: "otherVersions", label: "schema.character.links.otherVersions", target: "character", reverse: "original" }
     ]
   },
   category: {
     kind: "category",
-    label: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
-    labelPlural: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
+    label: "schema.category.label",
+    labelPlural: "schema.category.labelPlural",
     icon: "tag",
     folder: "",
     layer: "world",
     titleField: "Name",
-    fields: [{ key: "summary", label: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438", type: "text" }],
-    links: [{ key: "project", label: "\u041F\u0440\u043E\u0435\u043A\u0442", target: "project", single: true }]
+    fields: [{ key: "summary", label: "schema.category.fields.summary", type: "text" }],
+    links: [{ key: "project", label: "schema.category.links.project", target: "project", single: true }]
   },
   // Базовая схема элемента категории — поля/связи дополняются динамически.
   categoryItem: {
     kind: "categoryItem",
-    label: "\u042D\u043B\u0435\u043C\u0435\u043D\u0442",
-    labelPlural: "\u042D\u043B\u0435\u043C\u0435\u043D\u0442\u044B",
+    label: "schema.categoryItem.label",
+    labelPlural: "schema.categoryItem.labelPlural",
     icon: "circle-dot",
     folder: "",
     layer: "world",
     titleField: "Name",
     fields: [],
-    links: [{ key: "works", label: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F", target: "work" }]
+    links: [{ key: "works", label: "schema.categoryItem.links.works", target: "work" }]
   }
 };
 var CATEGORY_PRESETS = {
@@ -588,7 +1191,7 @@ var CATEGORY_PRESETS = {
     fields: [
       {
         key: "type",
-        label: "\u0422\u0438\u043F",
+        label: "schema.categoryPreset.organization.type",
         type: "select",
         options: [
           { value: "\u0421\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u0438", color: "#f5a623" },
@@ -599,11 +1202,11 @@ var CATEGORY_PRESETS = {
           { value: "\u0414\u0440\u0443\u0433\u043E\u0435", color: "#7ed321" }
         ]
       },
-      { key: "summary", label: "\u041A\u043E\u0440\u043E\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }
+      { key: "summary", label: "schema.categoryPreset.organization.summary", type: "text" }
     ],
     linkDefs: [
-      { key: "leader", label: "\u041B\u0438\u0434\u0435\u0440", target: "character", single: true },
-      { key: "members", label: "\u0423\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u0438", target: "character", reverse: "affiliation" }
+      { key: "leader", label: "schema.categoryPreset.organization.linkDefs.leader", target: "character", single: true },
+      { key: "members", label: "schema.categoryPreset.organization.linkDefs.members", target: "character", reverse: "affiliation" }
     ]
   },
   location: {
@@ -612,7 +1215,7 @@ var CATEGORY_PRESETS = {
     fields: [
       {
         key: "type",
-        label: "\u0422\u0438\u043F",
+        label: "schema.categoryPreset.location.type",
         type: "select",
         options: [
           { value: "\u041B\u043E\u043A\u0430\u0446\u0438\u044F", color: "#f5a623" },
@@ -621,8 +1224,8 @@ var CATEGORY_PRESETS = {
           { value: "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u043E", color: "#7ed321" }
         ]
       },
-      { key: "country", label: "\u0421\u0442\u0440\u0430\u043D\u0430", type: "text" },
-      { key: "summary", label: "\u041A\u043E\u0440\u043E\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }
+      { key: "country", label: "schema.categoryPreset.location.country", type: "text" },
+      { key: "summary", label: "schema.categoryPreset.location.summary", type: "text" }
     ],
     linkDefs: []
   },
@@ -632,7 +1235,7 @@ var CATEGORY_PRESETS = {
     fields: [
       {
         key: "type",
-        label: "\u0422\u0438\u043F",
+        label: "schema.categoryPreset.language.type",
         type: "select",
         options: [
           { value: "\u041E\u0444\u0438\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u0439", color: "#4a9eff" },
@@ -641,23 +1244,23 @@ var CATEGORY_PRESETS = {
           { value: "\u0421\u043E\u0437\u0434\u0430\u043D\u043D\u044B\u0439", color: "#9b59b6" }
         ]
       },
-      { key: "region", label: "\u0420\u0435\u0433\u0438\u043E\u043D", type: "text" },
-      { key: "summary", label: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }
+      { key: "region", label: "schema.categoryPreset.language.region", type: "text" },
+      { key: "summary", label: "schema.categoryPreset.language.summary", type: "text" }
     ],
     linkDefs: []
   },
   custom: {
     icon: "shapes",
     preset: "custom",
-    fields: [{ key: "summary", label: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435", type: "text" }],
+    fields: [{ key: "summary", label: "schema.categoryPreset.custom.summary", type: "text" }],
     linkDefs: []
   }
 };
 var PRESET_LABELS = {
-  organization: "\u041E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u044F",
-  location: "\u041B\u043E\u043A\u0430\u0446\u0438\u044F",
-  language: "\u042F\u0437\u044B\u043A",
-  custom: "\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0430\u044F"
+  organization: "schema.preset.organization",
+  location: "schema.preset.location",
+  language: "schema.preset.language",
+  custom: "schema.preset.custom"
 };
 function resolveSchema(entity, store) {
   if (entity.kind === "categoryItem") {
@@ -869,8 +1472,8 @@ var ScenaristStore = class {
     if (!e)
       return;
     const prev = e.links[key] || [];
-    const removed = prev.filter((t) => !targetIds.includes(t));
-    const added = targetIds.filter((t) => !prev.includes(t));
+    const removed = prev.filter((t2) => !targetIds.includes(t2));
+    const added = targetIds.filter((t2) => !prev.includes(t2));
     e.links[key] = [...targetIds];
     e.updatedAt = Date.now();
     const def = findLinkDef(e, key, this);
@@ -1444,13 +2047,13 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
       const def = cat == null ? void 0 : cat.categorySchema;
       return {
         icon: (def == null ? void 0 : def.icon) || "\u2B21",
-        label: cat ? cat.name : "\u042D\u043B\u0435\u043C\u0435\u043D\u0442",
+        label: cat ? cat.name : t("schema.categoryItem.label"),
         fields: (def == null ? void 0 : def.fields) || [],
         links: [...SCHEMAS.categoryItem.links, ...(def == null ? void 0 : def.linkDefs) || []]
       };
     }
     const s = SCHEMAS[this.opts.kind];
-    return { icon: s.icon, label: s.label, fields: s.fields, links: s.links };
+    return { icon: s.icon, label: t(s.label), fields: s.fields, links: s.links };
   }
   onOpen() {
     var _a;
@@ -1460,21 +2063,21 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
     (this.opts.parentLinks || []).forEach((p) => hidden.add(p.key));
     contentEl.addClass("scenarist-modal");
     contentEl.createEl("h2", {
-      text: `${icon} ${this.opts.titleHint || "\u041D\u043E\u0432\u044B\u0439: " + label}`,
+      text: `${icon} ${this.opts.titleHint || t("modal.newEntity", { label })}`,
       cls: "scenarist-modal-title"
     });
     const nameRow = contentEl.createDiv("scenarist-form-row");
-    nameRow.createEl("label", { text: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435", cls: "scenarist-label" });
+    nameRow.createEl("label", { text: t("modal.name"), cls: "scenarist-label" });
     const nameInput = nameRow.createEl("input", {
       cls: "scenarist-input",
-      placeholder: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435\u2026"
+      placeholder: t("modal.namePlaceholder")
     });
     const fieldInputs = {};
     for (const field of fields) {
       if (field.type === "multiselect")
         continue;
       const row = contentEl.createDiv("scenarist-form-row");
-      row.createEl("label", { text: field.label, cls: "scenarist-label" });
+      row.createEl("label", { text: t(field.label, void 0, field.label), cls: "scenarist-label" });
       if (field.type === "select" || field.type === "status") {
         const sel = row.createEl("select", { cls: "scenarist-select" });
         if (!field.required)
@@ -1502,7 +2105,7 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
         continue;
       const row = contentEl.createDiv("scenarist-form-row");
       row.createEl("label", {
-        text: link.label + (link.single ? "" : " (\u043C\u043E\u0436\u043D\u043E \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E)"),
+        text: t(link.label, void 0, link.label) + (link.single ? "" : t("modal.multipleHint")),
         cls: "scenarist-label"
       });
       const sel = row.createEl("select", { cls: "scenarist-select" });
@@ -1514,10 +2117,10 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
       linkInputs[link.key] = sel;
     }
     const btns = contentEl.createDiv("scenarist-modal-buttons");
-    btns.createEl("button", { cls: "scenarist-btn", text: "\u041E\u0442\u043C\u0435\u043D\u0430" }).onclick = () => this.close();
+    btns.createEl("button", { cls: "scenarist-btn", text: t("modal.cancel") }).onclick = () => this.close();
     const createBtn = btns.createEl("button", {
       cls: "scenarist-btn-primary",
-      text: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C"
+      text: t("modal.create")
     });
     createBtn.onclick = async () => {
       const name = nameInput.value.trim();
@@ -1564,7 +2167,7 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
         await this.plugin.sync.ensureNote(store.get(entity.id));
       }
       this.plugin.navigateTo(entity.id);
-      new import_obsidian3.Notice(`\u0421\u043E\u0437\u0434\u0430\u043D\u043E: ${name}`);
+      new import_obsidian3.Notice(t("modal.created", { name }));
       this.close();
     };
     nameInput.focus();
@@ -1584,14 +2187,14 @@ var CreateWorkModal = class extends import_obsidian4.Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.addClass("scenarist-modal");
-    contentEl.createEl("h2", { text: "\u041D\u043E\u0432\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435", cls: "scenarist-modal-title" });
+    contentEl.createEl("h2", { text: t("modal.newWork"), cls: "scenarist-modal-title" });
     const fmtRow = contentEl.createDiv("scenarist-form-row");
-    fmtRow.createEl("label", { text: "\u0424\u043E\u0440\u043C\u0430\u0442", cls: "scenarist-label" });
+    fmtRow.createEl("label", { text: t("modal.workFormat"), cls: "scenarist-label" });
     const fmtWrap = fmtRow.createDiv("scenarist-choice");
     let format = "\u0421\u0435\u0440\u0438\u044F";
-    const mkChoice = (val, desc) => {
+    const mkChoice = (val, displayLabel, desc) => {
       const b = fmtWrap.createEl("button", { cls: "scenarist-choice-btn", text: "" });
-      b.createEl("div", { cls: "scenarist-choice-title", text: val });
+      b.createEl("div", { cls: "scenarist-choice-title", text: displayLabel });
       b.createEl("div", { cls: "scenarist-choice-desc", text: desc });
       if (val === format)
         b.addClass("active");
@@ -1601,23 +2204,27 @@ var CreateWorkModal = class extends import_obsidian4.Modal {
         b.addClass("active");
       };
     };
-    mkChoice("\u0421\u0435\u0440\u0438\u044F", "\u041D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u043A\u043D\u0438\u0433 (\u0442\u043E\u043C\u043E\u0432)");
-    mkChoice("\u0412\u0430\u043D\u0448\u043E\u0442", "\u041E\u0434\u043D\u0430 \u043A\u043D\u0438\u0433\u0430");
+    mkChoice("\u0421\u0435\u0440\u0438\u044F", t("modal.series"), t("modal.seriesDesc"));
+    mkChoice("\u0412\u0430\u043D\u0448\u043E\u0442", t("modal.oneshot"), t("modal.oneshotDesc"));
     const typeRow = contentEl.createDiv("scenarist-form-row");
-    typeRow.createEl("label", { text: "\u0422\u0438\u043F", cls: "scenarist-label" });
+    typeRow.createEl("label", { text: t("modal.workType"), cls: "scenarist-label" });
     const typeSel = typeRow.createEl("select", { cls: "scenarist-select" });
-    ["\u0420\u0430\u0441\u0441\u043A\u0430\u0437", "\u0421\u0446\u0435\u043D\u0430\u0440\u0438\u0439"].forEach((t) => typeSel.createEl("option", { value: t, text: t }));
+    const typeOptions = [
+      ["\u0420\u0430\u0441\u0441\u043A\u0430\u0437", t("modal.story")],
+      ["\u0421\u0446\u0435\u043D\u0430\u0440\u0438\u0439", t("modal.script")]
+    ];
+    typeOptions.forEach(([val, label]) => typeSel.createEl("option", { value: val, text: label }));
     const nameRow = contentEl.createDiv("scenarist-form-row");
-    nameRow.createEl("label", { text: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435", cls: "scenarist-label" });
+    nameRow.createEl("label", { text: t("modal.workName"), cls: "scenarist-label" });
     const nameInput = nameRow.createEl("input", {
       cls: "scenarist-input",
-      placeholder: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F\u2026"
+      placeholder: t("modal.workNamePlaceholder")
     });
     const btns = contentEl.createDiv("scenarist-modal-buttons");
-    btns.createEl("button", { cls: "scenarist-btn", text: "\u041E\u0442\u043C\u0435\u043D\u0430" }).onclick = () => this.close();
+    btns.createEl("button", { cls: "scenarist-btn", text: t("modal.cancel") }).onclick = () => this.close();
     const createBtn = btns.createEl("button", {
       cls: "scenarist-btn-primary",
-      text: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C"
+      text: t("modal.create")
     });
     createBtn.onclick = async () => {
       const name = nameInput.value.trim();
@@ -1638,7 +2245,7 @@ var CreateWorkModal = class extends import_obsidian4.Modal {
       if (this.plugin.settings.autoCreateNotes)
         await this.plugin.sync.ensureNote(store.get(work.id));
       this.plugin.navigateTo(work.id);
-      new import_obsidian4.Notice(`\u0421\u043E\u0437\u0434\u0430\u043D\u043E \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435: ${name}`);
+      new import_obsidian4.Notice(t("modal.workCreated", { name }));
       this.close();
     };
     nameInput.focus();
@@ -1661,26 +2268,27 @@ var CreateCategoryModal = class extends import_obsidian5.Modal {
     contentEl.addClass("scenarist-modal");
     const fixedPreset = this.defaultPreset;
     const def = fixedPreset ? CATEGORY_PRESETS[fixedPreset] : null;
+    const presetLabel = fixedPreset ? t(PRESET_LABELS[fixedPreset]) : "";
     contentEl.createEl("h2", {
-      text: def ? `\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F: ${PRESET_LABELS[fixedPreset]}` : "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+      text: def ? t("modal.newCategoryPreset", { preset: presetLabel }) : t("modal.newCategory"),
       cls: "scenarist-modal-title"
     });
     let preset = fixedPreset || "organization";
     const nameInputHolder = {};
     if (!fixedPreset) {
       const presetRow = contentEl.createDiv("scenarist-form-row");
-      presetRow.createEl("label", { text: "\u0422\u0438\u043F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438", cls: "scenarist-label" });
+      presetRow.createEl("label", { text: t("modal.categoryType"), cls: "scenarist-label" });
       const wrap = presetRow.createDiv("scenarist-choice");
       const PRESETS = [
-        ["organization", "\u041F\u043E\u043B\u044F: \u0442\u0438\u043F, \u043B\u0438\u0434\u0435\u0440, \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u0438"],
-        ["location", "\u041F\u043E\u043B\u044F: \u0442\u0438\u043F, \u0441\u0442\u0440\u0430\u043D\u0430"],
-        ["language", "\u041F\u043E\u043B\u044F: \u0442\u0438\u043F, \u0440\u0435\u0433\u0438\u043E\u043D"],
-        ["custom", "\u041F\u0443\u0441\u0442\u0430\u044F, \u043F\u043E\u043B\u044F \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u0435 \u043F\u043E\u0437\u0436\u0435"]
+        ["organization", t("modal.presets.organization")],
+        ["location", t("modal.presets.location")],
+        ["language", t("modal.presets.language")],
+        ["custom", t("modal.presets.custom")]
       ];
       const mk = (p, desc) => {
         const pDef = CATEGORY_PRESETS[p];
         const b = wrap.createEl("button", { cls: "scenarist-choice-btn" });
-        b.createEl("div", { cls: "scenarist-choice-title", text: `${pDef.icon} ${PRESET_LABELS[p]}` });
+        b.createEl("div", { cls: "scenarist-choice-title", text: `${pDef.icon} ${t(PRESET_LABELS[p])}` });
         b.createEl("div", { cls: "scenarist-choice-desc", text: desc });
         if (p === preset)
           b.addClass("active");
@@ -1689,24 +2297,24 @@ var CreateCategoryModal = class extends import_obsidian5.Modal {
           wrap.querySelectorAll(".scenarist-choice-btn").forEach((e) => e.removeClass("active"));
           b.addClass("active");
           if (nameInputHolder.el && !nameInputHolder.el.value)
-            nameInputHolder.el.placeholder = `\u041D\u0430\u043F\u0440. \xAB${PRESET_LABELS[p]}\xBB\u2026`;
+            nameInputHolder.el.placeholder = t("modal.categoryNamePlaceholder", { preset: t(PRESET_LABELS[p]) });
         };
       };
       for (const [p, desc] of PRESETS)
         mk(p, desc);
     }
     const nameRow = contentEl.createDiv("scenarist-form-row");
-    nameRow.createEl("label", { text: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438", cls: "scenarist-label" });
+    nameRow.createEl("label", { text: t("modal.categoryName"), cls: "scenarist-label" });
     const nameInput = nameRow.createEl("input", {
       cls: "scenarist-input",
-      placeholder: fixedPreset ? `\u041D\u0430\u043F\u0440. \xAB${PRESET_LABELS[fixedPreset]}\xBB\u2026` : "\u041D\u0430\u043F\u0440. \xAB\u041E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u0438\xBB, \xAB\u041B\u043E\u043A\u0430\u0446\u0438\u0438\xBB\u2026"
+      placeholder: fixedPreset ? t("modal.categoryNamePlaceholder", { preset: presetLabel }) : t("modal.categoryNameGenericPlaceholder")
     });
     nameInputHolder.el = nameInput;
     const btns = contentEl.createDiv("scenarist-modal-buttons");
-    btns.createEl("button", { cls: "scenarist-btn", text: "\u041E\u0442\u043C\u0435\u043D\u0430" }).onclick = () => this.close();
+    btns.createEl("button", { cls: "scenarist-btn", text: t("modal.cancel") }).onclick = () => this.close();
     const createBtn = btns.createEl("button", {
       cls: "scenarist-btn-primary",
-      text: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C"
+      text: t("modal.create")
     });
     createBtn.onclick = async () => {
       const name = nameInput.value.trim();
@@ -1718,7 +2326,7 @@ var CreateCategoryModal = class extends import_obsidian5.Modal {
       if (this.plugin.settings.autoCreateNotes)
         await this.plugin.sync.ensureNote(this.plugin.store.get(cat.id));
       this.plugin.navigateTo(cat.id);
-      new import_obsidian5.Notice(`\u0421\u043E\u0437\u0434\u0430\u043D\u0430 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F: ${name}`);
+      new import_obsidian5.Notice(t("modal.categoryCreated", { name }));
       this.close();
     };
     nameInput.focus();
@@ -1769,14 +2377,17 @@ var NavigatorView = class extends import_obsidian6.ItemView {
   async onClose() {
     this.unsub.forEach((u) => u());
   }
+  refresh() {
+    this.render();
+  }
   get store() {
     return this.plugin.store;
   }
   enabledQuickTypes() {
-    return (this.plugin.settings.categoryQuickTypes || []).filter((t) => t.enabled);
+    return (this.plugin.settings.categoryQuickTypes || []).filter((qt) => qt.enabled);
   }
   resolveTab() {
-    const valid = /* @__PURE__ */ new Set(["work", "character", ...this.enabledQuickTypes().map((t) => t.id)]);
+    const valid = /* @__PURE__ */ new Set(["work", "character", ...this.enabledQuickTypes().map((qt) => qt.id)]);
     if (!valid.has(this.tab))
       this.tab = "work";
   }
@@ -1821,7 +2432,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     } else if (this.tab === "character") {
       this.renderCharacterTab(body);
     } else {
-      const qt = this.enabledQuickTypes().find((t) => t.id === this.tab);
+      const qt = this.enabledQuickTypes().find((qt2) => qt2.id === this.tab);
       if (qt)
         this.renderCategoryTypeTab(body, qt);
     }
@@ -1838,7 +2449,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     const wrap = c.createDiv("scenarist-search-wrap");
     const input = wrap.createEl("input", {
       cls: "scenarist-search",
-      placeholder: "\u041F\u043E\u0438\u0441\u043A\u2026",
+      placeholder: t("nav.search"),
       type: "text"
     });
     input.value = this.search;
@@ -1852,14 +2463,14 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     let totalFound = 0;
     const works = this.store.byKindForProject("work").filter((w) => this.workHasMatch(w));
     if (works.length > 0) {
-      this.searchSectionTitle(body, "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F");
+      this.searchSectionTitle(body, t("nav.works"));
       for (const work of works)
         this.renderWorkBlock(body, work);
       totalFound += works.length;
     }
     const chars = this.store.byKindForProject("character").filter((c) => this.matches(c));
     if (chars.length > 0) {
-      this.searchSectionTitle(body, "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438");
+      this.searchSectionTitle(body, t("nav.characters"));
       const pills = body.createDiv("scenarist-pills");
       pills.style.paddingLeft = "12px";
       for (const ch of chars)
@@ -1887,7 +2498,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
             () => new CreateEntityModal(this.app, this.plugin, {
               kind: "categoryItem",
               categoryId: cat.id,
-              titleHint: `\u041D\u043E\u0432\u044B\u0439: ${cat.name}`
+              titleHint: t("nav.newWork", { name: cat.name })
             }).open(),
             () => this.plugin.navigateTo(cat.id),
             cat
@@ -1897,7 +2508,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
       }
     }
     if (totalFound === 0) {
-      body.createDiv("scenarist-tree-empty").setText("\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E");
+      body.createDiv("scenarist-tree-empty").setText(t("nav.nothingFound"));
     }
   }
   searchSectionTitle(parent, text) {
@@ -1908,7 +2519,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     const bar = c.createDiv("scenarist-projbar");
     const gear = bar.createEl("button", { cls: "clickable-icon scenarist-proj-settings" });
     (0, import_obsidian6.setIcon)(gear, "settings");
-    gear.setAttribute("aria-label", "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 Scenarist");
+    gear.setAttribute("aria-label", t("nav.openSettings"));
     gear.onclick = () => {
       const setting = this.app.setting;
       if (setting) {
@@ -1917,7 +2528,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
       }
     };
     const sel = bar.createEl("select", { cls: "scenarist-work-select" });
-    const none = sel.createEl("option", { value: NO_PROJECT, text: "\u2014 \u0411\u0435\u0437 \u043F\u0440\u043E\u0435\u043A\u0442\u0430" });
+    const none = sel.createEl("option", { value: NO_PROJECT, text: t("nav.noProject") });
     if (this.store.getActiveProjectId() === NO_PROJECT)
       none.selected = true;
     this.store.getProjects().forEach((p) => {
@@ -1928,17 +2539,17 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     sel.onchange = () => this.store.setActiveProject(sel.value);
     const add = bar.createEl("button", { cls: "clickable-icon scenarist-proj-add" });
     (0, import_obsidian6.setIcon)(add, "plus");
-    add.setAttribute("aria-label", "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0440\u043E\u0435\u043A\u0442");
+    add.setAttribute("aria-label", t("nav.createProject"));
     add.onclick = () => new CreateEntityModal(this.app, this.plugin, {
       kind: "project",
-      titleHint: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442"
+      titleHint: t("nav.newProject")
     }).open();
   }
   // ── вкладки ────────────────────────────────────────────────────────────────
   renderTabs(c) {
     const row = c.createDiv("scenarist-tabs-icons");
-    this.makeTabBtn(row, "work", "palette", "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F");
-    this.makeTabBtn(row, "character", "user", "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438");
+    this.makeTabBtn(row, "work", "palette", t("nav.works"));
+    this.makeTabBtn(row, "character", "user", t("nav.characters"));
     for (const qt of this.enabledQuickTypes()) {
       this.makeTabBtn(row, qt.id, qt.icon, qt.label);
     }
@@ -1963,13 +2574,13 @@ var NavigatorView = class extends import_obsidian6.ItemView {
   renderWorkTab(body) {
     this.tabHeader(
       body,
-      "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
+      t("nav.works"),
       () => new CreateWorkModal(this.app, this.plugin).open(),
-      "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435"
+      t("nav.createWork")
     );
     const works = this.store.byKindForProject("work");
     if (works.length === 0) {
-      body.createDiv("scenarist-tree-empty").setText("\u041D\u0435\u0442 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0439");
+      body.createDiv("scenarist-tree-empty").setText(t("nav.noWorks"));
       return;
     }
     for (const work of works)
@@ -2003,14 +2614,14 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     };
     const tl = head.createEl("button", { cls: "clickable-icon" });
     (0, import_obsidian6.setIcon)(tl, "clock");
-    tl.setAttribute("aria-label", "\u0422\u0430\u0439\u043C\u043B\u0430\u0439\u043D");
+    tl.setAttribute("aria-label", t("nav.timeline"));
     tl.onclick = (e) => {
       e.stopPropagation();
       this.plugin.openTimeline(work.id);
     };
     const addBtn = head.createEl("button", { cls: "clickable-icon" });
     (0, import_obsidian6.setIcon)(addBtn, "plus");
-    addBtn.setAttribute("aria-label", "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C");
+    addBtn.setAttribute("aria-label", t("nav.add"));
     addBtn.onclick = (e) => {
       e.stopPropagation();
       this.workAddMenu(e, work);
@@ -2035,7 +2646,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
         () => new CreateEntityModal(this.app, this.plugin, {
           kind: "chapter",
           parentLinks: [{ key: "book", id: b.id }],
-          titleHint: "\u041D\u043E\u0432\u0430\u044F \u0433\u043B\u0430\u0432\u0430"
+          titleHint: t("nav.newChapter")
         }).open(),
         void 0,
         b
@@ -2046,12 +2657,12 @@ var NavigatorView = class extends import_obsidian6.ItemView {
       inner,
       `arcs:${work.id}`,
       ENTITY_ICON.arc,
-      "\u0410\u0440\u043A\u0438",
+      t("nav.arcs"),
       arcs,
       () => new CreateEntityModal(this.app, this.plugin, {
         kind: "arc",
         parentLinks: [{ key: "work", id: work.id }],
-        titleHint: "\u041D\u043E\u0432\u0430\u044F \u0430\u0440\u043A\u0430"
+        titleHint: t("nav.newArc")
       }).open()
     );
     const anchors = this.linked(work, "anchors", "anchor").filter((a) => this.matches(a));
@@ -2059,12 +2670,12 @@ var NavigatorView = class extends import_obsidian6.ItemView {
       inner,
       `anch:${work.id}`,
       ENTITY_ICON.anchor,
-      "\u042F\u043A\u043E\u0440\u044F",
+      t("nav.anchors"),
       anchors,
       () => new CreateEntityModal(this.app, this.plugin, {
         kind: "anchor",
         parentLinks: [{ key: "work", id: work.id }],
-        titleHint: "\u041D\u043E\u0432\u044B\u0439 \u044F\u043A\u043E\u0440\u044C"
+        titleHint: t("nav.newAnchor")
       }).open()
     );
   }
@@ -2072,9 +2683,9 @@ var NavigatorView = class extends import_obsidian6.ItemView {
   renderCharacterTab(body) {
     this.tabHeader(
       body,
-      "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
+      t("nav.characters"),
       () => new CreateEntityModal(this.app, this.plugin, { kind: "character" }).open(),
-      "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430"
+      t("nav.createCharacter")
     );
     const chars = this.store.byKindForProject("character");
     for (const role of CHAR_ROLES) {
@@ -2088,7 +2699,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
         () => new CreateEntityModal(this.app, this.plugin, {
           kind: "character",
           presetProps: { role },
-          titleHint: `\u041D\u043E\u0432\u044B\u0439 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436 (${role.toLowerCase()})`
+          titleHint: t("nav.newWork", { name: role.toLowerCase() })
         }).open()
       );
     }
@@ -2098,7 +2709,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
         body,
         "role:none",
         ENTITY_ICON.character,
-        "\u0411\u0435\u0437 \u0440\u043E\u043B\u0438",
+        t("nav.noRole"),
         noRole,
         () => new CreateEntityModal(this.app, this.plugin, { kind: "character" }).open()
       );
@@ -2110,14 +2721,14 @@ var NavigatorView = class extends import_obsidian6.ItemView {
       body,
       qt.label,
       () => new CreateCategoryModal(this.app, this.plugin, qt.preset).open(),
-      `\u0421\u043E\u0437\u0434\u0430\u0442\u044C: ${qt.label}`
+      t("nav.createFor", { label: qt.label })
     );
     const cats = this.store.byKindForProject("category").filter((c) => {
       var _a;
       return ((_a = c.categorySchema) == null ? void 0 : _a.preset) === qt.preset;
     });
     if (cats.length === 0) {
-      body.createDiv("scenarist-tree-empty").setText(`\u041D\u0435\u0442 ${qt.label.toLowerCase()}. \u041D\u0430\u0436\u043C\u0438\u0442\u0435 + \u0447\u0442\u043E\u0431\u044B \u0441\u043E\u0437\u0434\u0430\u0442\u044C.`);
+      body.createDiv("scenarist-tree-empty").setText(t("nav.noItems", { label: qt.label.toLowerCase() }));
       return;
     }
     for (const cat of cats) {
@@ -2131,7 +2742,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
         () => new CreateEntityModal(this.app, this.plugin, {
           kind: "categoryItem",
           categoryId: cat.id,
-          titleHint: `\u041D\u043E\u0432\u044B\u0439: ${cat.name}`
+          titleHint: t("nav.newWork", { name: cat.name })
         }).open(),
         () => this.plugin.navigateTo(cat.id),
         cat
@@ -2152,11 +2763,11 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     const head = parent.createDiv("scenarist-group-header");
     head.createEl("span", { cls: "scenarist-chevron", text: open ? "\u25BE" : "\u25B8" });
     this.typeIcon(head, icon);
-    const t = head.createEl("span", { cls: "scenarist-group-title", text: title });
+    const titleEl = head.createEl("span", { cls: "scenarist-group-title", text: title });
     head.createEl("span", { cls: "scenarist-count-badge", text: String(items.length) });
     if (onTitleClick) {
-      t.addClass("linkable");
-      t.onclick = (e) => {
+      titleEl.addClass("linkable");
+      titleEl.onclick = (e) => {
         e.stopPropagation();
         onTitleClick();
       };
@@ -2176,7 +2787,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
       this.renderPill(pills, item);
     const add = pills.createEl("button", { cls: "scenarist-pill add" });
     (0, import_obsidian6.setIcon)(add, "plus");
-    add.setAttribute("aria-label", "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C");
+    add.setAttribute("aria-label", t("nav.add"));
     add.onclick = onAdd;
   }
   renderPill(parent, entity) {
@@ -2203,33 +2814,33 @@ var NavigatorView = class extends import_obsidian6.ItemView {
   }
   workAddMenu(e, work) {
     const menu = new import_obsidian6.Menu();
-    const mk = (label, kind, icon) => menu.addItem(
+    const mk = (label, stored, kind, icon) => menu.addItem(
       (i) => i.setTitle(label).setIcon(icon).onClick(
         () => new CreateEntityModal(this.app, this.plugin, {
           kind,
           parentLinks: [{ key: "work", id: work.id }],
-          titleHint: `\u041D\u043E\u0432\u044B\u0439: ${label}`
+          titleHint: t("nav.newWork", { name: stored })
         }).open()
       )
     );
-    mk("\u041A\u043D\u0438\u0433\u0430", "book", "book-open");
-    mk("\u0410\u0440\u043A\u0430", "arc", "git-branch");
-    mk("\u042F\u043A\u043E\u0440\u044C", "anchor", "anchor");
+    mk(t("nav.book"), t("nav.book"), "book", "book-open");
+    mk(t("nav.arc"), t("nav.arc"), "arc", "git-branch");
+    mk(t("nav.anchor"), t("nav.anchor"), "anchor", "anchor");
     menu.showAtMouseEvent(e);
   }
   contextMenu(e, entity) {
     const menu = new import_obsidian6.Menu();
     menu.addItem(
-      (i) => i.setTitle("\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443").setIcon("info").onClick(() => this.plugin.navigateTo(entity.id))
+      (i) => i.setTitle(t("nav.openCard")).setIcon("info").onClick(() => this.plugin.navigateTo(entity.id))
     );
     menu.addItem(
-      (i) => i.setTitle("\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443").setIcon("file-text").onClick(() => this.plugin.sync.openNote(entity))
+      (i) => i.setTitle(t("nav.openNote")).setIcon("file-text").onClick(() => this.plugin.sync.openNote(entity))
     );
     menu.addSeparator();
     menu.addItem(
-      (i) => i.setTitle("\u0423\u0434\u0430\u043B\u0438\u0442\u044C").setIcon("trash").onClick(async () => {
+      (i) => i.setTitle(t("nav.delete")).setIcon("trash").onClick(async () => {
         await this.plugin.sync.deleteEntity(entity.id);
-        new import_obsidian6.Notice(`\u0423\u0434\u0430\u043B\u0435\u043D\u043E: ${entity.name}`);
+        new import_obsidian6.Notice(t("nav.deleted", { name: entity.name }));
       })
     );
     menu.showAtMouseEvent(e);
@@ -2239,15 +2850,6 @@ var NavigatorView = class extends import_obsidian6.ItemView {
 // src/views/CardView.ts
 var import_obsidian7 = require("obsidian");
 var CARD_VIEW = "scenarist-card";
-var BACKLINK_LABELS = {
-  chapters: "\u041F\u043E\u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0432 \u0433\u043B\u0430\u0432\u0430\u0445",
-  pages: "\u041F\u043E\u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043D\u0430 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0430\u0445",
-  members: "\u0423\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u0438",
-  arcs: "\u0410\u0440\u043A\u0438",
-  books: "\u041A\u043D\u0438\u0433\u0438",
-  anchors: "\u042F\u043A\u043E\u0440\u044F",
-  works: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F"
-};
 var STRUCTURAL = /* @__PURE__ */ new Set(["project", "category"]);
 var LONG_FIELDS = /* @__PURE__ */ new Set(["summary", "synopsis", "description", "idea", "goal"]);
 var CardView = class extends import_obsidian7.ItemView {
@@ -2275,6 +2877,9 @@ var CardView = class extends import_obsidian7.ItemView {
   }
   async onClose() {
     this.unsub.forEach((u) => u());
+  }
+  refresh() {
+    this.render();
   }
   /** Debounced re-entrant-safe render scheduler. */
   scheduleRender() {
@@ -2316,10 +2921,10 @@ var CardView = class extends import_obsidian7.ItemView {
         const empty = root.createDiv("scenarist-empty");
         const iconBox = empty.createDiv("scenarist-empty-icon");
         (0, import_obsidian7.setIcon)(iconBox, "layers");
-        empty.createEl("p", { text: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u044D\u043B\u0435\u043C\u0435\u043D\u0442 \u0432 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0435" });
+        empty.createEl("p", { text: t("card.empty") });
         empty.createEl("p", {
           cls: "scenarist-empty-hint",
-          text: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435, \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430 \u0438\u043B\u0438 \u0433\u043B\u0430\u0432\u0443 \u0441\u043B\u0435\u0432\u0430"
+          text: t("card.emptyHint")
         });
         return;
       }
@@ -2363,7 +2968,7 @@ var CardView = class extends import_obsidian7.ItemView {
     const schema = this.plugin.store.resolved(entity);
     const top = card.createDiv("scenarist-card-top");
     if (this.plugin.canGoBack()) {
-      const back = top.createEl("button", { cls: "scenarist-card-back", attr: { title: "\u041D\u0430\u0437\u0430\u0434" } });
+      const back = top.createEl("button", { cls: "scenarist-card-back", attr: { title: t("card.back") } });
       (0, import_obsidian7.setIcon)(back, "arrow-left");
       back.onclick = () => this.plugin.back();
     }
@@ -2384,19 +2989,19 @@ var CardView = class extends import_obsidian7.ItemView {
       a.onclick = () => this.plugin.navigateTo(cr.id);
       trail.createEl("span", { cls: "scenarist-crumb-sep", text: "/" });
     });
-    trail.createEl("span", { cls: "scenarist-crumb current", text: schema.label });
+    trail.createEl("span", { cls: "scenarist-crumb current", text: t(schema.label, void 0, schema.label) });
     const spacer = top.createDiv();
     spacer.style.flex = "1";
-    const openBtn = top.createEl("button", { cls: "scenarist-card-note-btn", attr: { title: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443" } });
+    const openBtn = top.createEl("button", { cls: "scenarist-card-note-btn", attr: { title: t("card.openNote") } });
     (0, import_obsidian7.setIcon)(openBtn, "external-link");
-    openBtn.createEl("span", { text: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430" });
+    openBtn.createEl("span", { text: t("card.noteLabel") });
     openBtn.onclick = () => this.plugin.sync.openNote(entity);
     const titleRow = card.createDiv("scenarist-card-titlerow");
     const iconBox = titleRow.createEl("span", { cls: "scenarist-card-icon" });
     this.renderIconInto(iconBox, schema.icon);
     const title = titleRow.createEl("input", { cls: "scenarist-card-title" });
     title.value = entity.name;
-    title.placeholder = "\u0411\u0435\u0437 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044F";
+    title.placeholder = t("card.noName");
     title.onchange = () => {
       const v = title.value.trim();
       if (v && v !== entity.name) {
@@ -2409,29 +3014,29 @@ var CardView = class extends import_obsidian7.ItemView {
   /** Строка тегов под заголовком. */
   renderTagsHeader(card, entity) {
     const rawTags = entity.props["tags"];
-    const tags = rawTags ? String(rawTags).split(",").map((t) => t.trim()).filter(Boolean) : [];
+    const tags = rawTags ? String(rawTags).split(",").map((tg) => tg.trim()).filter(Boolean) : [];
     const row = card.createDiv("scenarist-card-tags");
     for (const tag of tags) {
       const chip = row.createEl("span", { cls: "scenarist-tag-chip" });
       const text = chip.createEl("span", { cls: "scenarist-tag-chip-text", text: "#" + tag });
-      text.title = `\u041D\u0430\u0439\u0442\u0438 #${tag} \u0432 vault`;
+      text.title = t("card.findTag", { tag });
       text.onclick = (e) => {
         e.stopPropagation();
         this.openTagSearch(tag);
       };
       const x = chip.createEl("span", { cls: "scenarist-tag-chip-x", text: "\xD7" });
-      x.title = "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0442\u0435\u0433";
+      x.title = t("card.removeTag");
       x.onclick = (e) => {
         e.stopPropagation();
-        const next = tags.filter((t) => t !== tag);
+        const next = tags.filter((tg) => tg !== tag);
         this.commitProp(entity, "tags", next.length ? next.join(", ") : null);
       };
     }
-    const addBtn = row.createEl("button", { cls: "scenarist-tag-add", text: "+ \u0442\u0435\u0433" });
+    const addBtn = row.createEl("button", { cls: "scenarist-tag-add", text: t("card.addTag") });
     addBtn.onclick = () => {
       addBtn.style.display = "none";
       const inp = row.createEl("input", { cls: "scenarist-tag-input" });
-      inp.placeholder = "\u0442\u0435\u0433\u2026";
+      inp.placeholder = t("card.tagPlaceholder");
       inp.focus();
       const commit = () => {
         const val = inp.value.trim().replace(/^#/, "");
@@ -2457,7 +3062,7 @@ var CardView = class extends import_obsidian7.ItemView {
     const section = card.createDiv("scenarist-card-section");
     for (const field of fields) {
       const row = section.createDiv("scenarist-prop");
-      row.createEl("div", { cls: "scenarist-prop-label", text: field.label });
+      row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
       const valWrap = row.createDiv("scenarist-prop-value");
       this.renderFieldControl(valWrap, entity, field);
     }
@@ -2472,7 +3077,7 @@ var CardView = class extends import_obsidian7.ItemView {
     while ((m = re.exec(rawVal)) !== null)
       links.push(m[1]);
     const row = section.createDiv("scenarist-prop");
-    row.createEl("div", { cls: "scenarist-prop-label", text: "\u0421\u0441\u044B\u043B\u043A\u0438 \u043D\u0430 \u0437\u0430\u043C\u0435\u0442\u043A\u0438" });
+    row.createEl("div", { cls: "scenarist-prop-label", text: t("card.noteLinks") });
     const valWrap = row.createDiv("scenarist-prop-value");
     const chipRow = valWrap.createDiv("scenarist-card-tags scenarist-link-chips");
     chipRow.style.margin = "0";
@@ -2483,7 +3088,7 @@ var CardView = class extends import_obsidian7.ItemView {
     for (const link of links) {
       const chip = chipRow.createEl("span", { cls: "scenarist-link-chip" });
       const text = chip.createEl("span", { cls: "scenarist-tag-chip-text", text: `[[${link}]]` });
-      text.title = `\u041E\u0442\u043A\u0440\u044B\u0442\u044C: ${link}`;
+      text.title = t("card.openLink", { link });
       text.onclick = (e) => {
         e.stopPropagation();
         this.openObsidianLink(link);
@@ -2494,11 +3099,11 @@ var CardView = class extends import_obsidian7.ItemView {
         commitLinks(links.filter((l) => l !== link));
       };
     }
-    const addBtn = chipRow.createEl("button", { cls: "scenarist-tag-add", text: "+ \u0441\u0441\u044B\u043B\u043A\u0430" });
+    const addBtn = chipRow.createEl("button", { cls: "scenarist-tag-add", text: t("card.addLink") });
     addBtn.onclick = () => {
       addBtn.style.display = "none";
       const inp = chipRow.createEl("input", { cls: "scenarist-tag-input" });
-      inp.placeholder = "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0437\u0430\u043C\u0435\u0442\u043A\u0438\u2026";
+      inp.placeholder = t("card.linkPlaceholder");
       inp.style.width = "160px";
       inp.focus();
       const commit = () => {
@@ -2543,16 +3148,16 @@ var CardView = class extends import_obsidian7.ItemView {
         }
         const available = settingsOpts.filter((o) => !selected.includes(o));
         const sel = chipRow.createEl("select", { cls: "scenarist-genre-add" });
-        sel.createEl("option", { value: "", text: "\uFF0B \u0436\u0430\u043D\u0440\u2026" });
+        sel.createEl("option", { value: "", text: t("card.addGenre") });
         available.forEach((o) => sel.createEl("option", { value: o, text: o }));
-        sel.createEl("option", { value: "__new__", text: "\uFF0B \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0441\u0432\u043E\u0439\u2026" });
+        sel.createEl("option", { value: "__new__", text: t("card.addNewGenre") });
         sel.onchange = async () => {
           if (!sel.value)
             return;
           if (sel.value === "__new__") {
             sel.style.display = "none";
             const inp = chipRow.createEl("input", { cls: "scenarist-tag-input" });
-            inp.placeholder = "\u041D\u043E\u0432\u044B\u0439 \u0436\u0430\u043D\u0440\u2026";
+            inp.placeholder = t("card.newGenrePlaceholder");
             inp.focus();
             const doAdd = async () => {
               const newG = inp.value.trim();
@@ -2664,16 +3269,16 @@ var CardView = class extends import_obsidian7.ItemView {
     const items = this.plugin.store.categoryItems(cat.id);
     const section = card.createDiv("scenarist-card-section");
     const head = section.createDiv("scenarist-card-body-head");
-    head.createEl("div", { cls: "scenarist-card-section-title", text: `\u042D\u043B\u0435\u043C\u0435\u043D\u0442\u044B (${items.length})` });
-    const add = head.createEl("button", { cls: "scenarist-card-edit-btn", text: "\uFF0B \u044D\u043B\u0435\u043C\u0435\u043D\u0442" });
+    head.createEl("div", { cls: "scenarist-card-section-title", text: t("card.items", { count: items.length }) });
+    const add = head.createEl("button", { cls: "scenarist-card-edit-btn", text: t("card.addItem") });
     add.onclick = () => new CreateEntityModal(this.app, this.plugin, {
       kind: "categoryItem",
       categoryId: cat.id,
-      titleHint: `\u041D\u043E\u0432\u044B\u0439: ${cat.name}`
+      titleHint: t("modal.newEntity", { label: cat.name })
     }).open();
     const chips = section.createDiv("scenarist-rel-chips");
     if (items.length === 0) {
-      chips.createEl("span", { cls: "scenarist-muted", text: "\u041F\u043E\u043A\u0430 \u043F\u0443\u0441\u0442\u043E." });
+      chips.createEl("span", { cls: "scenarist-muted", text: t("card.emptyItems") });
     }
     for (const it of items) {
       const chip = chips.createEl("span", { cls: "scenarist-rel-chip" });
@@ -2688,12 +3293,18 @@ var CardView = class extends import_obsidian7.ItemView {
     const schema = this.plugin.store.resolved(entity);
     const linkKeys = new Set(schema.links.map((l) => l.key));
     const section = card.createDiv("scenarist-card-section");
-    section.createEl("div", { cls: "scenarist-card-section-title", text: "\u0421\u0432\u044F\u0437\u0438" });
+    section.createEl("div", { cls: "scenarist-card-section-title", text: t("card.relations") });
     const blocks = [];
     for (const link of schema.links) {
       if (STRUCTURAL.has(link.key))
         continue;
-      const el = this.renderLinkEditor(entity, link.key, link.label, link.target, !!link.single);
+      const el = this.renderLinkEditor(
+        entity,
+        link.key,
+        t(link.label, void 0, link.label),
+        link.target,
+        !!link.single
+      );
       if (el) {
         section.appendChild(el);
         blocks.push(el);
@@ -2723,13 +3334,13 @@ var CardView = class extends import_obsidian7.ItemView {
     lbl.textContent = label;
     const chips = wrap.createDiv("scenarist-rel-chips");
     for (const tid of current) {
-      const t = this.plugin.store.get(tid);
-      if (!t)
+      const target_entity = this.plugin.store.get(tid);
+      if (!target_entity)
         continue;
       const chip = chips.createEl("span", { cls: "scenarist-rel-chip" });
       const chipIcon = chip.createEl("span", { cls: "scenarist-rel-chip-icon" });
-      this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
-      chip.createEl("span", { text: t.name });
+      this.renderIconInto(chipIcon, this.plugin.store.resolved(target_entity).icon);
+      chip.createEl("span", { text: target_entity.name });
       chip.onclick = () => this.plugin.navigateTo(tid);
       const x = chip.createEl("span", { cls: "scenarist-rel-x", text: "\xD7" });
       x.onclick = (e) => {
@@ -2744,7 +3355,7 @@ var CardView = class extends import_obsidian7.ItemView {
     }
     if (candidates.length > 0) {
       const sel = chips.createEl("select", { cls: "scenarist-rel-add" });
-      sel.createEl("option", { value: "", text: "+ \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u044C\u2026" });
+      sel.createEl("option", { value: "", text: t("card.addRelation") });
       candidates.forEach((c) => sel.createEl("option", { value: c.id, text: c.name }));
       sel.onchange = () => {
         if (!sel.value)
@@ -2759,16 +3370,16 @@ var CardView = class extends import_obsidian7.ItemView {
   renderBacklinks(key, ids) {
     const wrap = document.createElement("div");
     wrap.className = "scenarist-rel-group backlinks";
-    wrap.createDiv("scenarist-rel-label").textContent = BACKLINK_LABELS[key] || key;
+    wrap.createDiv("scenarist-rel-label").textContent = t("card.backlinks." + key, void 0, key);
     const chips = wrap.createDiv("scenarist-rel-chips");
     for (const id of ids) {
-      const t = this.plugin.store.get(id);
-      if (!t)
+      const entity = this.plugin.store.get(id);
+      if (!entity)
         continue;
       const chip = chips.createEl("span", { cls: "scenarist-rel-chip readonly" });
       const chipIcon = chip.createEl("span", { cls: "scenarist-rel-chip-icon" });
-      this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
-      chip.createEl("span", { text: t.name });
+      this.renderIconInto(chipIcon, this.plugin.store.resolved(entity).icon);
+      chip.createEl("span", { text: entity.name });
       chip.onclick = () => this.plugin.navigateTo(id);
     }
     return wrap;
@@ -2777,10 +3388,10 @@ var CardView = class extends import_obsidian7.ItemView {
   async renderBody(card, entity) {
     const section = card.createDiv("scenarist-card-section scenarist-card-body");
     const head = section.createDiv("scenarist-card-body-head");
-    head.createEl("div", { cls: "scenarist-card-section-title", text: "\u0422\u0435\u043A\u0441\u0442" });
+    head.createEl("div", { cls: "scenarist-card-section-title", text: t("card.text") });
     const editBtn = head.createEl("button", { cls: "scenarist-card-edit-btn" });
     (0, import_obsidian7.setIcon)(editBtn, "pencil");
-    editBtn.createEl("span", { text: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C" });
+    editBtn.createEl("span", { text: t("card.edit") });
     editBtn.onclick = () => this.plugin.sync.openNote(entity);
     const file = entity.filePath ? this.plugin.app.vault.getAbstractFileByPath(entity.filePath) : null;
     const target = section.createDiv("scenarist-card-body-render markdown-rendered");
@@ -2790,12 +3401,12 @@ var CardView = class extends import_obsidian7.ItemView {
       if (body) {
         await import_obsidian7.MarkdownRenderer.render(this.plugin.app, body, target, file.path, this);
       } else {
-        target.createEl("p", { cls: "scenarist-muted", text: "\u041F\u0443\u0441\u0442\u043E." });
+        target.createEl("p", { cls: "scenarist-muted", text: t("card.emptyBody") });
       }
     } else {
       target.createEl("p", {
         cls: "scenarist-muted",
-        text: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430 \u0435\u0449\u0451 \u043D\u0435 \u0441\u043E\u0437\u0434\u0430\u043D\u0430 \u2014 \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \xAB\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C\xBB."
+        text: t("card.noteNotCreated")
       });
     }
   }
@@ -2841,7 +3452,7 @@ var BoardView = class extends import_obsidian8.ItemView {
     return BOARD_VIEW;
   }
   getDisplayText() {
-    return "\u0414\u043E\u0441\u043A\u0430 \u0433\u043B\u0430\u0432";
+    return t("board.title");
   }
   getIcon() {
     return "kanban-square";
@@ -2852,6 +3463,9 @@ var BoardView = class extends import_obsidian8.ItemView {
   }
   async onClose() {
     this.unsub.forEach((u) => u());
+  }
+  refresh() {
+    this.render();
   }
   projectChapters() {
     const works = this.plugin.store.byKindForProject("work");
@@ -2865,11 +3479,11 @@ var BoardView = class extends import_obsidian8.ItemView {
     c.empty();
     c.addClass("scenarist-panel", "scenarist-board");
     const header = c.createDiv("scenarist-panel-header");
-    header.createEl("span", { cls: "scenarist-panel-title", text: "\u{1F5C2} \u0414\u043E\u0441\u043A\u0430 \u0433\u043B\u0430\u0432" });
+    header.createEl("span", { cls: "scenarist-panel-title", text: "\u{1F5C2} " + t("board.title") });
     const statuses = ((_a = SCHEMAS.chapter.fields.find((f) => f.key === "status")) == null ? void 0 : _a.options) || [];
     const chapters = this.projectChapters();
     if (chapters.length === 0) {
-      c.createDiv("scenarist-empty").createEl("p", { text: "\u041D\u0435\u0442 \u0433\u043B\u0430\u0432 \u0432 \u0430\u043A\u0442\u0438\u0432\u043D\u043E\u043C \u043F\u0440\u043E\u0435\u043A\u0442\u0435" });
+      c.createDiv("scenarist-empty").createEl("p", { text: t("board.empty") });
       return;
     }
     const board = c.createDiv("scenarist-board-columns");
@@ -2905,7 +3519,7 @@ var BoardView = class extends import_obsidian8.ItemView {
     const noStatus = chapters.filter((ch) => !statuses.some((s) => s.value === ch.props["status"]));
     if (noStatus.length > 0) {
       const col = board.createDiv("scenarist-board-col");
-      col.createDiv("scenarist-board-col-head").createEl("span", { text: "\u0411\u0435\u0437 \u0441\u0442\u0430\u0442\u0443\u0441\u0430" });
+      col.createDiv("scenarist-board-col-head").createEl("span", { text: t("board.noStatus") });
       const drop = col.createDiv("scenarist-board-drop");
       for (const ch of noStatus)
         this.renderCard(drop, ch);
@@ -2956,7 +3570,7 @@ var GraphView = class extends import_obsidian9.ItemView {
     return GRAPH_VIEW;
   }
   getDisplayText() {
-    return "\u0413\u0440\u0430\u0444 \u0441\u0432\u044F\u0437\u0435\u0439";
+    return t("commands.openGraph");
   }
   getIcon() {
     return "git-fork";
@@ -2969,6 +3583,9 @@ var GraphView = class extends import_obsidian9.ItemView {
   async onClose() {
     this.unsub.forEach((u) => u());
   }
+  refresh() {
+    this.render();
+  }
   render() {
     const c = this.containerEl.children[1];
     c.empty();
@@ -2976,7 +3593,7 @@ var GraphView = class extends import_obsidian9.ItemView {
     const entities = this.plugin.store.all().filter((e) => GRAPH_KINDS.includes(e.kind) && this.plugin.store.inActiveProject(e));
     if (entities.length === 0) {
       c.createDiv("scenarist-empty").createEl("p", {
-        text: "\u041D\u0435\u0442 \u0441\u0443\u0449\u043D\u043E\u0441\u0442\u0435\u0439 \u0434\u043B\u044F \u0433\u0440\u0430\u0444\u0430 \u0432 \u044D\u0442\u043E\u043C \u043F\u0440\u043E\u0435\u043A\u0442\u0435"
+        text: t("graph.empty")
       });
       return;
     }
@@ -2999,9 +3616,9 @@ var GraphView = class extends import_obsidian9.ItemView {
           if (seen.has(k))
             continue;
           seen.add(k);
-          const t = index.get(tid);
-          if (t)
-            edges.push([n, t]);
+          const tgt = index.get(tid);
+          if (tgt)
+            edges.push([n, tgt]);
         }
       }
     }
@@ -3020,18 +3637,18 @@ var GraphView = class extends import_obsidian9.ItemView {
     for (const n of nodes)
       this.renderNode(svg, n, edgeEls);
     const legend = c.createDiv("scenarist-graph-legend");
-    const labels = {
-      work: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
-      character: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
-      categoryItem: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
-      arc: "\u0410\u0440\u043A\u0438",
-      anchor: "\u042F\u043A\u043E\u0440\u044F"
-    };
-    for (const kind of GRAPH_KINDS) {
+    const legendKeys = [
+      ["work", t("graph.legend.work")],
+      ["character", t("graph.legend.character")],
+      ["categoryItem", t("graph.legend.categoryItem")],
+      ["arc", t("graph.legend.arc")],
+      ["anchor", t("graph.legend.anchor")]
+    ];
+    for (const [kind, label] of legendKeys) {
       const item = legend.createDiv("scenarist-legend-item");
       const dot = item.createEl("span", { cls: "scenarist-status-dot" });
       dot.style.background = NODE_COLORS[kind] || "#888";
-      item.createEl("span", { text: labels[kind] });
+      item.createEl("span", { text: label });
     }
   }
   setLine(line, a, b) {
@@ -3157,7 +3774,7 @@ var TimelineView = class extends import_obsidian10.ItemView {
     return TIMELINE_VIEW;
   }
   getDisplayText() {
-    return "\u0422\u0430\u0439\u043C\u043B\u0430\u0439\u043D";
+    return t("timeline.title");
   }
   getIcon() {
     return "clock";
@@ -3168,6 +3785,9 @@ var TimelineView = class extends import_obsidian10.ItemView {
   }
   async onClose() {
     this.unsub.forEach((u) => u());
+  }
+  refresh() {
+    this.render();
   }
   anchorsOf(workId) {
     return this.plugin.store.byKind("anchor").filter((a) => (a.links["work"] || []).includes(workId)).sort((a, b) => {
@@ -3186,18 +3806,18 @@ var TimelineView = class extends import_obsidian10.ItemView {
     const header = c.createDiv("scenarist-panel-header");
     header.createEl("span", {
       cls: "scenarist-panel-title",
-      text: work ? `\u{1F552} \u0422\u0430\u0439\u043C\u043B\u0430\u0439\u043D \u2014 ${work.name}` : "\u{1F552} \u0422\u0430\u0439\u043C\u043B\u0430\u0439\u043D"
+      text: work ? "\u{1F552} " + t("timeline.titleWork", { name: work.name }) : "\u{1F552} " + t("timeline.title")
     });
     if (!work) {
       c.createDiv("scenarist-empty").createEl("p", {
-        text: "\u041E\u0442\u043A\u0440\u043E\u0439\u0442\u0435 \u0442\u0430\u0439\u043C\u043B\u0430\u0439\u043D \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F \u0438\u0437 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0430"
+        text: t("timeline.noWork")
       });
       return;
     }
     const anchors = this.anchorsOf(work.id);
     if (anchors.length === 0) {
       c.createDiv("scenarist-empty").createEl("p", {
-        text: "\u041D\u0435\u0442 \u044F\u043A\u043E\u0440\u0435\u0439. \u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F \u0447\u0435\u0440\u0435\u0437 \xAB\uFF0B\xBB \u0443 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F."
+        text: t("timeline.noAnchors")
       });
       return;
     }
@@ -3262,6 +3882,7 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
   }
   async onload() {
     await this.loadSettings();
+    setLocale(this.settings.language || "ru");
     this.store = new ScenaristStore(this);
     this.sync = new SyncEngine(this);
     this.state = new ScenaristState(this);
@@ -3276,28 +3897,28 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     this.registerView(BOARD_VIEW, (leaf) => new BoardView(leaf, this));
     this.registerView(GRAPH_VIEW, (leaf) => new GraphView(leaf, this));
     this.registerView(TIMELINE_VIEW, (leaf) => new TimelineView(leaf, this));
-    this.addRibbonIcon("film", "Scenarist", () => this.activateLayout());
-    this.addCommand({ id: "open-scenarist", name: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C Scenarist", callback: () => this.activateLayout() });
-    this.addCommand({ id: "open-board", name: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0434\u043E\u0441\u043A\u0443 \u0433\u043B\u0430\u0432", callback: () => this.openCentre(BOARD_VIEW) });
-    this.addCommand({ id: "open-graph", name: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0433\u0440\u0430\u0444 \u0441\u0432\u044F\u0437\u0435\u0439", callback: () => this.openCentre(GRAPH_VIEW) });
+    this.addRibbonIcon("film", t("commands.ribbon"), () => this.activateLayout());
+    this.addCommand({ id: "open-scenarist", name: t("commands.openScenarist"), callback: () => this.activateLayout() });
+    this.addCommand({ id: "open-board", name: t("commands.openBoard"), callback: () => this.openCentre(BOARD_VIEW) });
+    this.addCommand({ id: "open-graph", name: t("commands.openGraph"), callback: () => this.openCentre(GRAPH_VIEW) });
     this.addCommand({
       id: "new-project",
-      name: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442",
-      callback: () => new CreateEntityModal(this.app, this, { kind: "project", titleHint: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442" }).open()
+      name: t("commands.newProject"),
+      callback: () => new CreateEntityModal(this.app, this, { kind: "project", titleHint: t("nav.newProject") }).open()
     });
     this.addCommand({
       id: "new-work",
-      name: "\u041D\u043E\u0432\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435 (\u0421\u0435\u0440\u0438\u044F/\u0412\u0430\u043D\u0448\u043E\u0442)",
+      name: t("commands.newWork"),
       callback: () => new CreateWorkModal(this.app, this).open()
     });
     this.addCommand({
       id: "new-character",
-      name: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436",
+      name: t("commands.newCharacter"),
       callback: () => new CreateEntityModal(this.app, this, { kind: "character" }).open()
     });
     this.addCommand({
       id: "new-category",
-      name: "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+      name: t("commands.newCategory"),
       callback: () => new CreateCategoryModal(this.app, this).open()
     });
     this.addSettingTab(new ScenaristSettingsTab(this.app, this));
@@ -3345,6 +3966,16 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
   refreshViews() {
     void this.store.save();
     this.state.notify();
+  }
+  /** Принудительно перерисовать все открытые вью (например, после смены языка). */
+  refreshAllViews() {
+    const views = [NAVIGATOR_VIEW, CARD_VIEW, BOARD_VIEW, GRAPH_VIEW, TIMELINE_VIEW];
+    for (const type of views) {
+      this.app.workspace.getLeavesOfType(type).forEach((leaf) => {
+        var _a, _b;
+        (_b = (_a = leaf.view).refresh) == null ? void 0 : _b.call(_a);
+      });
+    }
   }
   async openTimeline(workId) {
     this.state.timelineWorkId = workId;

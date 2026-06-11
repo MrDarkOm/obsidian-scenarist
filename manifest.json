@@ -1,9 +1,9 @@
-{
+﻿{
   "id": "obsidian-scenarist",
   "name": "Scenarist",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "minAppVersion": "1.0.0",
-  "description": "Writing & worldbuilding tool — works, books, arcs, chapters, characters, categories and timeline.",
+  "description": "Writing & worldbuilding tool вЂ” works, books, arcs, chapters, characters, categories and timeline.",
   "author": "MrDarkOm",
   "authorUrl": "https://github.com/MrDarkOm",
   "isDesktopOnly": false

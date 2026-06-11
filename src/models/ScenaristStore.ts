@@ -1,23 +1,37 @@
-import {
-	CategoryPreset,
-	Entity,
-	EntityKind,
-	NO_PROJECT,
-	ScenaristIndex,
-	INDEX_VERSION,
-} from './types';
+import { nanoid } from 'nanoid';
+import { CategoryPreset, Entity, EntityKind, NO_PROJECT, ScenaristIndex, INDEX_VERSION } from './types';
 import { CATEGORY_PRESETS, findLinkDef, resolveSchema, SCHEMAS } from './schema';
 import type ScenaristPlugin from '../main';
 
-const INDEX_PATH = '.scenarist/index.json';
+/**
+ * Путь к индексу — хранится в папке плагина (.obsidian/plugins/…),
+ * а НЕ в корне vault. Пользователь его не видит и не трогает.
+ */
+const INDEX_PATH = '.obsidian/plugins/obsidian-scenarist/scenarist-index.json';
 
-/** Граф всех сущностей. Источник истины для панелей; персист в .scenarist/index.json. */
+/**
+ * Старый путь (до рефакторинга). При первом load() мигрируется автоматически.
+ */
+const LEGACY_INDEX_PATH = '.scenarist/index.json';
+
+/**
+ * Граф всех сущностей. Источник истины для панелей.
+ * Персистируется в INDEX_PATH.
+ *
+ * Содержит вторичные индексы для O(1)-доступа по kind и path.
+ */
 export class ScenaristStore {
 	private plugin: ScenaristPlugin;
 	private entities: Map<string, Entity> = new Map();
 	private activeProjectId: string | null = NO_PROJECT;
 	private listeners: Array<() => void> = [];
 	private saveTimer: number | null = null;
+
+	// ---- Вторичные индексы ----
+	/** kind → Set<id> */
+	private byKindIndex: Map<EntityKind, Set<string>> = new Map();
+	/** filePath → id */
+	private byPathIndex: Map<string, string> = new Map();
 
 	constructor(plugin: ScenaristPlugin) {
 		this.plugin = plugin;
@@ -41,8 +55,23 @@ export class ScenaristStore {
 	all(): Entity[] {
 		return Array.from(this.entities.values());
 	}
+
+	/** O(1) — использует вторичный индекс. */
 	byKind(kind: EntityKind): Entity[] {
-		return this.all().filter((e) => e.kind === kind);
+		const ids = this.byKindIndex.get(kind);
+		if (!ids) return [];
+		const result: Entity[] = [];
+		for (const id of ids) {
+			const e = this.entities.get(id);
+			if (e) result.push(e);
+		}
+		return result;
+	}
+
+	/** O(1) — использует вторичный индекс. */
+	findByPath(path: string): Entity | null {
+		const id = this.byPathIndex.get(path);
+		return id ? (this.entities.get(id) ?? null) : null;
 	}
 
 	// ---- проекты ----
@@ -75,9 +104,7 @@ export class ScenaristStore {
 
 	// ---- категории ----
 	categoryItems(categoryId: string): Entity[] {
-		return this.byKind('categoryItem').filter((e) =>
-			(e.links['category'] || []).includes(categoryId)
-		);
+		return this.byKind('categoryItem').filter((e) => (e.links['category'] || []).includes(categoryId));
 	}
 
 	// ---- мутации ----
@@ -93,6 +120,7 @@ export class ScenaristStore {
 			updatedAt: Date.now(),
 		};
 		this.entities.set(entity.id, entity);
+		this.indexAdd(entity);
 		this.attachToActiveProject(entity);
 		this.scheduleSave();
 		this.notify();
@@ -111,6 +139,7 @@ export class ScenaristStore {
 			updatedAt: Date.now(),
 		};
 		this.entities.set(p.id, p);
+		this.indexAdd(p);
 		this.activeProjectId = p.id;
 		this.scheduleSave();
 		this.notify();
@@ -166,7 +195,10 @@ export class ScenaristStore {
 	setFilePath(id: string, filePath: string) {
 		const e = this.entities.get(id);
 		if (!e) return;
+		// Обновляем path-индекс
+		if (e.filePath) this.byPathIndex.delete(e.filePath);
 		e.filePath = filePath;
+		if (filePath) this.byPathIndex.set(filePath, id);
 		this.scheduleSave();
 	}
 
@@ -230,19 +262,12 @@ export class ScenaristStore {
 				}
 			}
 		}
+
+		this.indexRemove(e);
 		this.entities.delete(id);
 		if (this.activeProjectId === id) this.activeProjectId = NO_PROJECT;
 		this.scheduleSave();
 		this.notify();
-	}
-
-	findByPath(path: string): Entity | null {
-		for (const e of this.entities.values()) if (e.filePath === path) return e;
-		return null;
-	}
-
-	private generateId(): string {
-		return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
 	}
 
 	schema(kind: EntityKind) {
@@ -252,21 +277,68 @@ export class ScenaristStore {
 		return resolveSchema(entity, this);
 	}
 
+	// ---- вторичные индексы ----
+
+	private indexAdd(e: Entity) {
+		let set = this.byKindIndex.get(e.kind);
+		if (!set) {
+			set = new Set();
+			this.byKindIndex.set(e.kind, set);
+		}
+		set.add(e.id);
+		if (e.filePath) this.byPathIndex.set(e.filePath, e.id);
+	}
+
+	private indexRemove(e: Entity) {
+		this.byKindIndex.get(e.kind)?.delete(e.id);
+		if (e.filePath) this.byPathIndex.delete(e.filePath);
+	}
+
+	private rebuildIndexes() {
+		this.byKindIndex.clear();
+		this.byPathIndex.clear();
+		for (const e of this.entities.values()) {
+			this.indexAdd(e);
+		}
+	}
+
 	// ---- персистентность ----
 	async load() {
 		try {
-			const raw = await this.plugin.app.vault.adapter.read(INDEX_PATH);
-			const data = JSON.parse(raw) as ScenaristIndex;
-			this.entities.clear();
-			(data.entities || []).forEach((e) => {
-				e.props = e.props || {};
-				e.links = e.links || {};
-				this.entities.set(e.id, e);
-			});
-			this.activeProjectId = data.activeProjectId || NO_PROJECT;
-			this.migrateCategoryIcons();
-		} catch {
-			/* первого запуска ещё нет файла */
+			const adapter = this.plugin.app.vault.adapter;
+			let raw: string | null = null;
+
+			// Попытка загрузить из нового пути
+			try {
+				raw = await adapter.read(INDEX_PATH);
+			} catch {
+				// Не нашли — пробуем легаси-путь (миграция)
+				try {
+					raw = await adapter.read(LEGACY_INDEX_PATH);
+					console.log('Scenarist: мигрируем index.json из .scenarist/ в папку плагина');
+				} catch {
+					// Первый запуск — файла нет ни там ни там
+				}
+			}
+
+			if (raw) {
+				const data = JSON.parse(raw) as ScenaristIndex;
+				this.entities.clear();
+				(data.entities || []).forEach((e) => {
+					e.props = e.props || {};
+					e.links = e.links || {};
+					this.entities.set(e.id, e);
+				});
+				this.activeProjectId = data.activeProjectId || NO_PROJECT;
+				this.migrateCategoryIcons();
+			}
+
+			this.rebuildIndexes();
+
+			// Если мигрировали — сразу сохраняем в новое место
+			if (raw) await this.save();
+		} catch (err) {
+			console.error('Scenarist: ошибка загрузки индекса', err);
 		}
 		this.notify();
 	}
@@ -306,10 +378,17 @@ export class ScenaristStore {
 		};
 		const adapter = this.plugin.app.vault.adapter;
 		try {
-			if (!(await adapter.exists('.scenarist'))) await adapter.mkdir('.scenarist');
+			// Убедиться что папка плагина существует
+			const dir = INDEX_PATH.split('/').slice(0, -1).join('/');
+			if (!(await adapter.exists(dir))) await adapter.mkdir(dir);
 			await adapter.write(INDEX_PATH, JSON.stringify(index, null, 2));
 		} catch (e) {
 			console.error('Scenarist: не удалось сохранить индекс', e);
 		}
+	}
+
+	// ---- утилиты ----
+	private generateId(): string {
+		return nanoid(12);
 	}
 }

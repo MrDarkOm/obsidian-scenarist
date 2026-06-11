@@ -2,6 +2,7 @@ import { Plugin, TFile, TAbstractFile, WorkspaceLeaf } from 'obsidian';
 import { ScenaristSettingsTab, ScenaristSettings, DEFAULT_SETTINGS, DEFAULT_QUICK_TYPES } from './settings';
 import { ScenaristStore } from './models/ScenaristStore';
 import { SyncEngine } from './sync/SyncEngine';
+import { ScenaristState } from './state/ScenaristState';
 import { NavigatorView, NAVIGATOR_VIEW } from './views/NavigatorView';
 import { CardView, CARD_VIEW } from './views/CardView';
 import { BoardView, BOARD_VIEW } from './views/BoardView';
@@ -15,22 +16,28 @@ export default class ScenaristPlugin extends Plugin {
 	settings: ScenaristSettings;
 	store: ScenaristStore;
 	sync: SyncEngine;
-	selectedId: string | null = null;
-	timelineWorkId: string | null = null;
-	private selectListeners: Array<() => void> = [];
-	private history: string[] = [];
-	private selectionSaveTimer: number | null = null;
+	/** Состояние UI: выбранный элемент, навигация, подписки. */
+	state: ScenaristState;
+
+	// ── Обратная совместимость для views, которые читают plugin.selectedId ──
+	get selectedId(): string | null {
+		return this.state.selectedId;
+	}
+	get timelineWorkId(): string | null {
+		return this.state.timelineWorkId;
+	}
 
 	async onload() {
 		await this.loadSettings();
 		this.store = new ScenaristStore(this);
 		this.sync = new SyncEngine(this);
+		this.state = new ScenaristState(this);
 		await this.store.load();
 
 		// Восстанавливаем последний открытый элемент
 		if (this.settings.lastSelectedId) {
 			const restored = this.store.get(this.settings.lastSelectedId);
-			if (restored) this.selectedId = this.settings.lastSelectedId;
+			if (restored) this.state.selectedId = this.settings.lastSelectedId;
 		}
 
 		this.registerView(NAVIGATOR_VIEW, (leaf) => new NavigatorView(leaf, this));
@@ -47,7 +54,8 @@ export default class ScenaristPlugin extends Plugin {
 		this.addCommand({
 			id: 'new-project',
 			name: 'Новый проект',
-			callback: () => new CreateEntityModal(this.app, this, { kind: 'project', titleHint: 'Новый проект' }).open(),
+			callback: () =>
+				new CreateEntityModal(this.app, this, { kind: 'project', titleHint: 'Новый проект' }).open(),
 		});
 		this.addCommand({
 			id: 'new-work',
@@ -84,57 +92,44 @@ export default class ScenaristPlugin extends Plugin {
 	}
 
 	onunload() {
-		// Flush any pending selection save synchronously before unload
-		if (this.selectionSaveTimer !== null) {
-			window.clearTimeout(this.selectionSaveTimer);
-			this.selectionSaveTimer = null;
-		}
-		this.store.save();
+		this.state.flushSave();
+		void this.store.save();
 		void this.saveSettings();
 	}
 
-	// ---- выбор и навигация ----
+	// ---- делегируем в state ----
+
 	select(id: string | null) {
-		this.selectedId = id;
-		this.settings.lastSelectedId = id ?? undefined;
-		this.debounceSaveSelection();
+		this.state.select(id);
 		if (id) void this.ensureCard();
-		this.selectListeners.forEach((fn) => fn());
 	}
 
-	private debounceSaveSelection() {
-		if (this.selectionSaveTimer !== null) window.clearTimeout(this.selectionSaveTimer);
-		this.selectionSaveTimer = window.setTimeout(() => {
-			this.selectionSaveTimer = null;
-			this.saveSettings();
-		}, 800);
-	}
 	navigateTo(id: string) {
-		if (this.selectedId && this.selectedId !== id) this.history.push(this.selectedId);
-		this.select(id);
+		this.state.navigateTo(id);
+		void this.ensureCard();
 	}
-	canGoBack(): boolean {
-		return this.history.length > 0;
-	}
+
 	back() {
-		const prev = this.history.pop();
-		if (prev) this.select(prev);
+		this.state.back();
 	}
+
+	canGoBack(): boolean {
+		return this.state.canGoBack();
+	}
+
 	onSelect(fn: () => void): () => void {
-		this.selectListeners.push(fn);
-		return () => {
-			this.selectListeners = this.selectListeners.filter((l) => l !== fn);
-		};
+		return this.state.onSelect(fn);
 	}
+
 	refreshViews() {
-		this.store.save();
-		this.selectListeners.forEach((fn) => fn());
+		void this.store.save();
+		this.state.notify();
 	}
 
 	async openTimeline(workId: string) {
-		this.timelineWorkId = workId;
+		this.state.timelineWorkId = workId;
 		await this.openCentre(TIMELINE_VIEW);
-		this.selectListeners.forEach((fn) => fn());
+		this.state.notify();
 	}
 
 	// ---- лейаут ----
@@ -175,13 +170,14 @@ export default class ScenaristPlugin extends Plugin {
 			if (qt.isDefault) {
 				const def = DEFAULT_QUICK_TYPES.find((d) => d.id === qt.id);
 				if (def && [...qt.icon].length <= 2) {
-					qt.icon = def.icon;   // заменяем emoji → Lucide-имя из дефолтов
+					qt.icon = def.icon; // заменяем emoji → Lucide-имя из дефолтов
 					migrated = true;
 				}
 			}
 		}
 		if (migrated) await this.saveSettings();
 	}
+
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}

@@ -1,11 +1,4 @@
-import {
-	CategoryPreset,
-	CategorySchemaDef,
-	Entity,
-	EntityKind,
-	EntitySchema,
-	ResolvedSchema,
-} from './types';
+import { CategoryPreset, CategorySchemaDef, Entity, EntityKind, EntitySchema, ResolvedSchema } from './types';
 
 // ============================================
 //  Статические схемы фиксированных типов
@@ -58,9 +51,9 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 				label: 'Статус',
 				type: 'status',
 				options: [
-					{ value: 'Обычное',   color: '#888' },
+					{ value: 'Обычное', color: '#888' },
 					{ value: 'Избранное', color: '#f5c518' },
-					{ value: 'Архив',     color: '#c0392b' },
+					{ value: 'Архив', color: '#c0392b' },
 				],
 			},
 			{ key: 'summary', label: 'Краткое описание', type: 'text' },
@@ -87,16 +80,16 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 				label: 'Жанр',
 				type: 'multiselect',
 				options: [
-					{ value: 'Приключение',      color: '#9b59b6' },
-					{ value: 'Комедия',          color: '#e67e22' },
-					{ value: 'Триллер',          color: '#f5a623' },
-					{ value: 'Драма',            color: '#4a9eff' },
-					{ value: 'Фэнтези',          color: '#7ed321' },
+					{ value: 'Приключение', color: '#9b59b6' },
+					{ value: 'Комедия', color: '#e67e22' },
+					{ value: 'Триллер', color: '#f5a623' },
+					{ value: 'Драма', color: '#4a9eff' },
+					{ value: 'Фэнтези', color: '#7ed321' },
 					{ value: 'Научная фантастика', color: '#00bcd4' },
-					{ value: 'Хоррор',           color: '#c0392b' },
-					{ value: 'Романтика',        color: '#e84393' },
-					{ value: 'Детектив',         color: '#8b5a2b' },
-					{ value: 'Боевик',           color: '#f5a623' },
+					{ value: 'Хоррор', color: '#c0392b' },
+					{ value: 'Романтика', color: '#e84393' },
+					{ value: 'Детектив', color: '#8b5a2b' },
+					{ value: 'Боевик', color: '#f5a623' },
 				],
 			},
 			{
@@ -177,11 +170,11 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 				type: 'status',
 				required: true,
 				options: [
-					{ value: 'Создано',  color: '#888' },
+					{ value: 'Создано', color: '#888' },
 					{ value: 'В работе', color: '#4a9eff' },
 					{ value: 'Черновик', color: '#f5a623' },
-					{ value: 'Готово',   color: '#7ed321' },
-					{ value: 'Архив',    color: '#c0392b' },
+					{ value: 'Готово', color: '#7ed321' },
+					{ value: 'Архив', color: '#c0392b' },
 				],
 			},
 			{ key: 'synopsis', label: 'Синопсис', type: 'text' },

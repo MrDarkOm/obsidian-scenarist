@@ -149,9 +149,9 @@ export class GraphView extends ItemView {
 				for (let j = i + 1; j < nodes.length; j++) {
 					const a = nodes[i];
 					const b = nodes[j];
-					let dx = a.x - b.x;
-					let dy = a.y - b.y;
-					let dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
+					const dx = a.x - b.x;
+					const dy = a.y - b.y;
+					const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
 					const rep = (k * k) / dist;
 					const ux = dx / dist;
 					const uy = dy / dist;
@@ -163,9 +163,9 @@ export class GraphView extends ItemView {
 			}
 			// притяжение по рёбрам
 			for (const [a, b] of edges) {
-				let dx = a.x - b.x;
-				let dy = a.y - b.y;
-				let dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
+				const dx = a.x - b.x;
+				const dy = a.y - b.y;
+				const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
 				const att = (dist * dist) / k;
 				const ux = dx / dist;
 				const uy = dy / dist;

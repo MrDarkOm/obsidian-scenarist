@@ -107,7 +107,9 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
         );
         s.addButton(
           (btn) => btn.setIcon("trash").setTooltip("\u0423\u0434\u0430\u043B\u0438\u0442\u044C").setWarning().onClick(async () => {
-            this.plugin.settings.categoryQuickTypes = this.plugin.settings.categoryQuickTypes.filter((t) => t.id !== qt.id);
+            this.plugin.settings.categoryQuickTypes = this.plugin.settings.categoryQuickTypes.filter(
+              (t) => t.id !== qt.id
+            );
             await this.plugin.saveSettings();
             this.display();
           })
@@ -299,6 +301,21 @@ var EditQuickTypeModal = class extends import_obsidian.Modal {
     this.contentEl.empty();
   }
 };
+
+// node_modules/nanoid/index.browser.js
+var nanoid = (size = 21) => crypto.getRandomValues(new Uint8Array(size)).reduce((id, byte) => {
+  byte &= 63;
+  if (byte < 36) {
+    id += byte.toString(36);
+  } else if (byte < 62) {
+    id += (byte - 26).toString(36).toUpperCase();
+  } else if (byte > 62) {
+    id += "-";
+  } else {
+    id += "_";
+  }
+  return id;
+}, "");
 
 // src/models/types.ts
 var INDEX_VERSION = 2;
@@ -670,13 +687,19 @@ function findLinkDef(entity, key, store) {
 }
 
 // src/models/ScenaristStore.ts
-var INDEX_PATH = ".scenarist/index.json";
+var INDEX_PATH = ".obsidian/plugins/obsidian-scenarist/scenarist-index.json";
+var LEGACY_INDEX_PATH = ".scenarist/index.json";
 var ScenaristStore = class {
   constructor(plugin) {
     this.entities = /* @__PURE__ */ new Map();
     this.activeProjectId = NO_PROJECT;
     this.listeners = [];
     this.saveTimer = null;
+    // ---- Вторичные индексы ----
+    /** kind → Set<id> */
+    this.byKindIndex = /* @__PURE__ */ new Map();
+    /** filePath → id */
+    this.byPathIndex = /* @__PURE__ */ new Map();
     this.plugin = plugin;
   }
   // ---- подписки ----
@@ -696,8 +719,24 @@ var ScenaristStore = class {
   all() {
     return Array.from(this.entities.values());
   }
+  /** O(1) — использует вторичный индекс. */
   byKind(kind) {
-    return this.all().filter((e) => e.kind === kind);
+    const ids = this.byKindIndex.get(kind);
+    if (!ids)
+      return [];
+    const result = [];
+    for (const id of ids) {
+      const e = this.entities.get(id);
+      if (e)
+        result.push(e);
+    }
+    return result;
+  }
+  /** O(1) — использует вторичный индекс. */
+  findByPath(path) {
+    var _a;
+    const id = this.byPathIndex.get(path);
+    return id ? (_a = this.entities.get(id)) != null ? _a : null : null;
   }
   // ---- проекты ----
   getProjects() {
@@ -729,9 +768,7 @@ var ScenaristStore = class {
   }
   // ---- категории ----
   categoryItems(categoryId) {
-    return this.byKind("categoryItem").filter(
-      (e) => (e.links["category"] || []).includes(categoryId)
-    );
+    return this.byKind("categoryItem").filter((e) => (e.links["category"] || []).includes(categoryId));
   }
   // ---- мутации ----
   create(kind, name) {
@@ -746,6 +783,7 @@ var ScenaristStore = class {
       updatedAt: Date.now()
     };
     this.entities.set(entity.id, entity);
+    this.indexAdd(entity);
     this.attachToActiveProject(entity);
     this.scheduleSave();
     this.notify();
@@ -763,6 +801,7 @@ var ScenaristStore = class {
       updatedAt: Date.now()
     };
     this.entities.set(p.id, p);
+    this.indexAdd(p);
     this.activeProjectId = p.id;
     this.scheduleSave();
     this.notify();
@@ -817,7 +856,11 @@ var ScenaristStore = class {
     const e = this.entities.get(id);
     if (!e)
       return;
+    if (e.filePath)
+      this.byPathIndex.delete(e.filePath);
     e.filePath = filePath;
+    if (filePath)
+      this.byPathIndex.set(filePath, id);
     this.scheduleSave();
   }
   /** Установить связь с поддержкой реципрокности (LinkDef.reverse). */
@@ -879,20 +922,12 @@ var ScenaristStore = class {
         }
       }
     }
+    this.indexRemove(e);
     this.entities.delete(id);
     if (this.activeProjectId === id)
       this.activeProjectId = NO_PROJECT;
     this.scheduleSave();
     this.notify();
-  }
-  findByPath(path) {
-    for (const e of this.entities.values())
-      if (e.filePath === path)
-        return e;
-    return null;
-  }
-  generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
   }
   schema(kind) {
     return SCHEMAS[kind];
@@ -900,20 +935,60 @@ var ScenaristStore = class {
   resolved(entity) {
     return resolveSchema(entity, this);
   }
+  // ---- вторичные индексы ----
+  indexAdd(e) {
+    let set = this.byKindIndex.get(e.kind);
+    if (!set) {
+      set = /* @__PURE__ */ new Set();
+      this.byKindIndex.set(e.kind, set);
+    }
+    set.add(e.id);
+    if (e.filePath)
+      this.byPathIndex.set(e.filePath, e.id);
+  }
+  indexRemove(e) {
+    var _a;
+    (_a = this.byKindIndex.get(e.kind)) == null ? void 0 : _a.delete(e.id);
+    if (e.filePath)
+      this.byPathIndex.delete(e.filePath);
+  }
+  rebuildIndexes() {
+    this.byKindIndex.clear();
+    this.byPathIndex.clear();
+    for (const e of this.entities.values()) {
+      this.indexAdd(e);
+    }
+  }
   // ---- персистентность ----
   async load() {
     try {
-      const raw = await this.plugin.app.vault.adapter.read(INDEX_PATH);
-      const data = JSON.parse(raw);
-      this.entities.clear();
-      (data.entities || []).forEach((e) => {
-        e.props = e.props || {};
-        e.links = e.links || {};
-        this.entities.set(e.id, e);
-      });
-      this.activeProjectId = data.activeProjectId || NO_PROJECT;
-      this.migrateCategoryIcons();
-    } catch (e) {
+      const adapter = this.plugin.app.vault.adapter;
+      let raw = null;
+      try {
+        raw = await adapter.read(INDEX_PATH);
+      } catch (e) {
+        try {
+          raw = await adapter.read(LEGACY_INDEX_PATH);
+          console.log("Scenarist: \u043C\u0438\u0433\u0440\u0438\u0440\u0443\u0435\u043C index.json \u0438\u0437 .scenarist/ \u0432 \u043F\u0430\u043F\u043A\u0443 \u043F\u043B\u0430\u0433\u0438\u043D\u0430");
+        } catch (e2) {
+        }
+      }
+      if (raw) {
+        const data = JSON.parse(raw);
+        this.entities.clear();
+        (data.entities || []).forEach((e) => {
+          e.props = e.props || {};
+          e.links = e.links || {};
+          this.entities.set(e.id, e);
+        });
+        this.activeProjectId = data.activeProjectId || NO_PROJECT;
+        this.migrateCategoryIcons();
+      }
+      this.rebuildIndexes();
+      if (raw)
+        await this.save();
+    } catch (err) {
+      console.error("Scenarist: \u043E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u0438\u043D\u0434\u0435\u043A\u0441\u0430", err);
     }
     this.notify();
   }
@@ -952,12 +1027,17 @@ var ScenaristStore = class {
     };
     const adapter = this.plugin.app.vault.adapter;
     try {
-      if (!await adapter.exists(".scenarist"))
-        await adapter.mkdir(".scenarist");
+      const dir = INDEX_PATH.split("/").slice(0, -1).join("/");
+      if (!await adapter.exists(dir))
+        await adapter.mkdir(dir);
       await adapter.write(INDEX_PATH, JSON.stringify(index, null, 2));
     } catch (e) {
       console.error("Scenarist: \u043D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u043D\u0434\u0435\u043A\u0441", e);
     }
+  }
+  // ---- утилиты ----
+  generateId() {
+    return nanoid(12);
   }
 };
 
@@ -1076,6 +1156,10 @@ function characterBody(name) {
 // src/sync/SyncEngine.ts
 var SyncEngine = class {
   constructor(plugin) {
+    /**
+     * Пути файлов, куда плагин сам только что записал через processFrontMatter.
+     * Используется для подавления ложных срабатываний handleModify.
+     */
     this.selfWrites = /* @__PURE__ */ new Set();
     this.plugin = plugin;
   }
@@ -1162,31 +1246,57 @@ var SyncEngine = class {
     let file = this.vault.getAbstractFileByPath(path);
     if (!file) {
       await this.ensureFolder(path);
-      const content = this.buildFrontmatter(entity) + bodyTemplate(entity.kind, entity.name);
-      this.selfWrites.add(path);
-      file = await this.vault.create(path, content);
-    } else if (file instanceof import_obsidian2.TFile) {
-      await this.syncToNote(entity);
+      const body = bodyTemplate(entity.kind, entity.name);
+      file = await this.vault.create(path, body);
+    }
+    if (file instanceof import_obsidian2.TFile) {
+      await this.syncToNote(entity, file);
     }
     return file instanceof import_obsidian2.TFile ? file : null;
   }
-  async syncToNote(entity) {
-    const file = this.vault.getAbstractFileByPath(entity.filePath);
+  /**
+   * Синхронизирует frontmatter заметки с данными сущности.
+   * Использует `processFrontMatter` — атомарная операция, не трогает тело файла.
+   */
+  async syncToNote(entity, fileArg) {
+    const file = fileArg != null ? fileArg : entity.filePath ? this.vault.getAbstractFileByPath(entity.filePath) : null;
     if (!(file instanceof import_obsidian2.TFile))
       return;
-    const old = await this.vault.read(file);
-    const body = this.stripFrontmatter(old);
-    const next = this.buildFrontmatter(entity) + body;
-    if (next === old)
-      return;
-    this.selfWrites.add(entity.filePath);
-    await this.vault.modify(file, next);
+    this.selfWrites.add(file.path);
+    await this.plugin.app.fileManager.processFrontMatter(file, (fm) => {
+      fm["scenarist_id"] = entity.id;
+      fm["kind"] = entity.kind;
+      const schema = this.store.resolved(entity);
+      for (const field of schema.fields) {
+        const v = entity.props[field.key];
+        if (v === void 0 || v === null || v === "") {
+          delete fm[field.key];
+        } else {
+          fm[field.key] = v;
+        }
+      }
+      for (const link of schema.links) {
+        if (link.target === "project")
+          continue;
+        const ids = entity.links[link.key] || [];
+        const names = ids.map((id) => this.store.get(id)).filter((e) => !!e).map((e) => `[[${e.name}]]`);
+        if (names.length) {
+          fm[link.key] = names;
+        } else {
+          delete fm[link.key];
+        }
+      }
+    });
   }
   async openNote(entity) {
     const file = await this.ensureNote(entity);
     if (file)
       await this.plugin.app.workspace.getLeaf(false).openFile(file);
   }
+  /**
+   * Обрабатывает внешнее изменение .md файла.
+   * Читает frontmatter через MetadataCache и обновляет Store.
+   */
   handleModify(file) {
     var _a, _b;
     if (this.selfWrites.has(file.path)) {
@@ -1208,50 +1318,14 @@ var SyncEngine = class {
       }
     }
     if (changed)
-      this.store.save();
+      void this.store.save();
   }
   handleRename(file, oldPath) {
     const entity = this.store.findByPath(oldPath);
     if (entity)
       this.store.setFilePath(entity.id, file.path);
   }
-  // ---- frontmatter ----
-  buildFrontmatter(entity) {
-    const schema = this.store.resolved(entity);
-    const lines = ["---", `scenarist_id: ${entity.id}`, `kind: ${entity.kind}`];
-    for (const field of schema.fields) {
-      const v = entity.props[field.key];
-      if (v === void 0 || v === null || v === "")
-        continue;
-      lines.push(`${field.key}: ${this.yaml(v)}`);
-    }
-    for (const link of schema.links) {
-      if (link.target === "project")
-        continue;
-      const ids = entity.links[link.key] || [];
-      const names = ids.map((id) => this.store.get(id)).filter((e) => !!e).map((e) => `"[[${e.name}]]"`);
-      if (names.length)
-        lines.push(`${link.key}: [${names.join(", ")}]`);
-    }
-    lines.push("---", "");
-    return lines.join("\n");
-  }
-  yaml(v) {
-    if (typeof v === "number" || typeof v === "boolean")
-      return String(v);
-    const s = String(v);
-    return /[:#\[\]{}"'\n]/.test(s) ? JSON.stringify(s) : s;
-  }
-  stripFrontmatter(content) {
-    if (content.startsWith("---")) {
-      const end = content.indexOf("\n---", 3);
-      if (end !== -1) {
-        const after = content.indexOf("\n", end + 1);
-        return after !== -1 ? content.slice(after + 1) : "";
-      }
-    }
-    return content;
-  }
+  // ---- helpers ----
   async ensureFolder(filePath) {
     const dir = filePath.split("/").slice(0, -1).join("/");
     if (!dir)
@@ -1266,6 +1340,68 @@ var SyncEngine = class {
         }
       }
     }
+  }
+};
+
+// src/state/ScenaristState.ts
+var ScenaristState = class {
+  constructor(plugin) {
+    this.plugin = plugin;
+    this.selectedId = null;
+    this.timelineWorkId = null;
+    this.history = [];
+    this.listeners = [];
+    this.saveTimer = null;
+  }
+  // ---- навигация ----
+  select(id) {
+    this.selectedId = id;
+    this.plugin.settings.lastSelectedId = id != null ? id : void 0;
+    this.debounceSave();
+    this.notify();
+  }
+  navigateTo(id) {
+    if (this.selectedId && this.selectedId !== id) {
+      this.history.push(this.selectedId);
+    }
+    this.select(id);
+  }
+  back() {
+    const prev = this.history.pop();
+    if (prev)
+      this.select(prev);
+  }
+  canGoBack() {
+    return this.history.length > 0;
+  }
+  // ---- подписки ----
+  /** Подписаться на смену выбора. Возвращает функцию отписки. */
+  onSelect(fn) {
+    this.listeners.push(fn);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== fn);
+    };
+  }
+  /** Сообщить всем подписчикам об изменении (используется при обновлении Store). */
+  notify() {
+    this.listeners.forEach((fn) => fn());
+  }
+  // ---- сброс ----
+  /** Вызывается при onunload: немедленно сохраняем settings без debounce. */
+  flushSave() {
+    if (this.saveTimer !== null) {
+      window.clearTimeout(this.saveTimer);
+      this.saveTimer = null;
+    }
+  }
+  // ---- private ----
+  debounceSave() {
+    if (this.saveTimer !== null)
+      window.clearTimeout(this.saveTimer);
+    this.saveTimer = window.setTimeout(() => {
+      this.saveTimer = null;
+      void this.plugin.saveSettings();
+    }, 800);
   }
 };
 
@@ -1321,9 +1457,7 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
         const sel = row.createEl("select", { cls: "scenarist-select" });
         if (!field.required)
           sel.createEl("option", { value: "", text: "\u2014" });
-        (field.options || []).forEach(
-          (o) => sel.createEl("option", { value: o.value, text: o.value })
-        );
+        (field.options || []).forEach((o) => sel.createEl("option", { value: o.value, text: o.value }));
         if (field.required && ((_a = field.options) == null ? void 0 : _a.length))
           sel.value = field.options[0].value;
         fieldInputs[field.key] = sel;
@@ -1441,9 +1575,7 @@ var CreateWorkModal = class extends import_obsidian4.Modal {
         b.addClass("active");
       b.onclick = () => {
         format = val;
-        fmtWrap.querySelectorAll(".scenarist-choice-btn").forEach(
-          (e) => e.removeClass("active")
-        );
+        fmtWrap.querySelectorAll(".scenarist-choice-btn").forEach((e) => e.removeClass("active"));
         b.addClass("active");
       };
     };
@@ -2095,13 +2227,7 @@ var BACKLINK_LABELS = {
   works: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F"
 };
 var STRUCTURAL = /* @__PURE__ */ new Set(["project", "category"]);
-var LONG_FIELDS = /* @__PURE__ */ new Set([
-  "summary",
-  "synopsis",
-  "description",
-  "idea",
-  "goal"
-]);
+var LONG_FIELDS = /* @__PURE__ */ new Set(["summary", "synopsis", "description", "idea", "goal"]);
 var CardView = class extends import_obsidian7.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
@@ -2169,7 +2295,10 @@ var CardView = class extends import_obsidian7.ItemView {
         const iconBox = empty.createDiv("scenarist-empty-icon");
         (0, import_obsidian7.setIcon)(iconBox, "layers");
         empty.createEl("p", { text: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u044D\u043B\u0435\u043C\u0435\u043D\u0442 \u0432 \u043D\u0430\u0432\u0438\u0433\u0430\u0442\u043E\u0440\u0435" });
-        empty.createEl("p", { cls: "scenarist-empty-hint", text: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435, \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430 \u0438\u043B\u0438 \u0433\u043B\u0430\u0432\u0443 \u0441\u043B\u0435\u0432\u0430" });
+        empty.createEl("p", {
+          cls: "scenarist-empty-hint",
+          text: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435, \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430 \u0438\u043B\u0438 \u0433\u043B\u0430\u0432\u0443 \u0441\u043B\u0435\u0432\u0430"
+        });
         return;
       }
       const card = root.createDiv("scenarist-card");
@@ -2351,7 +2480,7 @@ var CardView = class extends import_obsidian7.ItemView {
       inp.style.width = "160px";
       inp.focus();
       const commit = () => {
-        let val = inp.value.trim().replace(/^\[\[|\]\]$/g, "");
+        const val = inp.value.trim().replace(/^\[\[|\]\]$/g, "");
         if (val && !links.includes(val))
           commitLinks([...links, val]);
       };
@@ -2483,7 +2612,7 @@ var CardView = class extends import_obsidian7.ItemView {
     if (field.type === "number") {
       const inp = wrap.createEl("input", { cls: "scenarist-prop-input" });
       inp.type = "number";
-      inp.value = val != null ? String(val) : "";
+      inp.value = val !== null && val !== void 0 ? String(val) : "";
       inp.onchange = () => {
         const n = parseFloat(inp.value);
         this.commitProp(entity, field.key, isNaN(n) ? null : n);
@@ -2491,7 +2620,7 @@ var CardView = class extends import_obsidian7.ItemView {
       return;
     }
     const ta = wrap.createEl("textarea", { cls: "scenarist-prop-textarea" });
-    ta.value = val != null ? String(val) : "";
+    ta.value = val !== null && val !== void 0 ? String(val) : "";
     ta.placeholder = "\u2014";
     ta.rows = LONG_FIELDS.has(field.key) ? 3 : 1;
     this.autoGrow(ta);
@@ -2583,7 +2712,11 @@ var CardView = class extends import_obsidian7.ItemView {
       const x = chip.createEl("span", { cls: "scenarist-rel-x", text: "\xD7" });
       x.onclick = (e) => {
         e.stopPropagation();
-        this.plugin.store.setLink(entity.id, key, current.filter((c) => c !== tid));
+        this.plugin.store.setLink(
+          entity.id,
+          key,
+          current.filter((c) => c !== tid)
+        );
         this.plugin.sync.syncToNote(this.plugin.store.get(entity.id));
       };
     }
@@ -2655,6 +2788,12 @@ var CardView = class extends import_obsidian7.ItemView {
     }
     (_e = (_d = this.app.commands) == null ? void 0 : _d.executeCommandById) == null ? void 0 : _e.call(_d, "global-search:open");
   }
+  /**
+   * Убирает YAML frontmatter из контента для рендеринга тела заметки.
+   * Используется ТОЛЬКО для чтения/отображения — никогда для записи.
+   * Запись frontmatter происходит исключительно через SyncEngine.syncToNote
+   * (app.fileManager.processFrontMatter).
+   */
   stripFrontmatter(content) {
     if (content.startsWith("---")) {
       const end = content.indexOf("\n---", 3);
@@ -2741,9 +2880,7 @@ var BoardView = class extends import_obsidian8.ItemView {
       for (const ch of cards)
         this.renderCard(drop, ch);
     }
-    const noStatus = chapters.filter(
-      (ch) => !statuses.some((s) => s.value === ch.props["status"])
-    );
+    const noStatus = chapters.filter((ch) => !statuses.some((s) => s.value === ch.props["status"]));
     if (noStatus.length > 0) {
       const col = board.createDiv("scenarist-board-col");
       col.createDiv("scenarist-board-col-head").createEl("span", { text: "\u0411\u0435\u0437 \u0441\u0442\u0430\u0442\u0443\u0441\u0430" });
@@ -2896,9 +3033,9 @@ var GraphView = class extends import_obsidian9.ItemView {
         for (let j = i + 1; j < nodes.length; j++) {
           const a = nodes[i];
           const b = nodes[j];
-          let dx = a.x - b.x;
-          let dy = a.y - b.y;
-          let dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
           const rep = k * k / dist;
           const ux = dx / dist;
           const uy = dy / dist;
@@ -2909,9 +3046,9 @@ var GraphView = class extends import_obsidian9.ItemView {
         }
       }
       for (const [a, b] of edges) {
-        let dx = a.x - b.x;
-        let dy = a.y - b.y;
-        let dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
         const att = dist * dist / k;
         const ux = dx / dist;
         const uy = dy / dist;
@@ -3094,23 +3231,23 @@ var TimelineView = class extends import_obsidian10.ItemView {
 
 // src/main.ts
 var ScenaristPlugin = class extends import_obsidian11.Plugin {
-  constructor() {
-    super(...arguments);
-    this.selectedId = null;
-    this.timelineWorkId = null;
-    this.selectListeners = [];
-    this.history = [];
-    this.selectionSaveTimer = null;
+  // ── Обратная совместимость для views, которые читают plugin.selectedId ──
+  get selectedId() {
+    return this.state.selectedId;
+  }
+  get timelineWorkId() {
+    return this.state.timelineWorkId;
   }
   async onload() {
     await this.loadSettings();
     this.store = new ScenaristStore(this);
     this.sync = new SyncEngine(this);
+    this.state = new ScenaristState(this);
     await this.store.load();
     if (this.settings.lastSelectedId) {
       const restored = this.store.get(this.settings.lastSelectedId);
       if (restored)
-        this.selectedId = this.settings.lastSelectedId;
+        this.state.selectedId = this.settings.lastSelectedId;
     }
     this.registerView(NAVIGATOR_VIEW, (leaf) => new NavigatorView(leaf, this));
     this.registerView(CARD_VIEW, (leaf) => new CardView(leaf, this));
@@ -3160,57 +3297,37 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     });
   }
   onunload() {
-    if (this.selectionSaveTimer !== null) {
-      window.clearTimeout(this.selectionSaveTimer);
-      this.selectionSaveTimer = null;
-    }
-    this.store.save();
+    this.state.flushSave();
+    void this.store.save();
     void this.saveSettings();
   }
-  // ---- выбор и навигация ----
+  // ---- делегируем в state ----
   select(id) {
-    this.selectedId = id;
-    this.settings.lastSelectedId = id != null ? id : void 0;
-    this.debounceSaveSelection();
+    this.state.select(id);
     if (id)
       void this.ensureCard();
-    this.selectListeners.forEach((fn) => fn());
-  }
-  debounceSaveSelection() {
-    if (this.selectionSaveTimer !== null)
-      window.clearTimeout(this.selectionSaveTimer);
-    this.selectionSaveTimer = window.setTimeout(() => {
-      this.selectionSaveTimer = null;
-      this.saveSettings();
-    }, 800);
   }
   navigateTo(id) {
-    if (this.selectedId && this.selectedId !== id)
-      this.history.push(this.selectedId);
-    this.select(id);
-  }
-  canGoBack() {
-    return this.history.length > 0;
+    this.state.navigateTo(id);
+    void this.ensureCard();
   }
   back() {
-    const prev = this.history.pop();
-    if (prev)
-      this.select(prev);
+    this.state.back();
+  }
+  canGoBack() {
+    return this.state.canGoBack();
   }
   onSelect(fn) {
-    this.selectListeners.push(fn);
-    return () => {
-      this.selectListeners = this.selectListeners.filter((l) => l !== fn);
-    };
+    return this.state.onSelect(fn);
   }
   refreshViews() {
-    this.store.save();
-    this.selectListeners.forEach((fn) => fn());
+    void this.store.save();
+    this.state.notify();
   }
   async openTimeline(workId) {
-    this.timelineWorkId = workId;
+    this.state.timelineWorkId = workId;
     await this.openCentre(TIMELINE_VIEW);
-    this.selectListeners.forEach((fn) => fn());
+    this.state.notify();
   }
   // ---- лейаут ----
   async activateLayout() {

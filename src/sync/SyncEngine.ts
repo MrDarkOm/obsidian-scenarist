@@ -4,9 +4,18 @@ import { SCHEMAS } from '../models/schema';
 import { bodyTemplate } from '../templates';
 import type ScenaristPlugin from '../main';
 
-/** Связывает граф (ScenaristStore) с .md-заметками: путь, frontmatter, обратный разбор. */
+/**
+ * Связывает граф (ScenaristStore) с .md-заметками.
+ *
+ * Запись frontmatter — через официальный Obsidian API `processFrontMatter`,
+ * который гарантирует атомарность и не повреждает пользовательский контент.
+ */
 export class SyncEngine {
 	private plugin: ScenaristPlugin;
+	/**
+	 * Пути файлов, куда плагин сам только что записал через processFrontMatter.
+	 * Используется для подавления ложных срабатываний handleModify.
+	 */
 	private selfWrites: Set<string> = new Set();
 
 	constructor(plugin: ScenaristPlugin) {
@@ -100,24 +109,61 @@ export class SyncEngine {
 		let file = this.vault.getAbstractFileByPath(path);
 		if (!file) {
 			await this.ensureFolder(path);
-			const content = this.buildFrontmatter(entity) + bodyTemplate(entity.kind, entity.name);
-			this.selfWrites.add(path);
-			file = await this.vault.create(path, content);
-		} else if (file instanceof TFile) {
-			await this.syncToNote(entity);
+			// Создаём файл с телом (без frontmatter — добавим через processFrontMatter)
+			const body = bodyTemplate(entity.kind, entity.name);
+			file = await this.vault.create(path, body);
 		}
+
+		// Синхронизируем frontmatter через официальный API
+		if (file instanceof TFile) {
+			await this.syncToNote(entity, file);
+		}
+
 		return file instanceof TFile ? file : null;
 	}
 
-	async syncToNote(entity: Entity): Promise<void> {
-		const file = this.vault.getAbstractFileByPath(entity.filePath);
+	/**
+	 * Синхронизирует frontmatter заметки с данными сущности.
+	 * Использует `processFrontMatter` — атомарная операция, не трогает тело файла.
+	 */
+	async syncToNote(entity: Entity, fileArg?: TFile): Promise<void> {
+		const file =
+			fileArg ?? (entity.filePath ? (this.vault.getAbstractFileByPath(entity.filePath) as TFile | null) : null);
 		if (!(file instanceof TFile)) return;
-		const old = await this.vault.read(file);
-		const body = this.stripFrontmatter(old);
-		const next = this.buildFrontmatter(entity) + body;
-		if (next === old) return;
-		this.selfWrites.add(entity.filePath);
-		await this.vault.modify(file, next);
+
+		this.selfWrites.add(file.path);
+
+		await this.plugin.app.fileManager.processFrontMatter(file, (fm) => {
+			fm['scenarist_id'] = entity.id;
+			fm['kind'] = entity.kind;
+
+			const schema = this.store.resolved(entity);
+
+			// Поля-свойства
+			for (const field of schema.fields) {
+				const v = entity.props[field.key];
+				if (v === undefined || v === null || v === '') {
+					delete fm[field.key];
+				} else {
+					fm[field.key] = v;
+				}
+			}
+
+			// Связи — записываем как wikilinks, пропуская служебный ключ 'project'
+			for (const link of schema.links) {
+				if (link.target === 'project') continue;
+				const ids = entity.links[link.key] || [];
+				const names = ids
+					.map((id) => this.store.get(id))
+					.filter((e): e is Entity => !!e)
+					.map((e) => `[[${e.name}]]`);
+				if (names.length) {
+					fm[link.key] = names;
+				} else {
+					delete fm[link.key];
+				}
+			}
+		});
 	}
 
 	async openNote(entity: Entity): Promise<void> {
@@ -125,15 +171,22 @@ export class SyncEngine {
 		if (file) await this.plugin.app.workspace.getLeaf(false).openFile(file);
 	}
 
+	/**
+	 * Обрабатывает внешнее изменение .md файла.
+	 * Читает frontmatter через MetadataCache и обновляет Store.
+	 */
 	handleModify(file: TFile): void {
+		// Игнорируем записи, сделанные самим плагином
 		if (this.selfWrites.has(file.path)) {
 			this.selfWrites.delete(file.path);
 			return;
 		}
 		const entity = this.store.findByPath(file.path);
 		if (!entity) return;
+
 		const fm = this.plugin.app.metadataCache.getFileCache(file)?.frontmatter;
 		if (!fm) return;
+
 		const fields = this.store.resolved(entity).fields;
 		let changed = false;
 		for (const field of fields) {
@@ -142,7 +195,7 @@ export class SyncEngine {
 				changed = true;
 			}
 		}
-		if (changed) this.store.save();
+		if (changed) void this.store.save();
 	}
 
 	handleRename(file: TFile, oldPath: string): void {
@@ -150,45 +203,7 @@ export class SyncEngine {
 		if (entity) this.store.setFilePath(entity.id, file.path);
 	}
 
-	// ---- frontmatter ----
-	private buildFrontmatter(entity: Entity): string {
-		const schema = this.store.resolved(entity);
-		const lines: string[] = ['---', `scenarist_id: ${entity.id}`, `kind: ${entity.kind}`];
-		for (const field of schema.fields) {
-			const v = entity.props[field.key];
-			if (v === undefined || v === null || v === '') continue;
-			lines.push(`${field.key}: ${this.yaml(v)}`);
-		}
-		for (const link of schema.links) {
-			if (link.target === 'project') continue;
-			const ids = entity.links[link.key] || [];
-			const names = ids
-				.map((id) => this.store.get(id))
-				.filter((e): e is Entity => !!e)
-				.map((e) => `"[[${e.name}]]"`);
-			if (names.length) lines.push(`${link.key}: [${names.join(', ')}]`);
-		}
-		lines.push('---', '');
-		return lines.join('\n');
-	}
-
-	private yaml(v: string | number | boolean): string {
-		if (typeof v === 'number' || typeof v === 'boolean') return String(v);
-		const s = String(v);
-		return /[:#\[\]{}"'\n]/.test(s) ? JSON.stringify(s) : s;
-	}
-
-	private stripFrontmatter(content: string): string {
-		if (content.startsWith('---')) {
-			const end = content.indexOf('\n---', 3);
-			if (end !== -1) {
-				const after = content.indexOf('\n', end + 1);
-				return after !== -1 ? content.slice(after + 1) : '';
-			}
-		}
-		return content;
-	}
-
+	// ---- helpers ----
 	private async ensureFolder(filePath: string): Promise<void> {
 		const dir = filePath.split('/').slice(0, -1).join('/');
 		if (!dir) return;

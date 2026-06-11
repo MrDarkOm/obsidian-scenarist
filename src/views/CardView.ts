@@ -19,9 +19,7 @@ const BACKLINK_LABELS: Record<string, string> = {
 const STRUCTURAL = new Set(['project', 'category']);
 
 /** Текстовые поля которые рендерятся большими (3+ строки). */
-const LONG_FIELDS = new Set([
-	'summary', 'synopsis', 'description', 'idea', 'goal',
-]);
+const LONG_FIELDS = new Set(['summary', 'synopsis', 'description', 'idea', 'goal']);
 
 export class CardView extends ItemView {
 	private plugin: ScenaristPlugin;
@@ -34,16 +32,24 @@ export class CardView extends ItemView {
 		this.plugin = plugin;
 	}
 
-	getViewType() { return CARD_VIEW; }
-	getDisplayText() { return this.current()?.name || 'Scenarist'; }
-	getIcon() { return 'film'; }
+	getViewType() {
+		return CARD_VIEW;
+	}
+	getDisplayText() {
+		return this.current()?.name || 'Scenarist';
+	}
+	getIcon() {
+		return 'film';
+	}
 
 	async onOpen() {
 		this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
 		this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
 		this.render();
 	}
-	async onClose() { this.unsub.forEach((u) => u()); }
+	async onClose() {
+		this.unsub.forEach((u) => u());
+	}
 
 	/** Debounced re-entrant-safe render scheduler. */
 	private scheduleRender() {
@@ -73,29 +79,35 @@ export class CardView extends ItemView {
 	}
 
 	private async render() {
-		if (this._rendering) { this._renderPending = true; return; }
-		this._rendering = true;
-		try {
-		const root = this.containerEl.children[1] as HTMLElement;
-		root.empty();
-		root.addClass('scenarist-card-view');
-
-		const entity = this.current();
-		if (!entity) {
-			const empty = root.createDiv('scenarist-empty');
-			const iconBox = empty.createDiv('scenarist-empty-icon');
-			setIcon(iconBox, 'layers');
-			empty.createEl('p', { text: 'Выберите элемент в навигаторе' });
-			empty.createEl('p', { cls: 'scenarist-empty-hint', text: 'Нажмите на произведение, персонажа или главу слева' });
+		if (this._rendering) {
+			this._renderPending = true;
 			return;
 		}
+		this._rendering = true;
+		try {
+			const root = this.containerEl.children[1] as HTMLElement;
+			root.empty();
+			root.addClass('scenarist-card-view');
 
-		const card = root.createDiv('scenarist-card');
-		this.renderHeader(card, entity);
-		this.renderProps(card, entity);
-		if (entity.kind === 'category') this.renderCategoryItems(card, entity);
-		this.renderRelations(card, entity);
-		await this.renderBody(card, entity);
+			const entity = this.current();
+			if (!entity) {
+				const empty = root.createDiv('scenarist-empty');
+				const iconBox = empty.createDiv('scenarist-empty-icon');
+				setIcon(iconBox, 'layers');
+				empty.createEl('p', { text: 'Выберите элемент в навигаторе' });
+				empty.createEl('p', {
+					cls: 'scenarist-empty-hint',
+					text: 'Нажмите на произведение, персонажа или главу слева',
+				});
+				return;
+			}
+
+			const card = root.createDiv('scenarist-card');
+			this.renderHeader(card, entity);
+			this.renderProps(card, entity);
+			if (entity.kind === 'category') this.renderCategoryItems(card, entity);
+			this.renderRelations(card, entity);
+			await this.renderBody(card, entity);
 		} finally {
 			this._rendering = false;
 			if (this._renderPending) {
@@ -108,16 +120,22 @@ export class CardView extends ItemView {
 	// ---- шапка + крошки ----
 	private parentOf(e: Entity): Entity | null {
 		switch (e.kind) {
-			case 'page':      return this.single(e.links['chapter']);
-			case 'chapter':   return this.single(e.links['book']);
+			case 'page':
+				return this.single(e.links['chapter']);
+			case 'chapter':
+				return this.single(e.links['book']);
 			case 'book':
 			case 'arc':
-			case 'anchor':    return this.single(e.links['work']);
-			case 'categoryItem': return this.single(e.links['category']);
+			case 'anchor':
+				return this.single(e.links['work']);
+			case 'categoryItem':
+				return this.single(e.links['category']);
 			case 'work':
 			case 'character':
-			case 'category':  return this.single(e.links['project']);
-			default:          return null;
+			case 'category':
+				return this.single(e.links['project']);
+			default:
+				return null;
 		}
 	}
 
@@ -183,7 +201,10 @@ export class CardView extends ItemView {
 	private renderTagsHeader(card: HTMLElement, entity: Entity) {
 		const rawTags = entity.props['tags'];
 		const tags = rawTags
-			? String(rawTags).split(',').map((t) => t.trim()).filter(Boolean)
+			? String(rawTags)
+					.split(',')
+					.map((t) => t.trim())
+					.filter(Boolean)
 			: [];
 
 		const row = card.createDiv('scenarist-card-tags');
@@ -218,8 +239,13 @@ export class CardView extends ItemView {
 				}
 			};
 			inp.addEventListener('keydown', (e) => {
-				if (e.key === 'Enter') { commit(); }
-				if (e.key === 'Escape') { inp.remove(); addBtn.style.display = ''; }
+				if (e.key === 'Enter') {
+					commit();
+				}
+				if (e.key === 'Escape') {
+					inp.remove();
+					addBtn.style.display = '';
+				}
 			});
 			inp.addEventListener('blur', commit);
 		};
@@ -263,9 +289,15 @@ export class CardView extends ItemView {
 			const chip = chipRow.createEl('span', { cls: 'scenarist-link-chip' });
 			const text = chip.createEl('span', { cls: 'scenarist-tag-chip-text', text: `[[${link}]]` });
 			text.title = `Открыть: ${link}`;
-			text.onclick = (e) => { e.stopPropagation(); this.openObsidianLink(link); };
+			text.onclick = (e) => {
+				e.stopPropagation();
+				this.openObsidianLink(link);
+			};
 			const x = chip.createEl('span', { cls: 'scenarist-tag-chip-x', text: '×' });
-			x.onclick = (e) => { e.stopPropagation(); commitLinks(links.filter((l) => l !== link)); };
+			x.onclick = (e) => {
+				e.stopPropagation();
+				commitLinks(links.filter((l) => l !== link));
+			};
 		}
 
 		const addBtn = chipRow.createEl('button', { cls: 'scenarist-tag-add', text: '+ ссылка' });
@@ -276,12 +308,15 @@ export class CardView extends ItemView {
 			inp.style.width = '160px';
 			inp.focus();
 			const commit = () => {
-				let val = inp.value.trim().replace(/^\[\[|\]\]$/g, '');
+				const val = inp.value.trim().replace(/^\[\[|\]\]$/g, '');
 				if (val && !links.includes(val)) commitLinks([...links, val]);
 			};
 			inp.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') commit();
-				if (e.key === 'Escape') { inp.remove(); addBtn.style.display = ''; }
+				if (e.key === 'Escape') {
+					inp.remove();
+					addBtn.style.display = '';
+				}
 			});
 			inp.addEventListener('blur', commit);
 		};
@@ -292,12 +327,27 @@ export class CardView extends ItemView {
 		this.app.workspace.openLinkText(linkText, '', false);
 	}
 
-	private renderFieldControl(wrap: HTMLElement, entity: Entity, field: { key: string; label: string; type: string; required?: boolean; options?: { value: string; color: string }[] }) {
+	private renderFieldControl(
+		wrap: HTMLElement,
+		entity: Entity,
+		field: {
+			key: string;
+			label: string;
+			type: string;
+			required?: boolean;
+			options?: { value: string; color: string }[];
+		}
+	) {
 		const val = entity.props[field.key];
 
 		// ── Мульти-выбор (жанры) ────────────────────────────────────────────────
 		if (field.type === 'multiselect') {
-			const selected = val ? String(val).split(',').map((v) => v.trim()).filter(Boolean) : [];
+			const selected = val
+				? String(val)
+						.split(',')
+						.map((v) => v.trim())
+						.filter(Boolean)
+				: [];
 			const settingsOpts: string[] = this.plugin.settings.genreOptions?.length
 				? this.plugin.settings.genreOptions
 				: (field.options || []).map((o) => o.value);
@@ -344,11 +394,21 @@ export class CardView extends ItemView {
 									optMap.set(newG, '#888');
 									commitGenres(selected);
 								}
-							} else { sel.value = ''; sel.style.display = ''; renderChips(); }
+							} else {
+								sel.value = '';
+								sel.style.display = '';
+								renderChips();
+							}
 						};
 						inp.addEventListener('keydown', (e) => {
-							if (e.key === 'Enter') { doAdd(); }
-							if (e.key === 'Escape') { inp.remove(); sel.style.display = ''; sel.value = ''; }
+							if (e.key === 'Enter') {
+								doAdd();
+							}
+							if (e.key === 'Escape') {
+								inp.remove();
+								sel.style.display = '';
+								sel.value = '';
+							}
 						});
 						inp.addEventListener('blur', doAdd);
 					} else {
@@ -410,7 +470,7 @@ export class CardView extends ItemView {
 		if (field.type === 'number') {
 			const inp = wrap.createEl('input', { cls: 'scenarist-prop-input' });
 			inp.type = 'number';
-			inp.value = val != null ? String(val) : '';
+			inp.value = val !== null && val !== undefined ? String(val) : '';
 			inp.onchange = () => {
 				const n = parseFloat(inp.value);
 				this.commitProp(entity, field.key, isNaN(n) ? null : n);
@@ -420,7 +480,7 @@ export class CardView extends ItemView {
 
 		// ── Text / date → textarea ───────────────────────────────────────────────
 		const ta = wrap.createEl('textarea', { cls: 'scenarist-prop-textarea' });
-		ta.value = val != null ? String(val) : '';
+		ta.value = val !== null && val !== undefined ? String(val) : '';
 		ta.placeholder = '—';
 		ta.rows = LONG_FIELDS.has(field.key) ? 3 : 1;
 		this.autoGrow(ta);
@@ -524,7 +584,11 @@ export class CardView extends ItemView {
 			const x = chip.createEl('span', { cls: 'scenarist-rel-x', text: '×' });
 			x.onclick = (e) => {
 				e.stopPropagation();
-				this.plugin.store.setLink(entity.id, key, current.filter((c) => c !== tid));
+				this.plugin.store.setLink(
+					entity.id,
+					key,
+					current.filter((c) => c !== tid)
+				);
 				this.plugin.sync.syncToNote(this.plugin.store.get(entity.id)!);
 			};
 		}
@@ -570,9 +634,7 @@ export class CardView extends ItemView {
 		editBtn.createEl('span', { text: 'Редактировать' });
 		editBtn.onclick = () => this.plugin.sync.openNote(entity);
 
-		const file = entity.filePath
-			? this.plugin.app.vault.getAbstractFileByPath(entity.filePath)
-			: null;
+		const file = entity.filePath ? this.plugin.app.vault.getAbstractFileByPath(entity.filePath) : null;
 		const target = section.createDiv('scenarist-card-body-render markdown-rendered');
 
 		if (file instanceof TFile) {
@@ -602,6 +664,12 @@ export class CardView extends ItemView {
 		(this.app as any).commands?.executeCommandById?.('global-search:open');
 	}
 
+	/**
+	 * Убирает YAML frontmatter из контента для рендеринга тела заметки.
+	 * Используется ТОЛЬКО для чтения/отображения — никогда для записи.
+	 * Запись frontmatter происходит исключительно через SyncEngine.syncToNote
+	 * (app.fileManager.processFrontMatter).
+	 */
 	private stripFrontmatter(content: string): string {
 		if (content.startsWith('---')) {
 			const end = content.indexOf('\n---', 3);

@@ -87,9 +87,7 @@ export class BoardView extends ItemView {
 			for (const ch of cards) this.renderCard(drop, ch);
 		}
 
-		const noStatus = chapters.filter(
-			(ch) => !statuses.some((s) => s.value === ch.props['status'])
-		);
+		const noStatus = chapters.filter((ch) => !statuses.some((s) => s.value === ch.props['status']));
 		if (noStatus.length > 0) {
 			const col = board.createDiv('scenarist-board-col');
 			col.createDiv('scenarist-board-col-head').createEl('span', { text: 'Без статуса' });

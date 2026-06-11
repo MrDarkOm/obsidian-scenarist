@@ -27,9 +27,7 @@ export class CreateWorkModal extends Modal {
 			if (val === format) b.addClass('active');
 			b.onclick = () => {
 				format = val;
-				fmtWrap.querySelectorAll('.scenarist-choice-btn').forEach((e) =>
-					e.removeClass('active')
-				);
+				fmtWrap.querySelectorAll('.scenarist-choice-btn').forEach((e) => e.removeClass('active'));
 				b.addClass('active');
 			};
 		};
@@ -51,8 +49,7 @@ export class CreateWorkModal extends Modal {
 		});
 
 		const btns = contentEl.createDiv('scenarist-modal-buttons');
-		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () =>
-			this.close();
+		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () => this.close();
 		const createBtn = btns.createEl('button', {
 			cls: 'scenarist-btn-primary',
 			text: 'Создать',
@@ -72,12 +69,10 @@ export class CreateWorkModal extends Modal {
 			if (format === 'Ваншот') {
 				const book = store.create('book', name);
 				store.setLink(book.id, 'work', [work.id]);
-				if (this.plugin.settings.autoCreateNotes)
-					await this.plugin.sync.ensureNote(store.get(book.id)!);
+				if (this.plugin.settings.autoCreateNotes) await this.plugin.sync.ensureNote(store.get(book.id)!);
 			}
 
-			if (this.plugin.settings.autoCreateNotes)
-				await this.plugin.sync.ensureNote(store.get(work.id)!);
+			if (this.plugin.settings.autoCreateNotes) await this.plugin.sync.ensureNote(store.get(work.id)!);
 
 			this.plugin.navigateTo(work.id);
 			new Notice(`Создано произведение: ${name}`);

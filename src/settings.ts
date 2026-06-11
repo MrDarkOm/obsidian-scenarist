@@ -23,14 +23,22 @@ export interface ScenaristSettings {
 }
 
 export const DEFAULT_QUICK_TYPES: QuickCategoryType[] = [
-	{ id: 'org',  label: 'Организации', icon: 'building-2', preset: 'organization', enabled: true,  isDefault: true },
-	{ id: 'loc',  label: 'Локации',     icon: 'map-pin',    preset: 'location',     enabled: true,  isDefault: true },
-	{ id: 'lang', label: 'Языки',       icon: 'languages',  preset: 'language',     enabled: false, isDefault: true },
+	{ id: 'org', label: 'Организации', icon: 'building-2', preset: 'organization', enabled: true, isDefault: true },
+	{ id: 'loc', label: 'Локации', icon: 'map-pin', preset: 'location', enabled: true, isDefault: true },
+	{ id: 'lang', label: 'Языки', icon: 'languages', preset: 'language', enabled: false, isDefault: true },
 ];
 
 export const DEFAULT_GENRE_OPTIONS: string[] = [
-	'Приключение', 'Комедия', 'Триллер', 'Драма', 'Фэнтези',
-	'Научная фантастика', 'Хоррор', 'Романтика', 'Детектив', 'Боевик',
+	'Приключение',
+	'Комедия',
+	'Триллер',
+	'Драма',
+	'Фэнтези',
+	'Научная фантастика',
+	'Хоррор',
+	'Романтика',
+	'Детектив',
+	'Боевик',
 ];
 
 export const DEFAULT_SETTINGS: ScenaristSettings = {
@@ -74,12 +82,10 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 			.setName('Автосоздание заметок')
 			.setDesc('Создавать .md-заметку при добавлении сущности')
 			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.autoCreateNotes)
-					.onChange(async (value) => {
-						this.plugin.settings.autoCreateNotes = value;
-						await this.plugin.saveSettings();
-					})
+				toggle.setValue(this.plugin.settings.autoCreateNotes).onChange(async (value) => {
+					this.plugin.settings.autoCreateNotes = value;
+					await this.plugin.saveSettings();
+				})
 			);
 
 		containerEl.createEl('h3', { text: 'Быстрые типы категорий' });
@@ -93,22 +99,20 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 
 	private renderQuickTypes(containerEl: HTMLElement) {
 		for (const qt of this.plugin.settings.categoryQuickTypes) {
-			const s = new Setting(containerEl)
-				.setName(qt.label)
-				.addToggle((toggle) =>
-					toggle.setValue(qt.enabled).onChange(async (val) => {
-						qt.enabled = val;
-						await this.plugin.saveSettings();
-					})
-				);
+			const s = new Setting(containerEl).setName(qt.label).addToggle((toggle) =>
+				toggle.setValue(qt.enabled).onChange(async (val) => {
+					qt.enabled = val;
+					await this.plugin.saveSettings();
+				})
+			);
 
 			// Инжектируем иконку в nameEl (уже в DOM — setIcon работает корректно)
 			const iconEl = document.createElement('span');
 			iconEl.classList.add('scenarist-setting-icon');
 			if ([...qt.icon].length <= 2) {
-				iconEl.textContent = qt.icon;           // старый emoji-формат
+				iconEl.textContent = qt.icon; // старый emoji-формат
 			} else {
-				setIcon(iconEl, qt.icon);               // Lucide
+				setIcon(iconEl, qt.icon); // Lucide
 			}
 			s.nameEl.prepend(iconEl);
 
@@ -134,8 +138,9 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 						.setTooltip('Удалить')
 						.setWarning()
 						.onClick(async () => {
-							this.plugin.settings.categoryQuickTypes =
-								this.plugin.settings.categoryQuickTypes.filter((t) => t.id !== qt.id);
+							this.plugin.settings.categoryQuickTypes = this.plugin.settings.categoryQuickTypes.filter(
+								(t) => t.id !== qt.id
+							);
 							await this.plugin.saveSettings();
 							this.display();
 						})
@@ -160,21 +165,61 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 /** Иконки доступные в пикере (Lucide, тематика: творчество, миры, персонажи). */
 const LUCIDE_PICKER_ICONS: string[] = [
 	// Люди / роли
-	'user', 'users', 'user-check', 'user-cog', 'crown', 'shield',
+	'user',
+	'users',
+	'user-check',
+	'user-cog',
+	'crown',
+	'shield',
 	// Власть / организации
-	'building-2', 'landmark', 'flag', 'swords', 'handshake', 'network',
+	'building-2',
+	'landmark',
+	'flag',
+	'swords',
+	'handshake',
+	'network',
 	// Места / мир
-	'map-pin', 'map', 'compass', 'globe', 'mountain', 'home',
+	'map-pin',
+	'map',
+	'compass',
+	'globe',
+	'mountain',
+	'home',
 	// Природа / стихии
-	'trees', 'flame', 'droplets', 'zap', 'wind', 'cloud',
+	'trees',
+	'flame',
+	'droplets',
+	'zap',
+	'wind',
+	'cloud',
 	// Документы / знания
-	'book-open', 'scroll', 'pen-line', 'feather', 'brain', 'graduation-cap',
+	'book-open',
+	'scroll',
+	'pen-line',
+	'feather',
+	'brain',
+	'graduation-cap',
 	// Структуры / связи
-	'git-branch', 'layers', 'shapes', 'tag', 'anchor', 'link',
+	'git-branch',
+	'layers',
+	'shapes',
+	'tag',
+	'anchor',
+	'link',
 	// Предметы
-	'gem', 'key', 'lock', 'star', 'heart', 'target',
+	'gem',
+	'key',
+	'lock',
+	'star',
+	'heart',
+	'target',
 	// Время / прочее
-	'hourglass', 'clock', 'moon', 'sun', 'infinity', 'eye',
+	'hourglass',
+	'clock',
+	'moon',
+	'sun',
+	'infinity',
+	'eye',
 ];
 
 class AddQuickTypeModal extends Modal {
@@ -236,7 +281,10 @@ class AddQuickTypeModal extends Modal {
 		const createBtn = btns.createEl('button', { cls: 'scenarist-btn-primary', text: 'Добавить' });
 		createBtn.onclick = async () => {
 			const label = nameInput.value.trim();
-			if (!label) { nameInput.addClass('error'); return; }
+			if (!label) {
+				nameInput.addClass('error');
+				return;
+			}
 
 			this.plugin.settings.categoryQuickTypes.push({
 				id: 'custom_' + Date.now(),
@@ -255,7 +303,9 @@ class AddQuickTypeModal extends Modal {
 		nameInput.focus();
 	}
 
-	onClose() { this.contentEl.empty(); }
+	onClose() {
+		this.contentEl.empty();
+	}
 }
 
 // -------------------------------------------------------
@@ -319,7 +369,10 @@ class EditQuickTypeModal extends Modal {
 		const saveBtn = btns.createEl('button', { cls: 'scenarist-btn-primary', text: 'Сохранить' });
 		saveBtn.onclick = () => {
 			const label = nameInput.value.trim();
-			if (!label) { nameInput.addClass('error'); return; }
+			if (!label) {
+				nameInput.addClass('error');
+				return;
+			}
 			this.onSave(this.selectedIcon, label);
 			this.close();
 		};
@@ -327,5 +380,7 @@ class EditQuickTypeModal extends Modal {
 		nameInput.focus();
 	}
 
-	onClose() { this.contentEl.empty(); }
+	onClose() {
+		this.contentEl.empty();
+	}
 }

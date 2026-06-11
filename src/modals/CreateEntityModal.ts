@@ -66,9 +66,7 @@ export class CreateEntityModal extends Modal {
 			if (field.type === 'select' || field.type === 'status') {
 				const sel = row.createEl('select', { cls: 'scenarist-select' });
 				if (!field.required) sel.createEl('option', { value: '', text: '—' });
-				(field.options || []).forEach((o) =>
-					sel.createEl('option', { value: o.value, text: o.value })
-				);
+				(field.options || []).forEach((o) => sel.createEl('option', { value: o.value, text: o.value }));
 				// Обязательное поле — предвыбираем первый вариант
 				if (field.required && field.options?.length) sel.value = field.options[0].value;
 				fieldInputs[field.key] = sel;
@@ -102,8 +100,7 @@ export class CreateEntityModal extends Modal {
 		}
 
 		const btns = contentEl.createDiv('scenarist-modal-buttons');
-		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () =>
-			this.close();
+		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () => this.close();
 		const createBtn = btns.createEl('button', {
 			cls: 'scenarist-btn-primary',
 			text: 'Создать',
@@ -142,7 +139,9 @@ export class CreateEntityModal extends Modal {
 			for (const link of links) {
 				const sel = linkInputs[link.key];
 				if (!sel) continue;
-				const ids = Array.from(sel.selectedOptions).map((o) => o.value).filter(Boolean);
+				const ids = Array.from(sel.selectedOptions)
+					.map((o) => o.value)
+					.filter(Boolean);
 				if (ids.length) store.setLink(entity.id, link.key, ids);
 			}
 

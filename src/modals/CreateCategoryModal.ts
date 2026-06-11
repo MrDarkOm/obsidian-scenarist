@@ -40,9 +40,9 @@ export class CreateCategoryModal extends Modal {
 
 			const PRESETS: Array<[CategoryPreset, string]> = [
 				['organization', 'Поля: тип, лидер, участники'],
-				['location',     'Поля: тип, страна'],
-				['language',     'Поля: тип, регион'],
-				['custom',       'Пустая, поля добавите позже'],
+				['location', 'Поля: тип, страна'],
+				['language', 'Поля: тип, регион'],
+				['custom', 'Пустая, поля добавите позже'],
 			];
 
 			const mk = (p: CategoryPreset, desc: string) => {
@@ -66,15 +66,12 @@ export class CreateCategoryModal extends Modal {
 		nameRow.createEl('label', { text: 'Название категории', cls: 'scenarist-label' });
 		const nameInput = nameRow.createEl('input', {
 			cls: 'scenarist-input',
-			placeholder: fixedPreset
-				? `Напр. «${PRESET_LABELS[fixedPreset]}»…`
-				: 'Напр. «Организации», «Локации»…',
+			placeholder: fixedPreset ? `Напр. «${PRESET_LABELS[fixedPreset]}»…` : 'Напр. «Организации», «Локации»…',
 		});
 		nameInputHolder.el = nameInput;
 
 		const btns = contentEl.createDiv('scenarist-modal-buttons');
-		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () =>
-			this.close();
+		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () => this.close();
 		const createBtn = btns.createEl('button', {
 			cls: 'scenarist-btn-primary',
 			text: 'Создать',
@@ -86,8 +83,7 @@ export class CreateCategoryModal extends Modal {
 				return;
 			}
 			const cat = this.plugin.store.createCategory(preset, name);
-			if (this.plugin.settings.autoCreateNotes)
-				await this.plugin.sync.ensureNote(this.plugin.store.get(cat.id)!);
+			if (this.plugin.settings.autoCreateNotes) await this.plugin.sync.ensureNote(this.plugin.store.get(cat.id)!);
 			this.plugin.navigateTo(cat.id);
 			new Notice(`Создана категория: ${name}`);
 			this.close();

@@ -224,10 +224,11 @@ export class SyncEngine {
 
 	handleRename(file: TFile, oldPath: string): void {
 		const entity = this.store.findByPath(oldPath);
-		if (entity) {
-			this.store.setFilePath(entity.id, file.path);
-			this.plugin.refreshViews();
-		}
+		if (!entity) return;
+		this.store.setFilePath(entity.id, file.path);
+		// Если переместили в другой проект — обновляем привязку
+		this.syncProjectLink(entity, file.path);
+		this.plugin.refreshViews();
 	}
 
 	/**
@@ -241,6 +242,7 @@ export class SyncEngine {
 	/**
 	 * Сканирует все .md-файлы vault:
 	 * - обновляет filePath для сущностей, у которых путь устарел;
+	 * - исправляет project-ссылку по расположению файла;
 	 * - импортирует сущности из файлов с scenarist_id, которых нет в индексе.
 	 */
 	async rescanVault(): Promise<void> {
@@ -260,16 +262,58 @@ export class SyncEngine {
 					this.store.setFilePath(id, file.path);
 					changed = true;
 				}
+				if (this.syncProjectLink(existing, file.path)) changed = true;
 			} else if (fm.kind) {
 				this.importEntityFromFm(file, fm as Record<string, unknown>);
 				changed = true;
 			}
 		}
 
-		if (changed) this.plugin.refreshViews();
+		if (changed) {
+			void this.store.save();
+			this.plugin.refreshViews();
+		}
 	}
 
 	// ---- private helpers ----
+
+	/**
+	 * По пути файла определяет проект (root/ProjectFolder/...) и
+	 * обновляет project-ссылку у project-scoped сущностей если она отличается.
+	 * Возвращает true если ссылка была изменена.
+	 */
+	private syncProjectLink(entity: Entity, filePath: string): boolean {
+		const projectScoped: EntityKind[] = ['work', 'character', 'category', 'categoryItem'];
+		if (!projectScoped.includes(entity.kind)) return false;
+
+		const project = this.inferProjectFromPath(filePath);
+		if (!project) return false;
+
+		const currentPid = (entity.links['project'] || [])[0];
+		if (currentPid === project.id) return false;
+
+		entity.links['project'] = [project.id];
+		entity.updatedAt = Date.now();
+		return true;
+	}
+
+	/**
+	 * Определяет проект по пути файла: root/{ProjectFolder}/...
+	 * Ищет project-сущность, чьё safe(name) совпадает с именем папки.
+	 */
+	private inferProjectFromPath(filePath: string): Entity | null {
+		const root = normalizePath(this.plugin.settings.rootFolder || 'Scenarist');
+		const parts = filePath.split('/');
+		// Минимум: root/project/file.md
+		if (parts.length < 3) return null;
+		if (parts[0] !== root) return null;
+		const projFolder = parts[1];
+		return (
+			this.store.byKind('project').find(
+				(p) => this.safe(p.name) === projFolder || p.name === projFolder
+			) || null
+		);
+	}
 
 	private async processCreatedFile(file: TFile): Promise<void> {
 		const fm = this.plugin.app.metadataCache.getFileCache(file)?.frontmatter;
@@ -279,8 +323,14 @@ export class SyncEngine {
 		const existing = this.store.get(id);
 
 		if (existing) {
+			let changed = false;
 			if (existing.filePath !== file.path) {
 				this.store.setFilePath(id, file.path);
+				changed = true;
+			}
+			if (this.syncProjectLink(existing, file.path)) changed = true;
+			if (changed) {
+				void this.store.save();
 				this.plugin.refreshViews();
 			}
 		} else if (fm.kind) {
@@ -291,7 +341,7 @@ export class SyncEngine {
 
 	/**
 	 * Восстанавливает сущность из frontmatter файла и добавляет её в Store.
-	 * Связи не восстанавливаются (требуют разрешения имён), поля — восстанавливаются.
+	 * Поля восстанавливаются; project-ссылка выводится из пути файла.
 	 */
 	private importEntityFromFm(file: TFile, fm: Record<string, unknown>): void {
 		const kind = fm.kind as EntityKind;
@@ -308,13 +358,20 @@ export class SyncEngine {
 			}
 		}
 
+		const links: Record<string, string[]> = {};
+		const project = this.inferProjectFromPath(file.path);
+		const projectScoped: EntityKind[] = ['work', 'character', 'category', 'categoryItem'];
+		if (project && projectScoped.includes(kind)) {
+			links['project'] = [project.id];
+		}
+
 		const entity: Entity = {
 			id,
 			kind,
 			name: file.basename,
 			filePath: file.path,
 			props,
-			links: {},
+			links,
 			createdAt: Date.now(),
 			updatedAt: Date.now(),
 		};

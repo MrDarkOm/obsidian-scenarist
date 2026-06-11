@@ -2199,10 +2199,11 @@ var SyncEngine = class {
   }
   handleRename(file, oldPath) {
     const entity = this.store.findByPath(oldPath);
-    if (entity) {
-      this.store.setFilePath(entity.id, file.path);
-      this.plugin.refreshViews();
-    }
+    if (!entity)
+      return;
+    this.store.setFilePath(entity.id, file.path);
+    this.syncProjectLink(entity, file.path);
+    this.plugin.refreshViews();
   }
   /**
    * Вызывается при создании файла в vault (например, скопирован снаружи).
@@ -2214,6 +2215,7 @@ var SyncEngine = class {
   /**
    * Сканирует все .md-файлы vault:
    * - обновляет filePath для сущностей, у которых путь устарел;
+   * - исправляет project-ссылку по расположению файла;
    * - импортирует сущности из файлов с scenarist_id, которых нет в индексе.
    */
   async rescanVault() {
@@ -2232,15 +2234,54 @@ var SyncEngine = class {
           this.store.setFilePath(id, file.path);
           changed = true;
         }
+        if (this.syncProjectLink(existing, file.path))
+          changed = true;
       } else if (fm.kind) {
         this.importEntityFromFm(file, fm);
         changed = true;
       }
     }
-    if (changed)
+    if (changed) {
+      void this.store.save();
       this.plugin.refreshViews();
+    }
   }
   // ---- private helpers ----
+  /**
+   * По пути файла определяет проект (root/ProjectFolder/...) и
+   * обновляет project-ссылку у project-scoped сущностей если она отличается.
+   * Возвращает true если ссылка была изменена.
+   */
+  syncProjectLink(entity, filePath) {
+    const projectScoped = ["work", "character", "category", "categoryItem"];
+    if (!projectScoped.includes(entity.kind))
+      return false;
+    const project = this.inferProjectFromPath(filePath);
+    if (!project)
+      return false;
+    const currentPid = (entity.links["project"] || [])[0];
+    if (currentPid === project.id)
+      return false;
+    entity.links["project"] = [project.id];
+    entity.updatedAt = Date.now();
+    return true;
+  }
+  /**
+   * Определяет проект по пути файла: root/{ProjectFolder}/...
+   * Ищет project-сущность, чьё safe(name) совпадает с именем папки.
+   */
+  inferProjectFromPath(filePath) {
+    const root = (0, import_obsidian2.normalizePath)(this.plugin.settings.rootFolder || "Scenarist");
+    const parts = filePath.split("/");
+    if (parts.length < 3)
+      return null;
+    if (parts[0] !== root)
+      return null;
+    const projFolder = parts[1];
+    return this.store.byKind("project").find(
+      (p) => this.safe(p.name) === projFolder || p.name === projFolder
+    ) || null;
+  }
   async processCreatedFile(file) {
     var _a;
     const fm = (_a = this.plugin.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
@@ -2249,8 +2290,15 @@ var SyncEngine = class {
     const id = String(fm.scenarist_id);
     const existing = this.store.get(id);
     if (existing) {
+      let changed = false;
       if (existing.filePath !== file.path) {
         this.store.setFilePath(id, file.path);
+        changed = true;
+      }
+      if (this.syncProjectLink(existing, file.path))
+        changed = true;
+      if (changed) {
+        void this.store.save();
         this.plugin.refreshViews();
       }
     } else if (fm.kind) {
@@ -2260,7 +2308,7 @@ var SyncEngine = class {
   }
   /**
    * Восстанавливает сущность из frontmatter файла и добавляет её в Store.
-   * Связи не восстанавливаются (требуют разрешения имён), поля — восстанавливаются.
+   * Поля восстанавливаются; project-ссылка выводится из пути файла.
    */
   importEntityFromFm(file, fm) {
     const kind = fm.kind;
@@ -2275,13 +2323,19 @@ var SyncEngine = class {
         props[field.key] = v;
       }
     }
+    const links = {};
+    const project = this.inferProjectFromPath(file.path);
+    const projectScoped = ["work", "character", "category", "categoryItem"];
+    if (project && projectScoped.includes(kind)) {
+      links["project"] = [project.id];
+    }
     const entity = {
       id,
       kind,
       name: file.basename,
       filePath: file.path,
       props,
-      links: {},
+      links,
       createdAt: Date.now(),
       updatedAt: Date.now()
     };

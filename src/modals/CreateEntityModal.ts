@@ -2,6 +2,7 @@ import { App, Modal, Notice } from 'obsidian';
 import { EntityKind, FieldDef, LinkDef } from '../models/types';
 import { SCHEMAS } from '../models/schema';
 import type ScenaristPlugin from '../main';
+import { t } from '../i18n';
 
 export interface CreateOpts {
 	kind: EntityKind;
@@ -28,13 +29,13 @@ export class CreateEntityModal extends Modal {
 			const def = cat?.categorySchema;
 			return {
 				icon: def?.icon || '⬡',
-				label: cat ? cat.name : 'Элемент',
+				label: cat ? cat.name : t('schema.categoryItem.label'),
 				fields: def?.fields || [],
 				links: [...SCHEMAS.categoryItem.links, ...(def?.linkDefs || [])],
 			};
 		}
 		const s = SCHEMAS[this.opts.kind];
-		return { icon: s.icon, label: s.label, fields: s.fields, links: s.links };
+		return { icon: s.icon, label: t(s.label), fields: s.fields, links: s.links };
 	}
 
 	onOpen() {
@@ -45,15 +46,15 @@ export class CreateEntityModal extends Modal {
 
 		contentEl.addClass('scenarist-modal');
 		contentEl.createEl('h2', {
-			text: `${icon} ${this.opts.titleHint || 'Новый: ' + label}`,
+			text: `${icon} ${this.opts.titleHint || t('modal.newEntity', { label })}`,
 			cls: 'scenarist-modal-title',
 		});
 
 		const nameRow = contentEl.createDiv('scenarist-form-row');
-		nameRow.createEl('label', { text: 'Название', cls: 'scenarist-label' });
+		nameRow.createEl('label', { text: t('modal.name'), cls: 'scenarist-label' });
 		const nameInput = nameRow.createEl('input', {
 			cls: 'scenarist-input',
-			placeholder: 'Введите название…',
+			placeholder: t('modal.namePlaceholder'),
 		});
 
 		const fieldInputs: Record<string, HTMLInputElement | HTMLSelectElement> = {};
@@ -62,7 +63,7 @@ export class CreateEntityModal extends Modal {
 			if (field.type === 'multiselect') continue;
 
 			const row = contentEl.createDiv('scenarist-form-row');
-			row.createEl('label', { text: field.label, cls: 'scenarist-label' });
+			row.createEl('label', { text: t(field.label, undefined, field.label), cls: 'scenarist-label' });
 			if (field.type === 'select' || field.type === 'status') {
 				const sel = row.createEl('select', { cls: 'scenarist-select' });
 				if (!field.required) sel.createEl('option', { value: '', text: '—' });
@@ -88,7 +89,7 @@ export class CreateEntityModal extends Modal {
 			if (candidates.length === 0) continue;
 			const row = contentEl.createDiv('scenarist-form-row');
 			row.createEl('label', {
-				text: link.label + (link.single ? '' : ' (можно несколько)'),
+				text: t(link.label, undefined, link.label) + (link.single ? '' : t('modal.multipleHint')),
 				cls: 'scenarist-label',
 			});
 			const sel = row.createEl('select', { cls: 'scenarist-select' });
@@ -100,10 +101,10 @@ export class CreateEntityModal extends Modal {
 		}
 
 		const btns = contentEl.createDiv('scenarist-modal-buttons');
-		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () => this.close();
+		btns.createEl('button', { cls: 'scenarist-btn', text: t('modal.cancel') }).onclick = () => this.close();
 		const createBtn = btns.createEl('button', {
 			cls: 'scenarist-btn-primary',
-			text: 'Создать',
+			text: t('modal.create'),
 		});
 		createBtn.onclick = async () => {
 			const name = nameInput.value.trim();
@@ -149,7 +150,7 @@ export class CreateEntityModal extends Modal {
 				await this.plugin.sync.ensureNote(store.get(entity.id)!);
 			}
 			this.plugin.navigateTo(entity.id);
-			new Notice(`Создано: ${name}`);
+			new Notice(t('modal.created', { name }));
 			this.close();
 		};
 

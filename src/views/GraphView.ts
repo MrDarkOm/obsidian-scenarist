@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { Entity, EntityKind } from '../models/types';
 import type ScenaristPlugin from '../main';
+import { t } from '../i18n';
 
 export const GRAPH_VIEW = 'scenarist-graph';
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -37,7 +38,7 @@ export class GraphView extends ItemView {
 		return GRAPH_VIEW;
 	}
 	getDisplayText() {
-		return 'Граф связей';
+		return t('commands.openGraph');
 	}
 	getIcon() {
 		return 'git-fork';
@@ -52,6 +53,10 @@ export class GraphView extends ItemView {
 		this.unsub.forEach((u) => u());
 	}
 
+	refresh() {
+		this.render();
+	}
+
 	private render() {
 		const c = this.containerEl.children[1] as HTMLElement;
 		c.empty();
@@ -63,7 +68,7 @@ export class GraphView extends ItemView {
 
 		if (entities.length === 0) {
 			c.createDiv('scenarist-empty').createEl('p', {
-				text: 'Нет сущностей для графа в этом проекте',
+				text: t('graph.empty'),
 			});
 			return;
 		}
@@ -86,8 +91,8 @@ export class GraphView extends ItemView {
 					const k = [n.e.id, tid].sort().join('|');
 					if (seen.has(k)) continue;
 					seen.add(k);
-					const t = index.get(tid);
-					if (t) edges.push([n, t]);
+					const tgt = index.get(tid);
+					if (tgt) edges.push([n, tgt]);
 				}
 			}
 		}
@@ -110,18 +115,18 @@ export class GraphView extends ItemView {
 		for (const n of nodes) this.renderNode(svg, n, edgeEls);
 
 		const legend = c.createDiv('scenarist-graph-legend');
-		const labels: Record<string, string> = {
-			work: 'Произведения',
-			character: 'Персонажи',
-			categoryItem: 'Категории',
-			arc: 'Арки',
-			anchor: 'Якоря',
-		};
-		for (const kind of GRAPH_KINDS) {
+		const legendKeys: Array<[EntityKind, string]> = [
+			['work', t('graph.legend.work')],
+			['character', t('graph.legend.character')],
+			['categoryItem', t('graph.legend.categoryItem')],
+			['arc', t('graph.legend.arc')],
+			['anchor', t('graph.legend.anchor')],
+		];
+		for (const [kind, label] of legendKeys) {
 			const item = legend.createDiv('scenarist-legend-item');
 			const dot = item.createEl('span', { cls: 'scenarist-status-dot' });
 			dot.style.background = NODE_COLORS[kind] || '#888';
-			item.createEl('span', { text: labels[kind] });
+			item.createEl('span', { text: label });
 		}
 	}
 

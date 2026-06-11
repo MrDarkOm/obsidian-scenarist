@@ -2,18 +2,9 @@ import { ItemView, WorkspaceLeaf, MarkdownRenderer, TFile, setIcon } from 'obsid
 import { Entity, EntityKind } from '../models/types';
 import { CreateEntityModal } from '../modals/CreateEntityModal';
 import type ScenaristPlugin from '../main';
+import { t } from '../i18n';
 
 export const CARD_VIEW = 'scenarist-card';
-
-const BACKLINK_LABELS: Record<string, string> = {
-	chapters: 'Появляется в главах',
-	pages: 'Появляется на страницах',
-	members: 'Участники',
-	arcs: 'Арки',
-	books: 'Книги',
-	anchors: 'Якоря',
-	works: 'Произведения',
-};
 
 /** Скрытые из секции «Связи» структурные ключи. */
 const STRUCTURAL = new Set(['project', 'category']);
@@ -49,6 +40,10 @@ export class CardView extends ItemView {
 	}
 	async onClose() {
 		this.unsub.forEach((u) => u());
+	}
+
+	refresh() {
+		this.render();
 	}
 
 	/** Debounced re-entrant-safe render scheduler. */
@@ -94,10 +89,10 @@ export class CardView extends ItemView {
 				const empty = root.createDiv('scenarist-empty');
 				const iconBox = empty.createDiv('scenarist-empty-icon');
 				setIcon(iconBox, 'layers');
-				empty.createEl('p', { text: 'Выберите элемент в навигаторе' });
+				empty.createEl('p', { text: t('card.empty') });
 				empty.createEl('p', {
 					cls: 'scenarist-empty-hint',
-					text: 'Нажмите на произведение, персонажа или главу слева',
+					text: t('card.emptyHint'),
 				});
 				return;
 			}
@@ -144,7 +139,7 @@ export class CardView extends ItemView {
 
 		const top = card.createDiv('scenarist-card-top');
 		if (this.plugin.canGoBack()) {
-			const back = top.createEl('button', { cls: 'scenarist-card-back', attr: { title: 'Назад' } });
+			const back = top.createEl('button', { cls: 'scenarist-card-back', attr: { title: t('card.back') } });
 			setIcon(back, 'arrow-left');
 			back.onclick = () => this.plugin.back();
 		}
@@ -167,14 +162,14 @@ export class CardView extends ItemView {
 			a.onclick = () => this.plugin.navigateTo(cr.id);
 			trail.createEl('span', { cls: 'scenarist-crumb-sep', text: '/' });
 		});
-		trail.createEl('span', { cls: 'scenarist-crumb current', text: schema.label });
+		trail.createEl('span', { cls: 'scenarist-crumb current', text: t(schema.label, undefined, schema.label) });
 
 		const spacer = top.createDiv();
 		spacer.style.flex = '1';
 
-		const openBtn = top.createEl('button', { cls: 'scenarist-card-note-btn', attr: { title: 'Открыть заметку' } });
+		const openBtn = top.createEl('button', { cls: 'scenarist-card-note-btn', attr: { title: t('card.openNote') } });
 		setIcon(openBtn, 'external-link');
-		openBtn.createEl('span', { text: 'Заметка' });
+		openBtn.createEl('span', { text: t('card.noteLabel') });
 		openBtn.onclick = () => this.plugin.sync.openNote(entity);
 
 		// Заголовок (иконка-бокс + название)
@@ -184,7 +179,7 @@ export class CardView extends ItemView {
 
 		const title = titleRow.createEl('input', { cls: 'scenarist-card-title' });
 		title.value = entity.name;
-		title.placeholder = 'Без названия';
+		title.placeholder = t('card.noName');
 		title.onchange = () => {
 			const v = title.value.trim();
 			if (v && v !== entity.name) {
@@ -203,7 +198,7 @@ export class CardView extends ItemView {
 		const tags = rawTags
 			? String(rawTags)
 					.split(',')
-					.map((t) => t.trim())
+					.map((tg) => tg.trim())
 					.filter(Boolean)
 			: [];
 
@@ -212,25 +207,25 @@ export class CardView extends ItemView {
 		for (const tag of tags) {
 			const chip = row.createEl('span', { cls: 'scenarist-tag-chip' });
 			const text = chip.createEl('span', { cls: 'scenarist-tag-chip-text', text: '#' + tag });
-			text.title = `Найти #${tag} в vault`;
+			text.title = t('card.findTag', { tag });
 			text.onclick = (e) => {
 				e.stopPropagation();
 				this.openTagSearch(tag);
 			};
 			const x = chip.createEl('span', { cls: 'scenarist-tag-chip-x', text: '×' });
-			x.title = 'Удалить тег';
+			x.title = t('card.removeTag');
 			x.onclick = (e) => {
 				e.stopPropagation();
-				const next = tags.filter((t) => t !== tag);
+				const next = tags.filter((tg) => tg !== tag);
 				this.commitProp(entity, 'tags', next.length ? next.join(', ') : null);
 			};
 		}
 
-		const addBtn = row.createEl('button', { cls: 'scenarist-tag-add', text: '+ тег' });
+		const addBtn = row.createEl('button', { cls: 'scenarist-tag-add', text: t('card.addTag') });
 		addBtn.onclick = () => {
 			addBtn.style.display = 'none';
 			const inp = row.createEl('input', { cls: 'scenarist-tag-input' });
-			inp.placeholder = 'тег…';
+			inp.placeholder = t('card.tagPlaceholder');
 			inp.focus();
 			const commit = () => {
 				const val = inp.value.trim().replace(/^#/, '');
@@ -258,7 +253,7 @@ export class CardView extends ItemView {
 
 		for (const field of fields) {
 			const row = section.createDiv('scenarist-prop');
-			row.createEl('div', { cls: 'scenarist-prop-label', text: field.label });
+			row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
 			const valWrap = row.createDiv('scenarist-prop-value');
 			this.renderFieldControl(valWrap, entity, field);
 		}
@@ -275,7 +270,7 @@ export class CardView extends ItemView {
 		while ((m = re.exec(rawVal)) !== null) links.push(m[1]);
 
 		const row = section.createDiv('scenarist-prop');
-		row.createEl('div', { cls: 'scenarist-prop-label', text: 'Ссылки на заметки' });
+		row.createEl('div', { cls: 'scenarist-prop-label', text: t('card.noteLinks') });
 		const valWrap = row.createDiv('scenarist-prop-value');
 		const chipRow = valWrap.createDiv('scenarist-card-tags scenarist-link-chips');
 		chipRow.style.margin = '0';
@@ -288,7 +283,7 @@ export class CardView extends ItemView {
 		for (const link of links) {
 			const chip = chipRow.createEl('span', { cls: 'scenarist-link-chip' });
 			const text = chip.createEl('span', { cls: 'scenarist-tag-chip-text', text: `[[${link}]]` });
-			text.title = `Открыть: ${link}`;
+			text.title = t('card.openLink', { link });
 			text.onclick = (e) => {
 				e.stopPropagation();
 				this.openObsidianLink(link);
@@ -300,11 +295,11 @@ export class CardView extends ItemView {
 			};
 		}
 
-		const addBtn = chipRow.createEl('button', { cls: 'scenarist-tag-add', text: '+ ссылка' });
+		const addBtn = chipRow.createEl('button', { cls: 'scenarist-tag-add', text: t('card.addLink') });
 		addBtn.onclick = () => {
 			addBtn.style.display = 'none';
 			const inp = chipRow.createEl('input', { cls: 'scenarist-tag-input' });
-			inp.placeholder = 'Название заметки…';
+			inp.placeholder = t('card.linkPlaceholder');
 			inp.style.width = '160px';
 			inp.focus();
 			const commit = () => {
@@ -371,16 +366,16 @@ export class CardView extends ItemView {
 				}
 				const available = settingsOpts.filter((o) => !selected.includes(o));
 				const sel = chipRow.createEl('select', { cls: 'scenarist-genre-add' });
-				sel.createEl('option', { value: '', text: '＋ жанр…' });
+				sel.createEl('option', { value: '', text: t('card.addGenre') });
 				available.forEach((o) => sel.createEl('option', { value: o, text: o }));
-				sel.createEl('option', { value: '__new__', text: '＋ Добавить свой…' });
+				sel.createEl('option', { value: '__new__', text: t('card.addNewGenre') });
 
 				sel.onchange = async () => {
 					if (!sel.value) return;
 					if (sel.value === '__new__') {
 						sel.style.display = 'none';
 						const inp = chipRow.createEl('input', { cls: 'scenarist-tag-input' });
-						inp.placeholder = 'Новый жанр…';
+						inp.placeholder = t('card.newGenrePlaceholder');
 						inp.focus();
 						const doAdd = async () => {
 							const newG = inp.value.trim();
@@ -505,18 +500,18 @@ export class CardView extends ItemView {
 		const items = this.plugin.store.categoryItems(cat.id);
 		const section = card.createDiv('scenarist-card-section');
 		const head = section.createDiv('scenarist-card-body-head');
-		head.createEl('div', { cls: 'scenarist-card-section-title', text: `Элементы (${items.length})` });
-		const add = head.createEl('button', { cls: 'scenarist-card-edit-btn', text: '＋ элемент' });
+		head.createEl('div', { cls: 'scenarist-card-section-title', text: t('card.items', { count: items.length }) });
+		const add = head.createEl('button', { cls: 'scenarist-card-edit-btn', text: t('card.addItem') });
 		add.onclick = () =>
 			new CreateEntityModal(this.app, this.plugin, {
 				kind: 'categoryItem',
 				categoryId: cat.id,
-				titleHint: `Новый: ${cat.name}`,
+				titleHint: t('modal.newEntity', { label: cat.name }),
 			}).open();
 
 		const chips = section.createDiv('scenarist-rel-chips');
 		if (items.length === 0) {
-			chips.createEl('span', { cls: 'scenarist-muted', text: 'Пока пусто.' });
+			chips.createEl('span', { cls: 'scenarist-muted', text: t('card.emptyItems') });
 		}
 		for (const it of items) {
 			const chip = chips.createEl('span', { cls: 'scenarist-rel-chip' });
@@ -532,12 +527,18 @@ export class CardView extends ItemView {
 		const schema = this.plugin.store.resolved(entity);
 		const linkKeys = new Set(schema.links.map((l) => l.key));
 		const section = card.createDiv('scenarist-card-section');
-		section.createEl('div', { cls: 'scenarist-card-section-title', text: 'Связи' });
+		section.createEl('div', { cls: 'scenarist-card-section-title', text: t('card.relations') });
 		const blocks: HTMLElement[] = [];
 
 		for (const link of schema.links) {
 			if (STRUCTURAL.has(link.key)) continue;
-			const el = this.renderLinkEditor(entity, link.key, link.label, link.target, !!link.single);
+			const el = this.renderLinkEditor(
+				entity,
+				link.key,
+				t(link.label, undefined, link.label),
+				link.target,
+				!!link.single
+			);
 			if (el) {
 				section.appendChild(el);
 				blocks.push(el);
@@ -574,12 +575,12 @@ export class CardView extends ItemView {
 		const chips = wrap.createDiv('scenarist-rel-chips');
 
 		for (const tid of current) {
-			const t = this.plugin.store.get(tid);
-			if (!t) continue;
+			const target_entity = this.plugin.store.get(tid);
+			if (!target_entity) continue;
 			const chip = chips.createEl('span', { cls: 'scenarist-rel-chip' });
 			const chipIcon = chip.createEl('span', { cls: 'scenarist-rel-chip-icon' });
-			this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
-			chip.createEl('span', { text: t.name });
+			this.renderIconInto(chipIcon, this.plugin.store.resolved(target_entity).icon);
+			chip.createEl('span', { text: target_entity.name });
 			chip.onclick = () => this.plugin.navigateTo(tid);
 			const x = chip.createEl('span', { cls: 'scenarist-rel-x', text: '×' });
 			x.onclick = (e) => {
@@ -595,7 +596,7 @@ export class CardView extends ItemView {
 
 		if (candidates.length > 0) {
 			const sel = chips.createEl('select', { cls: 'scenarist-rel-add' });
-			sel.createEl('option', { value: '', text: '+ добавить…' });
+			sel.createEl('option', { value: '', text: t('card.addRelation') });
 			candidates.forEach((c) => sel.createEl('option', { value: c.id, text: c.name }));
 			sel.onchange = () => {
 				if (!sel.value) return;
@@ -610,15 +611,15 @@ export class CardView extends ItemView {
 	private renderBacklinks(key: string, ids: string[]): HTMLElement {
 		const wrap = document.createElement('div');
 		wrap.className = 'scenarist-rel-group backlinks';
-		wrap.createDiv('scenarist-rel-label').textContent = BACKLINK_LABELS[key] || key;
+		wrap.createDiv('scenarist-rel-label').textContent = t('card.backlinks.' + key, undefined, key);
 		const chips = wrap.createDiv('scenarist-rel-chips');
 		for (const id of ids) {
-			const t = this.plugin.store.get(id);
-			if (!t) continue;
+			const entity = this.plugin.store.get(id);
+			if (!entity) continue;
 			const chip = chips.createEl('span', { cls: 'scenarist-rel-chip readonly' });
 			const chipIcon = chip.createEl('span', { cls: 'scenarist-rel-chip-icon' });
-			this.renderIconInto(chipIcon, this.plugin.store.resolved(t).icon);
-			chip.createEl('span', { text: t.name });
+			this.renderIconInto(chipIcon, this.plugin.store.resolved(entity).icon);
+			chip.createEl('span', { text: entity.name });
 			chip.onclick = () => this.plugin.navigateTo(id);
 		}
 		return wrap;
@@ -628,10 +629,10 @@ export class CardView extends ItemView {
 	private async renderBody(card: HTMLElement, entity: Entity) {
 		const section = card.createDiv('scenarist-card-section scenarist-card-body');
 		const head = section.createDiv('scenarist-card-body-head');
-		head.createEl('div', { cls: 'scenarist-card-section-title', text: 'Текст' });
+		head.createEl('div', { cls: 'scenarist-card-section-title', text: t('card.text') });
 		const editBtn = head.createEl('button', { cls: 'scenarist-card-edit-btn' });
 		setIcon(editBtn, 'pencil');
-		editBtn.createEl('span', { text: 'Редактировать' });
+		editBtn.createEl('span', { text: t('card.edit') });
 		editBtn.onclick = () => this.plugin.sync.openNote(entity);
 
 		const file = entity.filePath ? this.plugin.app.vault.getAbstractFileByPath(entity.filePath) : null;
@@ -643,12 +644,12 @@ export class CardView extends ItemView {
 			if (body) {
 				await MarkdownRenderer.render(this.plugin.app, body, target, file.path, this);
 			} else {
-				target.createEl('p', { cls: 'scenarist-muted', text: 'Пусто.' });
+				target.createEl('p', { cls: 'scenarist-muted', text: t('card.emptyBody') });
 			}
 		} else {
 			target.createEl('p', {
 				cls: 'scenarist-muted',
-				text: 'Заметка ещё не создана — нажмите «Редактировать».',
+				text: t('card.noteNotCreated'),
 			});
 		}
 	}

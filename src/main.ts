@@ -11,6 +11,7 @@ import { TimelineView, TIMELINE_VIEW } from './views/TimelineView';
 import { CreateEntityModal } from './modals/CreateEntityModal';
 import { CreateWorkModal } from './modals/CreateWorkModal';
 import { CreateCategoryModal } from './modals/CreateCategoryModal';
+import { setLocale, t } from './i18n';
 
 export default class ScenaristPlugin extends Plugin {
 	settings: ScenaristSettings;
@@ -29,6 +30,8 @@ export default class ScenaristPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		setLocale(this.settings.language || 'ru');
+
 		this.store = new ScenaristStore(this);
 		this.sync = new SyncEngine(this);
 		this.state = new ScenaristState(this);
@@ -46,30 +49,30 @@ export default class ScenaristPlugin extends Plugin {
 		this.registerView(GRAPH_VIEW, (leaf) => new GraphView(leaf, this));
 		this.registerView(TIMELINE_VIEW, (leaf) => new TimelineView(leaf, this));
 
-		this.addRibbonIcon('film', 'Scenarist', () => this.activateLayout());
+		this.addRibbonIcon('film', t('commands.ribbon'), () => this.activateLayout());
 
-		this.addCommand({ id: 'open-scenarist', name: 'Открыть Scenarist', callback: () => this.activateLayout() });
-		this.addCommand({ id: 'open-board', name: 'Открыть доску глав', callback: () => this.openCentre(BOARD_VIEW) });
-		this.addCommand({ id: 'open-graph', name: 'Открыть граф связей', callback: () => this.openCentre(GRAPH_VIEW) });
+		this.addCommand({ id: 'open-scenarist', name: t('commands.openScenarist'), callback: () => this.activateLayout() });
+		this.addCommand({ id: 'open-board', name: t('commands.openBoard'), callback: () => this.openCentre(BOARD_VIEW) });
+		this.addCommand({ id: 'open-graph', name: t('commands.openGraph'), callback: () => this.openCentre(GRAPH_VIEW) });
 		this.addCommand({
 			id: 'new-project',
-			name: 'Новый проект',
+			name: t('commands.newProject'),
 			callback: () =>
-				new CreateEntityModal(this.app, this, { kind: 'project', titleHint: 'Новый проект' }).open(),
+				new CreateEntityModal(this.app, this, { kind: 'project', titleHint: t('nav.newProject') }).open(),
 		});
 		this.addCommand({
 			id: 'new-work',
-			name: 'Новое произведение (Серия/Ваншот)',
+			name: t('commands.newWork'),
 			callback: () => new CreateWorkModal(this.app, this).open(),
 		});
 		this.addCommand({
 			id: 'new-character',
-			name: 'Новый персонаж',
+			name: t('commands.newCharacter'),
 			callback: () => new CreateEntityModal(this.app, this, { kind: 'character' }).open(),
 		});
 		this.addCommand({
 			id: 'new-category',
-			name: 'Новая категория',
+			name: t('commands.newCategory'),
 			callback: () => new CreateCategoryModal(this.app, this).open(),
 		});
 
@@ -124,6 +127,16 @@ export default class ScenaristPlugin extends Plugin {
 	refreshViews() {
 		void this.store.save();
 		this.state.notify();
+	}
+
+	/** Принудительно перерисовать все открытые вью (например, после смены языка). */
+	refreshAllViews() {
+		const views = [NAVIGATOR_VIEW, CARD_VIEW, BOARD_VIEW, GRAPH_VIEW, TIMELINE_VIEW];
+		for (const type of views) {
+			this.app.workspace.getLeavesOfType(type).forEach((leaf) => {
+				(leaf.view as any).refresh?.();
+			});
+		}
 	}
 
 	async openTimeline(workId: string) {

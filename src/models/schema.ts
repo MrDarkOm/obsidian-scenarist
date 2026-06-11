@@ -7,20 +7,20 @@ import { CategoryPreset, CategorySchemaDef, Entity, EntityKind, EntitySchema, Re
 export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 	project: {
 		kind: 'project',
-		label: 'Проект',
-		labelPlural: 'Проекты',
+		label: 'schema.project.label',
+		labelPlural: 'schema.project.labelPlural',
 		icon: 'folder',
 		folder: '',
 		layer: 'project',
 		titleField: 'Name',
-		fields: [{ key: 'summary', label: 'Описание', type: 'text' }],
+		fields: [{ key: 'summary', label: 'schema.project.fields.summary', type: 'text' }],
 		links: [],
 	},
 
 	work: {
 		kind: 'work',
-		label: 'Произведение',
-		labelPlural: 'Произведения',
+		label: 'schema.work.label',
+		labelPlural: 'schema.work.labelPlural',
 		icon: 'pen-line',
 		folder: '',
 		layer: 'text',
@@ -28,7 +28,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		fields: [
 			{
 				key: 'format',
-				label: 'Формат',
+				label: 'schema.work.fields.format',
 				type: 'select',
 				required: true,
 				options: [
@@ -38,7 +38,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 			},
 			{
 				key: 'type',
-				label: 'Тип',
+				label: 'schema.work.fields.type',
 				type: 'select',
 				required: true,
 				options: [
@@ -48,7 +48,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 			},
 			{
 				key: 'status',
-				label: 'Статус',
+				label: 'schema.work.fields.status',
 				type: 'status',
 				options: [
 					{ value: 'Обычное', color: '#888' },
@@ -56,20 +56,20 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 					{ value: 'Архив', color: '#c0392b' },
 				],
 			},
-			{ key: 'summary', label: 'Краткое описание', type: 'text' },
+			{ key: 'summary', label: 'schema.work.fields.summary', type: 'text' },
 		],
 		links: [
-			{ key: 'project', label: 'Проект', target: 'project', single: true },
-			{ key: 'books', label: 'Книги', target: 'book', reverse: 'work' },
-			{ key: 'arcs', label: 'Арки', target: 'arc', reverse: 'work' },
-			{ key: 'anchors', label: 'Якоря', target: 'anchor', reverse: 'work' },
+			{ key: 'project', label: 'schema.work.links.project', target: 'project', single: true },
+			{ key: 'books', label: 'schema.work.links.books', target: 'book', reverse: 'work' },
+			{ key: 'arcs', label: 'schema.work.links.arcs', target: 'arc', reverse: 'work' },
+			{ key: 'anchors', label: 'schema.work.links.anchors', target: 'anchor', reverse: 'work' },
 		],
 	},
 
 	book: {
 		kind: 'book',
-		label: 'Книга',
-		labelPlural: 'Книги',
+		label: 'schema.book.label',
+		labelPlural: 'schema.book.labelPlural',
 		icon: 'book-open',
 		folder: 'Книги',
 		layer: 'text',
@@ -77,7 +77,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		fields: [
 			{
 				key: 'genre',
-				label: 'Жанр',
+				label: 'schema.book.fields.genre',
 				type: 'multiselect',
 				options: [
 					{ value: 'Приключение', color: '#9b59b6' },
@@ -94,7 +94,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 			},
 			{
 				key: 'format',
-				label: 'Формат',
+				label: 'schema.book.fields.format',
 				type: 'select',
 				required: true,
 				options: [
@@ -102,63 +102,63 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 					{ value: 'WebToon', color: '#e67e22' },
 				],
 			},
-			{ key: 'audience', label: 'Возрастная аудитория', type: 'number' },
-			{ key: 'idea', label: 'Идея', type: 'text' },
-			{ key: 'synopsis', label: 'Синопсис', type: 'text' },
-			{ key: 'completed', label: 'Завершено', type: 'checkbox' },
+			{ key: 'audience', label: 'schema.book.fields.audience', type: 'number' },
+			{ key: 'idea', label: 'schema.book.fields.idea', type: 'text' },
+			{ key: 'synopsis', label: 'schema.book.fields.synopsis', type: 'text' },
+			{ key: 'completed', label: 'schema.book.fields.completed', type: 'checkbox' },
 		],
 		links: [
-			{ key: 'work', label: 'Произведение', target: 'work', single: true, reverse: 'books' },
-			{ key: 'chapters', label: 'Главы', target: 'chapter', reverse: 'book' },
+			{ key: 'work', label: 'schema.book.links.work', target: 'work', single: true, reverse: 'books' },
+			{ key: 'chapters', label: 'schema.book.links.chapters', target: 'chapter', reverse: 'book' },
 		],
 	},
 
 	arc: {
 		kind: 'arc',
-		label: 'Арка',
-		labelPlural: 'Арки',
+		label: 'schema.arc.label',
+		labelPlural: 'schema.arc.labelPlural',
 		icon: 'git-branch',
 		folder: 'Арки',
 		layer: 'text',
 		titleField: 'Name',
 		fields: [
-			{ key: 'goal', label: 'Цель', type: 'text' },
-			{ key: 'description', label: 'Описание', type: 'text' },
+			{ key: 'goal', label: 'schema.arc.fields.goal', type: 'text' },
+			{ key: 'description', label: 'schema.arc.fields.description', type: 'text' },
 		],
 		links: [
-			{ key: 'work', label: 'Произведение', target: 'work', single: true, reverse: 'arcs' },
-			{ key: 'books', label: 'Книги', target: 'book' },
-			{ key: 'chapters', label: 'Главы', target: 'chapter', reverse: 'arc' },
-			{ key: 'anchors', label: 'Якоря', target: 'anchor', reverse: 'arc' },
-			{ key: 'keyCharacters', label: 'Ключевые персонажи', target: 'character' },
+			{ key: 'work', label: 'schema.arc.links.work', target: 'work', single: true, reverse: 'arcs' },
+			{ key: 'books', label: 'schema.arc.links.books', target: 'book' },
+			{ key: 'chapters', label: 'schema.arc.links.chapters', target: 'chapter', reverse: 'arc' },
+			{ key: 'anchors', label: 'schema.arc.links.anchors', target: 'anchor', reverse: 'arc' },
+			{ key: 'keyCharacters', label: 'schema.arc.links.keyCharacters', target: 'character' },
 		],
 	},
 
 	anchor: {
 		kind: 'anchor',
-		label: 'Якорь',
-		labelPlural: 'Якоря',
+		label: 'schema.anchor.label',
+		labelPlural: 'schema.anchor.labelPlural',
 		icon: 'anchor',
 		folder: 'Якоря',
 		layer: 'text',
 		titleField: 'Name',
 		fields: [
-			{ key: 'description', label: 'Описание события', type: 'text' },
-			{ key: 'date', label: 'Дата / момент', type: 'text' },
-			{ key: 'order', label: 'Порядок на таймлайне', type: 'number' },
+			{ key: 'description', label: 'schema.anchor.fields.description', type: 'text' },
+			{ key: 'date', label: 'schema.anchor.fields.date', type: 'text' },
+			{ key: 'order', label: 'schema.anchor.fields.order', type: 'number' },
 		],
 		links: [
-			{ key: 'work', label: 'Произведение', target: 'work', single: true, reverse: 'anchors' },
-			{ key: 'arc', label: 'Арка', target: 'arc', single: true, reverse: 'anchors' },
-			{ key: 'chapters', label: 'Главы', target: 'chapter', reverse: 'anchors' },
-			{ key: 'characters', label: 'Персонажи', target: 'character' },
+			{ key: 'work', label: 'schema.anchor.links.work', target: 'work', single: true, reverse: 'anchors' },
+			{ key: 'arc', label: 'schema.anchor.links.arc', target: 'arc', single: true, reverse: 'anchors' },
+			{ key: 'chapters', label: 'schema.anchor.links.chapters', target: 'chapter', reverse: 'anchors' },
+			{ key: 'characters', label: 'schema.anchor.links.characters', target: 'character' },
 		],
 	},
 
 	chapter: {
 		kind: 'chapter',
-		label: 'Глава',
-		labelPlural: 'Главы',
+		label: 'schema.chapter.label',
+		labelPlural: 'schema.chapter.labelPlural',
 		icon: 'scroll',
 		folder: 'Главы',
 		layer: 'text',
@@ -166,7 +166,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		fields: [
 			{
 				key: 'status',
-				label: 'Статус',
+				label: 'schema.chapter.fields.status',
 				type: 'status',
 				required: true,
 				options: [
@@ -177,35 +177,35 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 					{ value: 'Архив', color: '#c0392b' },
 				],
 			},
-			{ key: 'synopsis', label: 'Синопсис', type: 'text' },
+			{ key: 'synopsis', label: 'schema.chapter.fields.synopsis', type: 'text' },
 		],
 		links: [
-			{ key: 'book', label: 'Книга', target: 'book', single: true, reverse: 'chapters' },
-			{ key: 'arc', label: 'Арка', target: 'arc', reverse: 'chapters' },
-			{ key: 'anchors', label: 'Якоря', target: 'anchor', reverse: 'chapters' },
-			{ key: 'characters', label: 'Персонажи', target: 'character', reverse: 'chapters' },
+			{ key: 'book', label: 'schema.chapter.links.book', target: 'book', single: true, reverse: 'chapters' },
+			{ key: 'arc', label: 'schema.chapter.links.arc', target: 'arc', reverse: 'chapters' },
+			{ key: 'anchors', label: 'schema.chapter.links.anchors', target: 'anchor', reverse: 'chapters' },
+			{ key: 'characters', label: 'schema.chapter.links.characters', target: 'character', reverse: 'chapters' },
 		],
 	},
 
 	page: {
 		kind: 'page',
-		label: 'Страница',
-		labelPlural: 'Страницы',
+		label: 'schema.page.label',
+		labelPlural: 'schema.page.labelPlural',
 		icon: 'file-text',
 		folder: 'Страницы',
 		layer: 'text',
 		titleField: 'Name',
-		fields: [{ key: 'archived', label: 'Архив', type: 'checkbox' }],
+		fields: [{ key: 'archived', label: 'schema.page.fields.archived', type: 'checkbox' }],
 		links: [
-			{ key: 'chapter', label: 'Глава', target: 'chapter', single: true, reverse: 'pages' },
-			{ key: 'characters', label: 'Персонажи', target: 'character', reverse: 'pages' },
+			{ key: 'chapter', label: 'schema.page.links.chapter', target: 'chapter', single: true, reverse: 'pages' },
+			{ key: 'characters', label: 'schema.page.links.characters', target: 'character', reverse: 'pages' },
 		],
 	},
 
 	character: {
 		kind: 'character',
-		label: 'Персонаж',
-		labelPlural: 'Персонажи',
+		label: 'schema.character.label',
+		labelPlural: 'schema.character.labelPlural',
 		icon: 'user',
 		folder: 'Персонажи',
 		layer: 'world',
@@ -213,7 +213,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		fields: [
 			{
 				key: 'type',
-				label: 'Тип',
+				label: 'schema.character.fields.type',
 				type: 'select',
 				options: [
 					{ value: 'Протагонист', color: '#7ed321' },
@@ -225,7 +225,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 			},
 			{
 				key: 'role',
-				label: 'Роль в истории',
+				label: 'schema.character.fields.role',
 				type: 'select',
 				options: [
 					{ value: 'Главная', color: '#7ed321' },
@@ -234,42 +234,42 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 					{ value: 'Эпизодическая', color: '#e84393' },
 				],
 			},
-			{ key: 'age', label: 'Возраст', type: 'number' },
-			{ key: 'activity', label: 'Деятельность', type: 'text' },
-			{ key: 'summary', label: 'Краткое описание', type: 'text' },
+			{ key: 'age', label: 'schema.character.fields.age', type: 'number' },
+			{ key: 'activity', label: 'schema.character.fields.activity', type: 'text' },
+			{ key: 'summary', label: 'schema.character.fields.summary', type: 'text' },
 		],
 		links: [
-			{ key: 'project', label: 'Проект', target: 'project', single: true },
-			{ key: 'works', label: 'Произведения', target: 'work' },
-			{ key: 'affiliation', label: 'Принадлежность', target: 'categoryItem', reverse: 'members' },
-			{ key: 'original', label: 'Оригинал', target: 'character', single: true, reverse: 'otherVersions' },
-			{ key: 'otherVersions', label: 'В других историях', target: 'character', reverse: 'original' },
+			{ key: 'project', label: 'schema.character.links.project', target: 'project', single: true },
+			{ key: 'works', label: 'schema.character.links.works', target: 'work' },
+			{ key: 'affiliation', label: 'schema.character.links.affiliation', target: 'categoryItem', reverse: 'members' },
+			{ key: 'original', label: 'schema.character.links.original', target: 'character', single: true, reverse: 'otherVersions' },
+			{ key: 'otherVersions', label: 'schema.character.links.otherVersions', target: 'character', reverse: 'original' },
 		],
 	},
 
 	category: {
 		kind: 'category',
-		label: 'Категория',
-		labelPlural: 'Категории',
+		label: 'schema.category.label',
+		labelPlural: 'schema.category.labelPlural',
 		icon: 'tag',
 		folder: '',
 		layer: 'world',
 		titleField: 'Name',
-		fields: [{ key: 'summary', label: 'Описание категории', type: 'text' }],
-		links: [{ key: 'project', label: 'Проект', target: 'project', single: true }],
+		fields: [{ key: 'summary', label: 'schema.category.fields.summary', type: 'text' }],
+		links: [{ key: 'project', label: 'schema.category.links.project', target: 'project', single: true }],
 	},
 
 	// Базовая схема элемента категории — поля/связи дополняются динамически.
 	categoryItem: {
 		kind: 'categoryItem',
-		label: 'Элемент',
-		labelPlural: 'Элементы',
+		label: 'schema.categoryItem.label',
+		labelPlural: 'schema.categoryItem.labelPlural',
 		icon: 'circle-dot',
 		folder: '',
 		layer: 'world',
 		titleField: 'Name',
 		fields: [],
-		links: [{ key: 'works', label: 'Произведения', target: 'work' }],
+		links: [{ key: 'works', label: 'schema.categoryItem.links.works', target: 'work' }],
 	},
 };
 
@@ -297,7 +297,7 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 		fields: [
 			{
 				key: 'type',
-				label: 'Тип',
+				label: 'schema.categoryPreset.organization.type',
 				type: 'select',
 				options: [
 					{ value: 'Следователи', color: '#f5a623' },
@@ -308,11 +308,11 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 					{ value: 'Другое', color: '#7ed321' },
 				],
 			},
-			{ key: 'summary', label: 'Короткое описание', type: 'text' },
+			{ key: 'summary', label: 'schema.categoryPreset.organization.summary', type: 'text' },
 		],
 		linkDefs: [
-			{ key: 'leader', label: 'Лидер', target: 'character', single: true },
-			{ key: 'members', label: 'Участники', target: 'character', reverse: 'affiliation' },
+			{ key: 'leader', label: 'schema.categoryPreset.organization.linkDefs.leader', target: 'character', single: true },
+			{ key: 'members', label: 'schema.categoryPreset.organization.linkDefs.members', target: 'character', reverse: 'affiliation' },
 		],
 	},
 	location: {
@@ -321,7 +321,7 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 		fields: [
 			{
 				key: 'type',
-				label: 'Тип',
+				label: 'schema.categoryPreset.location.type',
 				type: 'select',
 				options: [
 					{ value: 'Локация', color: '#f5a623' },
@@ -330,8 +330,8 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 					{ value: 'Неизвестно', color: '#7ed321' },
 				],
 			},
-			{ key: 'country', label: 'Страна', type: 'text' },
-			{ key: 'summary', label: 'Короткое описание', type: 'text' },
+			{ key: 'country', label: 'schema.categoryPreset.location.country', type: 'text' },
+			{ key: 'summary', label: 'schema.categoryPreset.location.summary', type: 'text' },
 		],
 		linkDefs: [],
 	},
@@ -341,7 +341,7 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 		fields: [
 			{
 				key: 'type',
-				label: 'Тип',
+				label: 'schema.categoryPreset.language.type',
 				type: 'select',
 				options: [
 					{ value: 'Официальный', color: '#4a9eff' },
@@ -350,8 +350,8 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 					{ value: 'Созданный', color: '#9b59b6' },
 				],
 			},
-			{ key: 'region', label: 'Регион', type: 'text' },
-			{ key: 'summary', label: 'Описание', type: 'text' },
+			{ key: 'region', label: 'schema.categoryPreset.language.region', type: 'text' },
+			{ key: 'summary', label: 'schema.categoryPreset.language.summary', type: 'text' },
 		],
 		linkDefs: [],
 	},
@@ -359,16 +359,16 @@ export const CATEGORY_PRESETS: Record<CategoryPreset, CategorySchemaDef> = {
 	custom: {
 		icon: 'shapes',
 		preset: 'custom',
-		fields: [{ key: 'summary', label: 'Описание', type: 'text' }],
+		fields: [{ key: 'summary', label: 'schema.categoryPreset.custom.summary', type: 'text' }],
 		linkDefs: [],
 	},
 };
 
 export const PRESET_LABELS: Record<CategoryPreset, string> = {
-	organization: 'Организация',
-	location: 'Локация',
-	language: 'Язык',
-	custom: 'Пользовательская',
+	organization: 'schema.preset.organization',
+	location: 'schema.preset.location',
+	language: 'schema.preset.language',
+	custom: 'schema.preset.custom',
 };
 
 // ============================================

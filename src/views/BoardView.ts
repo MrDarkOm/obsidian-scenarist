@@ -2,6 +2,7 @@ import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { Entity } from '../models/types';
 import { SCHEMAS } from '../models/schema';
 import type ScenaristPlugin from '../main';
+import { t } from '../i18n';
 
 export const BOARD_VIEW = 'scenarist-board';
 
@@ -19,7 +20,7 @@ export class BoardView extends ItemView {
 		return BOARD_VIEW;
 	}
 	getDisplayText() {
-		return 'Доска глав';
+		return t('board.title');
 	}
 	getIcon() {
 		return 'kanban-square';
@@ -31,6 +32,10 @@ export class BoardView extends ItemView {
 	}
 	async onClose() {
 		this.unsub.forEach((u) => u());
+	}
+
+	refresh() {
+		this.render();
 	}
 
 	private projectChapters(): Entity[] {
@@ -48,13 +53,13 @@ export class BoardView extends ItemView {
 		c.addClass('scenarist-panel', 'scenarist-board');
 
 		const header = c.createDiv('scenarist-panel-header');
-		header.createEl('span', { cls: 'scenarist-panel-title', text: '🗂 Доска глав' });
+		header.createEl('span', { cls: 'scenarist-panel-title', text: '🗂 ' + t('board.title') });
 
 		const statuses = SCHEMAS.chapter.fields.find((f) => f.key === 'status')?.options || [];
 		const chapters = this.projectChapters();
 
 		if (chapters.length === 0) {
-			c.createDiv('scenarist-empty').createEl('p', { text: 'Нет глав в активном проекте' });
+			c.createDiv('scenarist-empty').createEl('p', { text: t('board.empty') });
 			return;
 		}
 
@@ -90,7 +95,7 @@ export class BoardView extends ItemView {
 		const noStatus = chapters.filter((ch) => !statuses.some((s) => s.value === ch.props['status']));
 		if (noStatus.length > 0) {
 			const col = board.createDiv('scenarist-board-col');
-			col.createDiv('scenarist-board-col-head').createEl('span', { text: 'Без статуса' });
+			col.createDiv('scenarist-board-col-head').createEl('span', { text: t('board.noStatus') });
 			const drop = col.createDiv('scenarist-board-drop');
 			for (const ch of noStatus) this.renderCard(drop, ch);
 		}

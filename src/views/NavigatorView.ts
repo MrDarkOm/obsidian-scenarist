@@ -6,6 +6,7 @@ import { CreateWorkModal } from '../modals/CreateWorkModal';
 import { CreateCategoryModal } from '../modals/CreateCategoryModal';
 import type ScenaristPlugin from '../main';
 import { QuickCategoryType } from '../settings';
+import { t } from '../i18n';
 
 export const NAVIGATOR_VIEW = 'scenarist-navigator';
 
@@ -56,16 +57,20 @@ export class NavigatorView extends ItemView {
 		this.unsub.forEach((u) => u());
 	}
 
+	refresh() {
+		this.render();
+	}
+
 	private get store() {
 		return this.plugin.store;
 	}
 
 	private enabledQuickTypes(): QuickCategoryType[] {
-		return (this.plugin.settings.categoryQuickTypes || []).filter((t) => t.enabled);
+		return (this.plugin.settings.categoryQuickTypes || []).filter((qt) => qt.enabled);
 	}
 
 	private resolveTab() {
-		const valid = new Set(['work', 'character', ...this.enabledQuickTypes().map((t) => t.id)]);
+		const valid = new Set(['work', 'character', ...this.enabledQuickTypes().map((qt) => qt.id)]);
 		if (!valid.has(this.tab)) this.tab = 'work';
 	}
 
@@ -113,7 +118,7 @@ export class NavigatorView extends ItemView {
 		} else if (this.tab === 'character') {
 			this.renderCharacterTab(body);
 		} else {
-			const qt = this.enabledQuickTypes().find((t) => t.id === this.tab);
+			const qt = this.enabledQuickTypes().find((qt) => qt.id === this.tab);
 			if (qt) this.renderCategoryTypeTab(body, qt);
 		}
 
@@ -131,7 +136,7 @@ export class NavigatorView extends ItemView {
 		const wrap = c.createDiv('scenarist-search-wrap');
 		const input = wrap.createEl('input', {
 			cls: 'scenarist-search',
-			placeholder: 'Поиск…',
+			placeholder: t('nav.search'),
 			type: 'text',
 		});
 		input.value = this.search;
@@ -147,14 +152,14 @@ export class NavigatorView extends ItemView {
 
 		const works = this.store.byKindForProject('work').filter((w) => this.workHasMatch(w));
 		if (works.length > 0) {
-			this.searchSectionTitle(body, 'Произведения');
+			this.searchSectionTitle(body, t('nav.works'));
 			for (const work of works) this.renderWorkBlock(body, work);
 			totalFound += works.length;
 		}
 
 		const chars = this.store.byKindForProject('character').filter((c) => this.matches(c));
 		if (chars.length > 0) {
-			this.searchSectionTitle(body, 'Персонажи');
+			this.searchSectionTitle(body, t('nav.characters'));
 			const pills = body.createDiv('scenarist-pills');
 			pills.style.paddingLeft = '12px';
 			for (const ch of chars) this.renderPill(pills, ch);
@@ -180,7 +185,7 @@ export class NavigatorView extends ItemView {
 							new CreateEntityModal(this.app, this.plugin, {
 								kind: 'categoryItem',
 								categoryId: cat.id,
-								titleHint: `Новый: ${cat.name}`,
+								titleHint: t('nav.newWork', { name: cat.name }),
 							}).open(),
 						() => this.plugin.navigateTo(cat.id),
 						cat
@@ -191,7 +196,7 @@ export class NavigatorView extends ItemView {
 		}
 
 		if (totalFound === 0) {
-			body.createDiv('scenarist-tree-empty').setText('Ничего не найдено');
+			body.createDiv('scenarist-tree-empty').setText(t('nav.nothingFound'));
 		}
 	}
 
@@ -205,7 +210,7 @@ export class NavigatorView extends ItemView {
 
 		const gear = bar.createEl('button', { cls: 'clickable-icon scenarist-proj-settings' });
 		setIcon(gear, 'settings');
-		gear.setAttribute('aria-label', 'Настройки Scenarist');
+		gear.setAttribute('aria-label', t('nav.openSettings'));
 		gear.onclick = () => {
 			const setting = (this.app as any).setting;
 			if (setting) {
@@ -215,7 +220,7 @@ export class NavigatorView extends ItemView {
 		};
 
 		const sel = bar.createEl('select', { cls: 'scenarist-work-select' });
-		const none = sel.createEl('option', { value: NO_PROJECT, text: '— Без проекта' });
+		const none = sel.createEl('option', { value: NO_PROJECT, text: t('nav.noProject') });
 		if (this.store.getActiveProjectId() === NO_PROJECT) none.selected = true;
 		this.store.getProjects().forEach((p) => {
 			const o = sel.createEl('option', { value: p.id, text: p.name });
@@ -225,19 +230,19 @@ export class NavigatorView extends ItemView {
 
 		const add = bar.createEl('button', { cls: 'clickable-icon scenarist-proj-add' });
 		setIcon(add, 'plus');
-		add.setAttribute('aria-label', 'Создать проект');
+		add.setAttribute('aria-label', t('nav.createProject'));
 		add.onclick = () =>
 			new CreateEntityModal(this.app, this.plugin, {
 				kind: 'project',
-				titleHint: 'Новый проект',
+				titleHint: t('nav.newProject'),
 			}).open();
 	}
 
 	// ── вкладки ────────────────────────────────────────────────────────────────
 	private renderTabs(c: HTMLElement) {
 		const row = c.createDiv('scenarist-tabs-icons');
-		this.makeTabBtn(row, 'work', 'palette', 'Произведения');
-		this.makeTabBtn(row, 'character', 'user', 'Персонажи');
+		this.makeTabBtn(row, 'work', 'palette', t('nav.works'));
+		this.makeTabBtn(row, 'character', 'user', t('nav.characters'));
 		// Динамические вкладки — icon теперь всегда Lucide-имя
 		for (const qt of this.enabledQuickTypes()) {
 			this.makeTabBtn(row, qt.id, qt.icon, qt.label);
@@ -266,13 +271,13 @@ export class NavigatorView extends ItemView {
 	private renderWorkTab(body: HTMLElement) {
 		this.tabHeader(
 			body,
-			'Произведения',
+			t('nav.works'),
 			() => new CreateWorkModal(this.app, this.plugin).open(),
-			'Создать произведение'
+			t('nav.createWork')
 		);
 		const works = this.store.byKindForProject('work');
 		if (works.length === 0) {
-			body.createDiv('scenarist-tree-empty').setText('Нет произведений');
+			body.createDiv('scenarist-tree-empty').setText(t('nav.noWorks'));
 			return;
 		}
 		for (const work of works) this.renderWorkBlock(body, work);
@@ -303,7 +308,7 @@ export class NavigatorView extends ItemView {
 
 		const tl = head.createEl('button', { cls: 'clickable-icon' });
 		setIcon(tl, 'clock');
-		tl.setAttribute('aria-label', 'Таймлайн');
+		tl.setAttribute('aria-label', t('nav.timeline'));
 		tl.onclick = (e) => {
 			e.stopPropagation();
 			this.plugin.openTimeline(work.id);
@@ -311,7 +316,7 @@ export class NavigatorView extends ItemView {
 
 		const addBtn = head.createEl('button', { cls: 'clickable-icon' });
 		setIcon(addBtn, 'plus');
-		addBtn.setAttribute('aria-label', 'Добавить');
+		addBtn.setAttribute('aria-label', t('nav.add'));
 		addBtn.onclick = (e) => {
 			e.stopPropagation();
 			this.workAddMenu(e, work);
@@ -339,26 +344,26 @@ export class NavigatorView extends ItemView {
 					new CreateEntityModal(this.app, this.plugin, {
 						kind: 'chapter',
 						parentLinks: [{ key: 'book', id: b.id }],
-						titleHint: 'Новая глава',
+						titleHint: t('nav.newChapter'),
 					}).open(),
 				undefined,
 				b
 			);
 		}
 		const arcs = this.linked(work, 'arcs', 'arc').filter((a) => this.matches(a));
-		this.chipGroup(inner, `arcs:${work.id}`, ENTITY_ICON.arc, 'Арки', arcs, () =>
+		this.chipGroup(inner, `arcs:${work.id}`, ENTITY_ICON.arc, t('nav.arcs'), arcs, () =>
 			new CreateEntityModal(this.app, this.plugin, {
 				kind: 'arc',
 				parentLinks: [{ key: 'work', id: work.id }],
-				titleHint: 'Новая арка',
+				titleHint: t('nav.newArc'),
 			}).open()
 		);
 		const anchors = this.linked(work, 'anchors', 'anchor').filter((a) => this.matches(a));
-		this.chipGroup(inner, `anch:${work.id}`, ENTITY_ICON.anchor, 'Якоря', anchors, () =>
+		this.chipGroup(inner, `anch:${work.id}`, ENTITY_ICON.anchor, t('nav.anchors'), anchors, () =>
 			new CreateEntityModal(this.app, this.plugin, {
 				kind: 'anchor',
 				parentLinks: [{ key: 'work', id: work.id }],
-				titleHint: 'Новый якорь',
+				titleHint: t('nav.newAnchor'),
 			}).open()
 		);
 	}
@@ -367,9 +372,9 @@ export class NavigatorView extends ItemView {
 	private renderCharacterTab(body: HTMLElement) {
 		this.tabHeader(
 			body,
-			'Персонажи',
+			t('nav.characters'),
 			() => new CreateEntityModal(this.app, this.plugin, { kind: 'character' }).open(),
-			'Создать персонажа'
+			t('nav.createCharacter')
 		);
 		const chars = this.store.byKindForProject('character');
 		for (const role of CHAR_ROLES) {
@@ -378,13 +383,13 @@ export class NavigatorView extends ItemView {
 				new CreateEntityModal(this.app, this.plugin, {
 					kind: 'character',
 					presetProps: { role },
-					titleHint: `Новый персонаж (${role.toLowerCase()})`,
+					titleHint: t('nav.newWork', { name: role.toLowerCase() }),
 				}).open()
 			);
 		}
 		const noRole = chars.filter((c) => !CHAR_ROLES.includes(String(c.props['role'])));
 		if (noRole.length > 0) {
-			this.chipGroup(body, 'role:none', ENTITY_ICON.character, 'Без роли', noRole, () =>
+			this.chipGroup(body, 'role:none', ENTITY_ICON.character, t('nav.noRole'), noRole, () =>
 				new CreateEntityModal(this.app, this.plugin, { kind: 'character' }).open()
 			);
 		}
@@ -396,13 +401,13 @@ export class NavigatorView extends ItemView {
 			body,
 			qt.label,
 			() => new CreateCategoryModal(this.app, this.plugin, qt.preset).open(),
-			`Создать: ${qt.label}`
+			t('nav.createFor', { label: qt.label })
 		);
 
 		const cats = this.store.byKindForProject('category').filter((c) => c.categorySchema?.preset === qt.preset);
 
 		if (cats.length === 0) {
-			body.createDiv('scenarist-tree-empty').setText(`Нет ${qt.label.toLowerCase()}. Нажмите + чтобы создать.`);
+			body.createDiv('scenarist-tree-empty').setText(t('nav.noItems', { label: qt.label.toLowerCase() }));
 			return;
 		}
 		for (const cat of cats) {
@@ -417,7 +422,7 @@ export class NavigatorView extends ItemView {
 					new CreateEntityModal(this.app, this.plugin, {
 						kind: 'categoryItem',
 						categoryId: cat.id,
-						titleHint: `Новый: ${cat.name}`,
+						titleHint: t('nav.newWork', { name: cat.name }),
 					}).open(),
 				() => this.plugin.navigateTo(cat.id),
 				cat
@@ -449,12 +454,12 @@ export class NavigatorView extends ItemView {
 		const head = parent.createDiv('scenarist-group-header');
 		head.createEl('span', { cls: 'scenarist-chevron', text: open ? '▾' : '▸' });
 		this.typeIcon(head, icon);
-		const t = head.createEl('span', { cls: 'scenarist-group-title', text: title });
+		const titleEl = head.createEl('span', { cls: 'scenarist-group-title', text: title });
 		head.createEl('span', { cls: 'scenarist-count-badge', text: String(items.length) });
 
 		if (onTitleClick) {
-			t.addClass('linkable');
-			t.onclick = (e) => {
+			titleEl.addClass('linkable');
+			titleEl.onclick = (e) => {
 				e.stopPropagation();
 				onTitleClick();
 			};
@@ -473,7 +478,7 @@ export class NavigatorView extends ItemView {
 		for (const item of items) this.renderPill(pills, item);
 		const add = pills.createEl('button', { cls: 'scenarist-pill add' });
 		setIcon(add, 'plus');
-		add.setAttribute('aria-label', 'Добавить');
+		add.setAttribute('aria-label', t('nav.add'));
 		add.onclick = onAdd;
 	}
 
@@ -505,7 +510,7 @@ export class NavigatorView extends ItemView {
 
 	private workAddMenu(e: MouseEvent, work: Entity) {
 		const menu = new Menu();
-		const mk = (label: string, kind: 'book' | 'arc' | 'anchor', icon: string) =>
+		const mk = (label: string, stored: string, kind: 'book' | 'arc' | 'anchor', icon: string) =>
 			menu.addItem((i) =>
 				i
 					.setTitle(label)
@@ -514,13 +519,13 @@ export class NavigatorView extends ItemView {
 						new CreateEntityModal(this.app, this.plugin, {
 							kind,
 							parentLinks: [{ key: 'work', id: work.id }],
-							titleHint: `Новый: ${label}`,
+							titleHint: t('nav.newWork', { name: stored }),
 						}).open()
 					)
 			);
-		mk('Книга', 'book', 'book-open');
-		mk('Арка', 'arc', 'git-branch');
-		mk('Якорь', 'anchor', 'anchor');
+		mk(t('nav.book'), t('nav.book'), 'book', 'book-open');
+		mk(t('nav.arc'), t('nav.arc'), 'arc', 'git-branch');
+		mk(t('nav.anchor'), t('nav.anchor'), 'anchor', 'anchor');
 		menu.showAtMouseEvent(e);
 	}
 
@@ -528,24 +533,24 @@ export class NavigatorView extends ItemView {
 		const menu = new Menu();
 		menu.addItem((i) =>
 			i
-				.setTitle('Открыть карточку')
+				.setTitle(t('nav.openCard'))
 				.setIcon('info')
 				.onClick(() => this.plugin.navigateTo(entity.id))
 		);
 		menu.addItem((i) =>
 			i
-				.setTitle('Открыть заметку')
+				.setTitle(t('nav.openNote'))
 				.setIcon('file-text')
 				.onClick(() => this.plugin.sync.openNote(entity))
 		);
 		menu.addSeparator();
 		menu.addItem((i) =>
 			i
-				.setTitle('Удалить')
+				.setTitle(t('nav.delete'))
 				.setIcon('trash')
 				.onClick(async () => {
 					await this.plugin.sync.deleteEntity(entity.id);
-					new Notice(`Удалено: ${entity.name}`);
+					new Notice(t('nav.deleted', { name: entity.name }));
 				})
 		);
 		menu.showAtMouseEvent(e);

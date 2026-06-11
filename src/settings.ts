@@ -1,6 +1,7 @@
 import { App, PluginSettingTab, Setting, Modal, Notice, setIcon } from 'obsidian';
 import type ScenaristPlugin from './main';
 import { CategoryPreset } from './models/types';
+import { t, setLocale } from './i18n';
 
 export interface QuickCategoryType {
 	id: string;
@@ -20,6 +21,8 @@ export interface ScenaristSettings {
 	genreOptions: string[];
 	/** Последний открытый entity — восстанавливается при следующем запуске. */
 	lastSelectedId?: string;
+	/** Язык интерфейса плагина ('ru' | 'en'). */
+	language: string;
 }
 
 export const DEFAULT_QUICK_TYPES: QuickCategoryType[] = [
@@ -44,8 +47,9 @@ export const DEFAULT_GENRE_OPTIONS: string[] = [
 export const DEFAULT_SETTINGS: ScenaristSettings = {
 	rootFolder: 'Scenarist',
 	autoCreateNotes: true,
-	categoryQuickTypes: DEFAULT_QUICK_TYPES.map((t) => ({ ...t })),
+	categoryQuickTypes: DEFAULT_QUICK_TYPES.map((qt) => ({ ...qt })),
 	genreOptions: [...DEFAULT_GENRE_OPTIONS],
+	language: 'ru',
 };
 
 // -------------------------------------------------------
@@ -61,13 +65,30 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 	display() {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.createEl('h2', { text: 'Scenarist — Настройки' });
+		containerEl.createEl('h2', { text: t('settings.title') });
 
-		containerEl.createEl('h3', { text: 'Общие' });
+		containerEl.createEl('h3', { text: t('settings.general') });
 
 		new Setting(containerEl)
-			.setName('Корневая папка')
-			.setDesc('Папка в vault, где Scenarist хранит заметки')
+			.setName(t('settings.language'))
+			.setDesc(t('settings.languageDesc'))
+			.addDropdown((drop) =>
+				drop
+					.addOption('ru', 'Русский')
+					.addOption('en', 'English')
+					.setValue(this.plugin.settings.language || 'ru')
+					.onChange(async (value) => {
+						this.plugin.settings.language = value;
+						setLocale(value);
+						await this.plugin.saveSettings();
+						this.plugin.refreshAllViews();
+						this.display();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName(t('settings.rootFolder'))
+			.setDesc(t('settings.rootFolderDesc'))
 			.addText((text) =>
 				text
 					.setPlaceholder('Scenarist')
@@ -79,8 +100,8 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName('Автосоздание заметок')
-			.setDesc('Создавать .md-заметку при добавлении сущности')
+			.setName(t('settings.autoCreate'))
+			.setDesc(t('settings.autoCreateDesc'))
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.autoCreateNotes).onChange(async (value) => {
 					this.plugin.settings.autoCreateNotes = value;
@@ -88,10 +109,10 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 				})
 			);
 
-		containerEl.createEl('h3', { text: 'Быстрые типы категорий' });
+		containerEl.createEl('h3', { text: t('settings.quickTypes') });
 		containerEl.createEl('p', {
 			cls: 'setting-item-description',
-			text: 'Кнопки-вкладки в навигаторе. Включите нужные или добавьте свой тип.',
+			text: t('settings.quickTypesDesc'),
 		});
 
 		this.renderQuickTypes(containerEl);
@@ -121,7 +142,7 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 				s.addButton((btn) =>
 					btn
 						.setIcon('pencil')
-						.setTooltip('Редактировать')
+						.setTooltip(t('settings.editTooltip'))
 						.onClick(() => {
 							new EditQuickTypeModal(this.app, qt.icon, qt.label, async (newIcon, newLabel) => {
 								qt.icon = newIcon;
@@ -135,11 +156,11 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 				s.addButton((btn) =>
 					btn
 						.setIcon('trash')
-						.setTooltip('Удалить')
+						.setTooltip(t('settings.deleteTooltip'))
 						.setWarning()
 						.onClick(async () => {
 							this.plugin.settings.categoryQuickTypes = this.plugin.settings.categoryQuickTypes.filter(
-								(t) => t.id !== qt.id
+								(qt2) => qt2.id !== qt.id
 							);
 							await this.plugin.saveSettings();
 							this.display();
@@ -149,11 +170,11 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 		}
 
 		new Setting(containerEl)
-			.setName('Добавить пользовательский тип')
-			.setDesc('Выберите иконку и задайте название')
+			.setName(t('settings.addCustomType'))
+			.setDesc(t('settings.addCustomTypeDesc'))
 			.addButton((btn) =>
 				btn
-					.setButtonText('＋ Добавить')
+					.setButtonText(t('settings.addCustomTypeBtn'))
 					.setCta()
 					.onClick(() => new AddQuickTypeModal(this.app, this.plugin, () => this.display()).open())
 			);
@@ -236,11 +257,11 @@ class AddQuickTypeModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 		contentEl.addClass('scenarist-modal');
-		contentEl.createEl('h2', { text: 'Новый тип категории', cls: 'scenarist-modal-title' });
+		contentEl.createEl('h2', { text: t('modal.newCategoryType'), cls: 'scenarist-modal-title' });
 
 		// ── Пикер иконок ──────────────────────────────────────────────────────
 		const iconRow = contentEl.createDiv('scenarist-form-row');
-		iconRow.createEl('label', { text: 'Иконка', cls: 'scenarist-label' });
+		iconRow.createEl('label', { text: t('modal.icon'), cls: 'scenarist-label' });
 
 		const pickerWrap = iconRow.createDiv('scenarist-icon-picker');
 
@@ -268,17 +289,17 @@ class AddQuickTypeModal extends Modal {
 
 		// ── Название ──────────────────────────────────────────────────────────
 		const nameRow = contentEl.createDiv('scenarist-form-row');
-		nameRow.createEl('label', { text: 'Название', cls: 'scenarist-label' });
+		nameRow.createEl('label', { text: t('modal.typeName'), cls: 'scenarist-label' });
 		const nameInput = nameRow.createEl('input', {
 			cls: 'scenarist-input',
-			placeholder: 'Например: Артефакты',
+			placeholder: t('modal.typeNamePlaceholder'),
 		});
 
 		// ── Кнопки ────────────────────────────────────────────────────────────
 		const btns = contentEl.createDiv('scenarist-modal-buttons');
-		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () => this.close();
+		btns.createEl('button', { cls: 'scenarist-btn', text: t('modal.cancel') }).onclick = () => this.close();
 
-		const createBtn = btns.createEl('button', { cls: 'scenarist-btn-primary', text: 'Добавить' });
+		const createBtn = btns.createEl('button', { cls: 'scenarist-btn-primary', text: t('modal.add') });
 		createBtn.onclick = async () => {
 			const label = nameInput.value.trim();
 			if (!label) {
@@ -295,7 +316,7 @@ class AddQuickTypeModal extends Modal {
 				isDefault: false,
 			});
 			await this.plugin.saveSettings();
-			new Notice(`Добавлен тип: ${label}`);
+			new Notice(t('modal.typeAdded', { label }));
 			this.close();
 			this.onDone();
 		};
@@ -328,20 +349,20 @@ class EditQuickTypeModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 		contentEl.addClass('scenarist-modal');
-		contentEl.createEl('h2', { text: 'Редактировать тип', cls: 'scenarist-modal-title' });
+		contentEl.createEl('h2', { text: t('modal.editType'), cls: 'scenarist-modal-title' });
 
 		// ── Поле названия ─────────────────────────────────────────────────────
 		const nameRow = contentEl.createDiv('scenarist-form-row');
-		nameRow.createEl('label', { text: 'Название', cls: 'scenarist-label' });
+		nameRow.createEl('label', { text: t('modal.typeName'), cls: 'scenarist-label' });
 		const nameInput = nameRow.createEl('input', {
 			cls: 'scenarist-input',
-			placeholder: 'Например: Артефакты',
+			placeholder: t('modal.typeNamePlaceholder'),
 		});
 		nameInput.value = this.currentLabel;
 
 		// ── Пикер иконок ──────────────────────────────────────────────────────
 		const iconRow = contentEl.createDiv('scenarist-form-row');
-		iconRow.createEl('label', { text: 'Иконка', cls: 'scenarist-label' });
+		iconRow.createEl('label', { text: t('modal.icon'), cls: 'scenarist-label' });
 
 		const pickerWrap = iconRow.createDiv('scenarist-icon-picker');
 
@@ -365,8 +386,8 @@ class EditQuickTypeModal extends Modal {
 		}
 
 		const btns = contentEl.createDiv('scenarist-modal-buttons');
-		btns.createEl('button', { cls: 'scenarist-btn', text: 'Отмена' }).onclick = () => this.close();
-		const saveBtn = btns.createEl('button', { cls: 'scenarist-btn-primary', text: 'Сохранить' });
+		btns.createEl('button', { cls: 'scenarist-btn', text: t('modal.cancel') }).onclick = () => this.close();
+		const saveBtn = btns.createEl('button', { cls: 'scenarist-btn-primary', text: t('modal.save') });
 		saveBtn.onclick = () => {
 			const label = nameInput.value.trim();
 			if (!label) {

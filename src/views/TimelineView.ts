@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { Entity } from '../models/types';
 import type ScenaristPlugin from '../main';
+import { t } from '../i18n';
 
 export const TIMELINE_VIEW = 'scenarist-timeline';
 
@@ -18,7 +19,7 @@ export class TimelineView extends ItemView {
 		return TIMELINE_VIEW;
 	}
 	getDisplayText() {
-		return 'Таймлайн';
+		return t('timeline.title');
 	}
 	getIcon() {
 		return 'clock';
@@ -30,6 +31,10 @@ export class TimelineView extends ItemView {
 	}
 	async onClose() {
 		this.unsub.forEach((u) => u());
+	}
+
+	refresh() {
+		this.render();
 	}
 
 	private anchorsOf(workId: string): Entity[] {
@@ -54,12 +59,12 @@ export class TimelineView extends ItemView {
 		const header = c.createDiv('scenarist-panel-header');
 		header.createEl('span', {
 			cls: 'scenarist-panel-title',
-			text: work ? `🕒 Таймлайн — ${work.name}` : '🕒 Таймлайн',
+			text: work ? '🕒 ' + t('timeline.titleWork', { name: work.name }) : '🕒 ' + t('timeline.title'),
 		});
 
 		if (!work) {
 			c.createDiv('scenarist-empty').createEl('p', {
-				text: 'Откройте таймлайн произведения из навигатора',
+				text: t('timeline.noWork'),
 			});
 			return;
 		}
@@ -67,7 +72,7 @@ export class TimelineView extends ItemView {
 		const anchors = this.anchorsOf(work.id);
 		if (anchors.length === 0) {
 			c.createDiv('scenarist-empty').createEl('p', {
-				text: 'Нет якорей. Добавьте ключевые события через «＋» у произведения.',
+				text: t('timeline.noAnchors'),
 			});
 			return;
 		}

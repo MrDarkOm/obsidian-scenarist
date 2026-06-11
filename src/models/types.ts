@@ -32,8 +32,10 @@ export interface FieldDef {
 	options?: FieldOption[];
 	/** Нельзя оставить пустым — первый вариант выбирается по умолчанию. */
 	required?: boolean;
-	/** Группа вкладки (например 'characteristics', 'biography', 'appearance'). */
+	/** Группа вкладки (например 'basic', 'characteristics', 'biography', 'appearance'). */
 	tab?: string;
+	/** Подраздел внутри вкладки (ключ для перевода, например 'story', 'life'). */
+	section?: string;
 }
 
 export interface LinkDef {

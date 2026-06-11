@@ -1,5 +1,5 @@
 import { ItemView, WorkspaceLeaf, MarkdownRenderer, TFile, setIcon } from 'obsidian';
-import { Entity, EntityKind } from '../models/types';
+import { Entity, EntityKind, FieldDef } from '../models/types';
 import { CreateEntityModal } from '../modals/CreateEntityModal';
 import type ScenaristPlugin from '../main';
 import { t } from '../i18n';
@@ -17,7 +17,7 @@ export class CardView extends ItemView {
 	private unsub: Array<() => void> = [];
 	private _rendering = false;
 	private _renderPending = false;
-	private _charTab = 'characteristics';
+	private _charTab = 'basic';
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -198,8 +198,10 @@ export class CardView extends ItemView {
 			this.renderAvatarBox(titleRow, entity);
 		}
 
-		// Теги
-		this.renderTagsHeader(card, entity);
+		// Теги (для персонажей рендерятся внутри таба «Основное»)
+		if (entity.kind !== 'character') {
+			this.renderTagsHeader(card, entity);
+		}
 	}
 
 	/** Строка тегов под заголовком. */
@@ -667,7 +669,7 @@ export class CardView extends ItemView {
 			input.onchange = async () => {
 				const file = input.files?.[0];
 				if (!file) return;
-				const path = await this.saveImageToVault(entity, file);
+				const path = await this.saveImageToVault(entity, file, 'avatar');
 				if (path) this.commitProp(entity, 'avatar', path);
 			};
 			input.click();
@@ -681,22 +683,47 @@ export class CardView extends ItemView {
 	}
 
 	// ---- сохранение изображения в vault ----
-	private async saveImageToVault(entity: Entity, file: File): Promise<string | null> {
+	private getAssetsFolder(entity: Entity): string {
+		const dir = entity.filePath.includes('/')
+			? entity.filePath.substring(0, entity.filePath.lastIndexOf('/'))
+			: '';
+		return dir ? `${dir}/assets` : 'assets';
+	}
+
+	private nameSlug(entity: Entity): string {
+		return entity.name.replace(/[/\\:*?"<>|]/g, '').replace(/\s+/g, '_');
+	}
+
+	private async saveImageToVault(
+		entity: Entity,
+		file: File,
+		type: 'avatar' | 'ref' | 'draw'
+	): Promise<string | null> {
 		if (!entity.filePath) return null;
 		try {
-			const folderPath = entity.filePath.replace(/\.md$/, '');
-			if (!this.plugin.app.vault.getAbstractFileByPath(folderPath)) {
-				await this.plugin.app.vault.createFolder(folderPath);
+			const assets = this.getAssetsFolder(entity);
+			if (!this.plugin.app.vault.getAbstractFileByPath(assets)) {
+				await this.plugin.app.vault.createFolder(assets);
 			}
-			let destPath = `${folderPath}/${file.name}`;
-			if (this.plugin.app.vault.getAbstractFileByPath(destPath)) {
-				const dot = file.name.lastIndexOf('.');
-				const ext = dot !== -1 ? file.name.slice(dot) : '';
-				const base = dot !== -1 ? file.name.slice(0, dot) : file.name;
-				destPath = `${folderPath}/${base}_${Date.now()}${ext}`;
+			const slug = this.nameSlug(entity);
+			const dot = file.name.lastIndexOf('.');
+			const ext = dot !== -1 ? file.name.slice(dot).toLowerCase() : '';
+
+			let destPath: string;
+			if (type === 'avatar') {
+				destPath = `${assets}/${slug}_avatar${ext}`;
+			} else {
+				let n = 1;
+				while (this.plugin.app.vault.getAbstractFileByPath(`${assets}/${slug}_${type}_${n}${ext}`)) n++;
+				destPath = `${assets}/${slug}_${type}_${n}${ext}`;
 			}
 			const buffer = await file.arrayBuffer();
-			await this.plugin.app.vault.createBinary(destPath, buffer);
+			const existing = this.plugin.app.vault.getAbstractFileByPath(destPath);
+			if (existing instanceof TFile) {
+				await this.plugin.app.vault.modifyBinary(existing, buffer);
+			} else {
+				await this.plugin.app.vault.createBinary(destPath, buffer);
+			}
 			return destPath;
 		} catch {
 			return null;
@@ -727,13 +754,19 @@ export class CardView extends ItemView {
 	}
 
 	// ---- галерея изображений ----
-	private renderImageGallery(container: HTMLElement, entity: Entity) {
-		const rawVal = entity.props['references'] ? String(entity.props['references']) : '';
+	private renderImageGallery(
+		container: HTMLElement,
+		entity: Entity,
+		propKey: string,
+		title: string,
+		fileType: 'ref' | 'draw'
+	) {
+		const rawVal = entity.props[propKey] ? String(entity.props[propKey]) : '';
 		const paths = rawVal.split(',').map((p) => p.trim()).filter(Boolean);
 
 		const section = container.createDiv('scenarist-card-section');
 		const head = section.createDiv('scenarist-card-body-head');
-		head.createEl('div', { cls: 'scenarist-card-section-title', text: t('card.gallery.title') });
+		head.createEl('div', { cls: 'scenarist-card-section-title', text: title });
 
 		const addBtn = head.createEl('button', { cls: 'scenarist-card-edit-btn' });
 		setIcon(addBtn, 'plus');
@@ -748,10 +781,10 @@ export class CardView extends ItemView {
 				if (!files.length) return;
 				const newPaths = [...paths];
 				for (const f of files) {
-					const p = await this.saveImageToVault(entity, f);
+					const p = await this.saveImageToVault(entity, f, fileType);
 					if (p) newPaths.push(p);
 				}
-				this.commitProp(entity, 'references', newPaths.join(', ') || null);
+				this.commitProp(entity, propKey, newPaths.join(', ') || null);
 			};
 			input.click();
 		};
@@ -766,19 +799,15 @@ export class CardView extends ItemView {
 		for (const imgPath of paths) {
 			const file = this.plugin.app.vault.getAbstractFileByPath(imgPath);
 			if (!(file instanceof TFile)) continue;
-
 			const url = this.plugin.app.vault.getResourcePath(file);
 			const cell = grid.createDiv('scenarist-img-cell');
-
-			const img = cell.createEl('img', { cls: 'scenarist-img-thumb', attr: { src: url } });
-			img.onclick = () => this.openLightbox(url);
-
+			cell.createEl('img', { cls: 'scenarist-img-thumb', attr: { src: url } }).onclick = () =>
+				this.openLightbox(url);
 			const del = cell.createDiv('scenarist-img-del');
 			setIcon(del, 'x');
 			del.onclick = (e) => {
 				e.stopPropagation();
-				const next = paths.filter((p) => p !== imgPath);
-				this.commitProp(entity, 'references', next.join(', ') || null);
+				this.commitProp(entity, propKey, paths.filter((p) => p !== imgPath).join(', ') || null);
 			};
 		}
 	}
@@ -786,14 +815,13 @@ export class CardView extends ItemView {
 	// ---- вкладки персонажа ----
 	private async renderCharacterTabs(card: HTMLElement, entity: Entity): Promise<void> {
 		const allFields = this.plugin.store.resolved(entity).fields;
-		const charFields = allFields.filter((f) => !f.tab || f.tab === 'characteristics');
-		const bioFields = allFields.filter((f) => f.tab === 'biography');
-		const appFields = allFields.filter((f) => f.tab === 'appearance');
+		const byTab = (id: string) => allFields.filter((f) => f.tab === id);
 
 		const tabDefs = [
+			{ id: 'basic',           label: t('card.tab.basic') },
 			{ id: 'characteristics', label: t('card.tab.characteristics') },
-			{ id: 'biography', label: t('card.tab.biography') },
-			{ id: 'appearance', label: t('card.tab.appearance') },
+			{ id: 'biography',       label: t('card.tab.biography') },
+			{ id: 'appearance',      label: t('card.tab.appearance') },
 		];
 
 		const tabBar = card.createDiv('scenarist-card-tabbar');
@@ -818,41 +846,53 @@ export class CardView extends ItemView {
 			btn.onclick = () => setTab(tab.id);
 		}
 
-		// === Характеристики ===
-		if (charFields.length > 0) {
-			const sec = sections['characteristics'].createDiv('scenarist-card-section');
-			for (const field of charFields) {
+		// === Основное ===
+		const basicFields = byTab('basic');
+		if (basicFields.length > 0) {
+			const sec = sections['basic'].createDiv('scenarist-card-section');
+			for (const field of basicFields) {
 				const row = sec.createDiv('scenarist-prop');
 				row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
 				this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
 			}
 			this.renderBacklinksProp(sec, entity);
+			// Теги — под ссылками на заметки
+			this.renderTagsHeader(sec, entity);
 		}
-		this.renderRelations(sections['characteristics'], entity);
+		this.renderRelations(sections['basic'], entity);
+
+		// === Характеристики (с подразделами) ===
+		this.renderFieldsWithSections(sections['characteristics'], entity, byTab('characteristics'));
 
 		// === Биография ===
-		if (bioFields.length > 0) {
-			const sec = sections['biography'].createDiv('scenarist-card-section');
-			for (const field of bioFields) {
-				const row = sec.createDiv('scenarist-prop');
-				row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
-				this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
-			}
-		}
+		this.renderFieldsWithSections(sections['biography'], entity, byTab('biography'));
 		await this.renderBody(sections['biography'], entity);
 
 		// === Внешность ===
-		if (appFields.length > 0) {
-			const sec = sections['appearance'].createDiv('scenarist-card-section');
-			for (const field of appFields) {
-				const row = sec.createDiv('scenarist-prop');
-				row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
-				this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
-			}
-		}
-		this.renderImageGallery(sections['appearance'], entity);
+		this.renderFieldsWithSections(sections['appearance'], entity, byTab('appearance'));
+		this.renderImageGallery(sections['appearance'], entity, 'references', t('card.gallery.references'), 'ref');
+		this.renderImageGallery(sections['appearance'], entity, 'sketches',   t('card.gallery.sketches'),   'draw');
 
 		setTab(this._charTab);
+	}
+
+	/** Рендер группы полей с автозаголовками подразделов. */
+	private renderFieldsWithSections(container: HTMLElement, entity: Entity, fields: FieldDef[]) {
+		if (fields.length === 0) return;
+		const sec = container.createDiv('scenarist-card-section');
+		let lastSection = '';
+		for (const field of fields) {
+			if (field.section && field.section !== lastSection) {
+				lastSection = field.section;
+				sec.createEl('div', {
+					cls: 'scenarist-prop-section-head',
+					text: t(`card.section.${field.section}`, undefined, field.section),
+				});
+			}
+			const row = sec.createDiv('scenarist-prop');
+			row.createEl('div', { cls: 'scenarist-prop-label', text: t(field.label, undefined, field.label) });
+			this.renderFieldControl(row.createDiv('scenarist-prop-value'), entity, field);
+		}
 	}
 
 	// ---- тело ----

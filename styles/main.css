@@ -752,6 +752,26 @@
   border-top: none;
 }
 
+/* Section sub-header inside tabs */
+.scenarist-prop-section-head {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 20px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.scenarist-prop-section-head:first-child {
+  margin-top: 8px;
+}
+
+/* Tags inside tab sections: reset left margin */
+.scenarist-card-tab-section .scenarist-card-tags {
+  margin-left: 0;
+}
+
 /* ---- tags row (below title) ---- */
 .scenarist-card-tags {
   display: flex;

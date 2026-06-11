@@ -93,24 +93,84 @@ var ru = {
       label: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436",
       labelPlural: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
       fields: {
+        // Основное
         type: "\u0422\u0438\u043F",
         role: "\u0420\u043E\u043B\u044C \u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438",
         age: "\u0412\u043E\u0437\u0440\u0430\u0441\u0442",
         activity: "\u0414\u0435\u044F\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C",
         summary: "\u041A\u0440\u0430\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
-        biography: "\u0411\u0438\u043E\u0433\u0440\u0430\u0444\u0438\u044F",
+        // Характеристики → История
+        storyGoalExternal: "\u0412\u043D\u0435\u0448\u043D\u044F\u044F \u0446\u0435\u043B\u044C",
+        storyGoalInternal: "\u0412\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u044F\u044F \u0446\u0435\u043B\u044C",
+        initialBeliefs: "\u0418\u0441\u0445\u043E\u0434\u043D\u044B\u0435 \u0443\u0431\u0435\u0436\u0434\u0435\u043D\u0438\u044F",
+        changedBeliefs: "\u0418\u0437\u043C\u0435\u043D\u0435\u043D\u043D\u044B\u0435 \u0443\u0431\u0435\u0436\u0434\u0435\u043D\u0438\u044F",
+        changeDriver: "\u0427\u0442\u043E \u043F\u0440\u0438\u0432\u043E\u0434\u0438\u0442 \u043A \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u044F\u043C",
+        firstAppearance: "\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u043E\u044F\u0432\u043B\u0435\u043D\u0438\u0435",
+        plotInvolvement: "\u0412\u043E\u0432\u043B\u0435\u0447\u0451\u043D\u043D\u043E\u0441\u0442\u044C \u0432 \u0441\u044E\u0436\u0435\u0442",
+        conflict: "\u041A\u043E\u043D\u0444\u043B\u0438\u043A\u0442",
+        decisiveMoment: "\u0420\u0435\u0448\u0430\u044E\u0449\u0438\u0439 \u043C\u043E\u043C\u0435\u043D\u0442",
+        // Характеристики → Жизнь
+        skills: "\u041D\u0430\u0432\u044B\u043A\u0438",
+        skillsOrigin: "\u041A\u0430\u043A \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u044B \u043D\u0430\u0432\u044B\u043A\u0438",
+        strengthTalent: "\u0421\u0438\u043B\u0430/\u0442\u0430\u043B\u0430\u043D\u0442",
+        weakness: "\u0421\u043B\u0430\u0431\u043E\u0441\u0442\u044C",
+        hobbies: "\u0423\u0432\u043B\u0435\u0447\u0435\u043D\u0438\u044F",
+        habits: "\u041F\u0440\u0438\u0432\u044B\u0447\u043A\u0438",
+        health: "\u0417\u0434\u043E\u0440\u043E\u0432\u044C\u0435",
+        speech: "\u0420\u0435\u0447\u044C",
+        pet: "\u0414\u043E\u043C\u0430\u0448\u043D\u0435\u0435 \u0436\u0438\u0432\u043E\u0442\u043D\u043E\u0435",
+        specialItems: "\u041E\u0441\u043E\u0431\u044B\u0435 \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u044B/\u043E\u0440\u0443\u0436\u0438\u0435/\u043F\u0440\u0438\u0441\u043F\u043E\u0441\u043E\u0431\u043B\u0435\u043D\u0438\u044F",
+        residence: "\u041C\u0435\u0441\u0442\u043E \u043F\u0440\u043E\u0436\u0438\u0432\u0430\u043D\u0438\u044F/\u0441\u0440\u0435\u0434\u0430",
+        homeDescription: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0434\u043E\u043C\u0430",
+        neighbors: "\u0421\u043E\u0441\u0435\u0434\u0438",
+        organizations: "\u0423\u0447\u0430\u0441\u0442\u0438\u0435 \u0432 \u043E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u044F\u0445",
+        income: "\u0414\u043E\u0445\u043E\u0434",
+        occupation: "\u0420\u0430\u0431\u043E\u0442\u0430/\u0440\u043E\u0434 \u0434\u0435\u044F\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u0438",
+        jobTitle: "\u0414\u043E\u043B\u0436\u043D\u043E\u0441\u0442\u044C",
+        jobSatisfaction: "\u0423\u0434\u043E\u0432\u043B\u0435\u0442\u0432\u043E\u0440\u0451\u043D\u043D\u043E\u0441\u0442\u044C \u0440\u0430\u0431\u043E\u0442\u043E\u0439",
+        // Характеристики → Мироощущение
+        personalityTraits: "\u0427\u0435\u0440\u0442\u044B \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u0430",
+        moralValues: "\u041C\u043E\u0440\u0430\u043B\u044C\u043D\u044B\u0435 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0438",
+        drivingForce: "\u0414\u0432\u0438\u0436\u0443\u0449\u0430\u044F \u0441\u0438\u043B\u0430",
+        discouragement: "\u0427\u0442\u043E \u043F\u0440\u0438\u0432\u043E\u0434\u0438\u0442 \u043A \u0443\u043F\u0430\u0434\u043A\u0443 \u0434\u0443\u0445\u0430",
+        philosophicalViews: "\u0424\u0438\u043B\u043E\u0441\u043E\u0444\u0441\u043A\u0438\u0435 \u0432\u0437\u0433\u043B\u044F\u0434\u044B",
+        biggestFear: "\u0421\u0430\u043C\u044B\u0439 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0441\u0442\u0440\u0430\u0445",
+        selfControl: "\u0421\u0430\u043C\u043E\u043A\u043E\u043D\u0442\u0440\u043E\u043B\u044C",
+        intelligenceLevel: "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0438\u043D\u0442\u0435\u043B\u043B\u0435\u043A\u0442\u0430",
+        confidenceLevel: "\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0443\u0432\u0435\u0440\u0435\u043D\u043D\u043E\u0441\u0442\u0438",
+        // Биография
+        childhood: "\u0414\u0435\u0442\u0441\u0442\u0432\u043E",
+        importantPastEvent: "\u0412\u0430\u0436\u043D\u043E\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u0435 \u0438\u0437 \u043F\u0440\u043E\u0448\u043B\u043E\u0433\u043E",
+        bestAchievement: "\u041B\u0443\u0447\u0448\u0435\u0435 \u0434\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u0435",
+        otherAchievements: "\u0414\u0440\u0443\u0433\u0438\u0435 \u0434\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F",
+        worstMoment: "\u0425\u0443\u0434\u0448\u0438\u0439 \u043C\u043E\u043C\u0435\u043D\u0442",
+        failures: "\u041D\u0435\u0443\u0434\u0430\u0447\u0438",
+        secrets: "\u0421\u0435\u043A\u0440\u0435\u0442\u044B",
+        bestMemories: "\u041B\u0443\u0447\u0448\u0438\u0435 \u0432\u043E\u0441\u043F\u043E\u043C\u0438\u043D\u0430\u043D\u0438\u044F",
+        worstMemories: "\u0425\u0443\u0434\u0448\u0438\u0435 \u0432\u043E\u0441\u043F\u043E\u043C\u0438\u043D\u0430\u043D\u0438\u044F",
+        // Внешность
         height: "\u0420\u043E\u0441\u0442",
+        weight: "\u0412\u0435\u0441",
         build: "\u0422\u0435\u043B\u043E\u0441\u043B\u043E\u0436\u0435\u043D\u0438\u0435",
+        skinColor: "\u0426\u0432\u0435\u0442 \u043A\u043E\u0436\u0438",
+        hairstyle: "\u041F\u0440\u0438\u0447\u0451\u0441\u043A\u0430",
         hairColor: "\u0426\u0432\u0435\u0442 \u0432\u043E\u043B\u043E\u0441",
+        eyeShape: "\u0424\u043E\u0440\u043C\u0430 \u0433\u043B\u0430\u0437",
         eyeColor: "\u0426\u0432\u0435\u0442 \u0433\u043B\u0430\u0437",
-        appearance: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0432\u043D\u0435\u0448\u043D\u043E\u0441\u0442\u0438"
+        faceShape: "\u0424\u043E\u0440\u043C\u0430 \u043B\u0438\u0446\u0430",
+        distinctiveFeatures: "\u041E\u0442\u043B\u0438\u0447\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u0447\u0435\u0440\u0442\u044B \u0432\u043D\u0435\u0448\u043D\u043E\u0441\u0442\u0438",
+        otherFaceFeatures: "\u041F\u0440\u043E\u0447\u0438\u0435 \u043E\u0441\u043E\u0431\u0435\u043D\u043D\u043E\u0441\u0442\u0438 \u043B\u0438\u0446\u0430",
+        posture: "\u041E\u0441\u0430\u043D\u043A\u0430",
+        otherAppearance: "\u041F\u0440\u043E\u0447\u0438\u0435 \u043E\u0441\u043E\u0431\u0435\u043D\u043D\u043E\u0441\u0442\u0438 \u0432\u043D\u0435\u0448\u043D\u043E\u0441\u0442\u0438",
+        ethnicity: "\u042D\u0442\u043D\u043E\u0441/\u0420\u0430\u0441\u0430",
+        clothing: "\u041E\u0434\u0435\u0436\u0434\u0430",
+        accessories: "\u0410\u043A\u0441\u0435\u0441\u0441\u0443\u0430\u0440\u044B"
       },
       links: {
         project: "\u041F\u0440\u043E\u0435\u043A\u0442",
         works: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
         affiliation: "\u041F\u0440\u0438\u043D\u0430\u0434\u043B\u0435\u0436\u043D\u043E\u0441\u0442\u044C",
-        original: "\u041E\u0440\u0438\u0433\u0438\u043D\u0430\u043B",
-        otherVersions: "\u0412 \u0434\u0440\u0443\u0433\u0438\u0445 \u0438\u0441\u0442\u043E\u0440\u0438\u044F\u0445"
+        arcs: "\u0410\u0440\u043A\u0438"
       }
     },
     category: {
@@ -194,9 +254,15 @@ var ru = {
     noteLabel: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430",
     noName: "\u0411\u0435\u0437 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044F",
     tab: {
+      basic: "\u041E\u0441\u043D\u043E\u0432\u043D\u043E\u0435",
       characteristics: "\u0425\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043A\u0438",
       biography: "\u0411\u0438\u043E\u0433\u0440\u0430\u0444\u0438\u044F",
       appearance: "\u0412\u043D\u0435\u0448\u043D\u043E\u0441\u0442\u044C"
+    },
+    section: {
+      story: "\u0418\u0441\u0442\u043E\u0440\u0438\u044F",
+      life: "\u0416\u0438\u0437\u043D\u044C",
+      worldview: "\u041C\u0438\u0440\u043E\u043E\u0449\u0443\u0449\u0435\u043D\u0438\u0435"
     },
     avatar: {
       set: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0444\u043E\u0442\u043E",
@@ -206,7 +272,9 @@ var ru = {
     gallery: {
       title: "\u0420\u0435\u0444\u0435\u0440\u0435\u043D\u0441\u044B \u0438 \u043D\u0430\u0431\u0440\u043E\u0441\u043A\u0438",
       add: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
-      empty: "\u041D\u0435\u0442 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439"
+      empty: "\u041D\u0435\u0442 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439",
+      references: "\u0420\u0435\u0444\u0435\u0440\u0435\u043D\u0441\u044B",
+      sketches: "\u041D\u0430\u0431\u0440\u043E\u0441\u043A\u0438"
     },
     addTag: "+ \u0442\u0435\u0433",
     tagPlaceholder: "\u0442\u0435\u0433\u2026",
@@ -395,24 +463,84 @@ var en = {
       label: "Character",
       labelPlural: "Characters",
       fields: {
+        // Basic
         type: "Type",
         role: "Story role",
         age: "Age",
         activity: "Occupation",
         summary: "Short description",
-        biography: "Biography",
+        // Characteristics → Story
+        storyGoalExternal: "External goal",
+        storyGoalInternal: "Internal goal",
+        initialBeliefs: "Initial beliefs",
+        changedBeliefs: "Changed beliefs",
+        changeDriver: "What drives the change",
+        firstAppearance: "First appearance",
+        plotInvolvement: "Plot involvement",
+        conflict: "Conflict",
+        decisiveMoment: "Decisive moment",
+        // Characteristics → Life
+        skills: "Skills",
+        skillsOrigin: "How skills were acquired",
+        strengthTalent: "Strength / talent",
+        weakness: "Weakness",
+        hobbies: "Hobbies",
+        habits: "Habits",
+        health: "Health",
+        speech: "Speech",
+        pet: "Pet",
+        specialItems: "Special interests / weapons / tools",
+        residence: "Residence / environment",
+        homeDescription: "Home description",
+        neighbors: "Neighbours",
+        organizations: "Organization memberships",
+        income: "Income",
+        occupation: "Occupation / work",
+        jobTitle: "Job title",
+        jobSatisfaction: "Job satisfaction",
+        // Characteristics → Worldview
+        personalityTraits: "Personality traits",
+        moralValues: "Moral values",
+        drivingForce: "Driving force",
+        discouragement: "What discourages them",
+        philosophicalViews: "Philosophical views",
+        biggestFear: "Biggest fear",
+        selfControl: "Self-control",
+        intelligenceLevel: "Intelligence level",
+        confidenceLevel: "Confidence level",
+        // Biography
+        childhood: "Childhood",
+        importantPastEvent: "Important past event",
+        bestAchievement: "Best achievement",
+        otherAchievements: "Other achievements",
+        worstMoment: "Worst moment",
+        failures: "Failures",
+        secrets: "Secrets",
+        bestMemories: "Best memories",
+        worstMemories: "Worst memories",
+        // Appearance
         height: "Height",
+        weight: "Weight",
         build: "Build",
+        skinColor: "Skin colour",
+        hairstyle: "Hairstyle",
         hairColor: "Hair colour",
+        eyeShape: "Eye shape",
         eyeColor: "Eye colour",
-        appearance: "Appearance description"
+        faceShape: "Face shape",
+        distinctiveFeatures: "Distinctive appearance features",
+        otherFaceFeatures: "Other facial features",
+        posture: "Posture",
+        otherAppearance: "Other appearance details",
+        ethnicity: "Ethnicity / Race",
+        clothing: "Clothing",
+        accessories: "Accessories"
       },
       links: {
         project: "Project",
         works: "Works",
         affiliation: "Affiliation",
-        original: "Original",
-        otherVersions: "In other stories"
+        arcs: "Arcs"
       }
     },
     category: {
@@ -496,9 +624,15 @@ var en = {
     noteLabel: "Note",
     noName: "Untitled",
     tab: {
+      basic: "Basic",
       characteristics: "Characteristics",
       biography: "Biography",
       appearance: "Appearance"
+    },
+    section: {
+      story: "Story",
+      life: "Life",
+      worldview: "Worldview"
     },
     avatar: {
       set: "Add photo",
@@ -508,7 +642,9 @@ var en = {
     gallery: {
       title: "References & sketches",
       add: "Add",
-      empty: "No images yet"
+      empty: "No images yet",
+      references: "References",
+      sketches: "Sketches"
     },
     addTag: "+ tag",
     tagPlaceholder: "tag\u2026",
@@ -1083,7 +1219,7 @@ var SCHEMAS = {
       { key: "books", label: "schema.arc.links.books", target: "book" },
       { key: "chapters", label: "schema.arc.links.chapters", target: "chapter", reverse: "arc" },
       { key: "anchors", label: "schema.arc.links.anchors", target: "anchor", reverse: "arc" },
-      { key: "keyCharacters", label: "schema.arc.links.keyCharacters", target: "character" }
+      { key: "keyCharacters", label: "schema.arc.links.keyCharacters", target: "character", reverse: "arcs" }
     ]
   },
   anchor: {
@@ -1160,12 +1296,12 @@ var SCHEMAS = {
     layer: "world",
     titleField: "Name",
     fields: [
-      // Характеристики
+      // ── Основное ───────────────────────────────────────────────────────
       {
         key: "type",
         label: "schema.character.fields.type",
         type: "select",
-        tab: "characteristics",
+        tab: "basic",
         options: [
           { value: "\u041F\u0440\u043E\u0442\u0430\u0433\u043E\u043D\u0438\u0441\u0442", color: "#7ed321" },
           { value: "\u0410\u043D\u0442\u0430\u0433\u043E\u043D\u0438\u0441\u0442", color: "#c0392b" },
@@ -1178,7 +1314,7 @@ var SCHEMAS = {
         key: "role",
         label: "schema.character.fields.role",
         type: "select",
-        tab: "characteristics",
+        tab: "basic",
         options: [
           { value: "\u0413\u043B\u0430\u0432\u043D\u0430\u044F", color: "#7ed321" },
           { value: "\u041A\u043B\u044E\u0447\u0435\u0432\u0430\u044F", color: "#f5a623" },
@@ -1186,24 +1322,81 @@ var SCHEMAS = {
           { value: "\u042D\u043F\u0438\u0437\u043E\u0434\u0438\u0447\u0435\u0441\u043A\u0430\u044F", color: "#e84393" }
         ]
       },
-      { key: "age", label: "schema.character.fields.age", type: "number", tab: "characteristics" },
-      { key: "activity", label: "schema.character.fields.activity", type: "text", tab: "characteristics" },
-      { key: "summary", label: "schema.character.fields.summary", type: "text", tab: "characteristics" },
-      // Биография
-      { key: "biography", label: "schema.character.fields.biography", type: "text", tab: "biography" },
-      // Внешность
+      { key: "age", label: "schema.character.fields.age", type: "number", tab: "basic" },
+      { key: "activity", label: "schema.character.fields.activity", type: "text", tab: "basic" },
+      { key: "summary", label: "schema.character.fields.summary", type: "text", tab: "basic" },
+      // ── Характеристики → История ───────────────────────────────────────
+      { key: "storyGoalExternal", label: "schema.character.fields.storyGoalExternal", type: "text", tab: "characteristics", section: "story" },
+      { key: "storyGoalInternal", label: "schema.character.fields.storyGoalInternal", type: "text", tab: "characteristics", section: "story" },
+      { key: "initialBeliefs", label: "schema.character.fields.initialBeliefs", type: "text", tab: "characteristics", section: "story" },
+      { key: "changedBeliefs", label: "schema.character.fields.changedBeliefs", type: "text", tab: "characteristics", section: "story" },
+      { key: "changeDriver", label: "schema.character.fields.changeDriver", type: "text", tab: "characteristics", section: "story" },
+      { key: "firstAppearance", label: "schema.character.fields.firstAppearance", type: "text", tab: "characteristics", section: "story" },
+      { key: "plotInvolvement", label: "schema.character.fields.plotInvolvement", type: "text", tab: "characteristics", section: "story" },
+      { key: "conflict", label: "schema.character.fields.conflict", type: "text", tab: "characteristics", section: "story" },
+      { key: "decisiveMoment", label: "schema.character.fields.decisiveMoment", type: "text", tab: "characteristics", section: "story" },
+      // ── Характеристики → Жизнь ────────────────────────────────────────
+      { key: "skills", label: "schema.character.fields.skills", type: "text", tab: "characteristics", section: "life" },
+      { key: "skillsOrigin", label: "schema.character.fields.skillsOrigin", type: "text", tab: "characteristics", section: "life" },
+      { key: "strengthTalent", label: "schema.character.fields.strengthTalent", type: "text", tab: "characteristics", section: "life" },
+      { key: "weakness", label: "schema.character.fields.weakness", type: "text", tab: "characteristics", section: "life" },
+      { key: "hobbies", label: "schema.character.fields.hobbies", type: "text", tab: "characteristics", section: "life" },
+      { key: "habits", label: "schema.character.fields.habits", type: "text", tab: "characteristics", section: "life" },
+      { key: "health", label: "schema.character.fields.health", type: "text", tab: "characteristics", section: "life" },
+      { key: "speech", label: "schema.character.fields.speech", type: "text", tab: "characteristics", section: "life" },
+      { key: "pet", label: "schema.character.fields.pet", type: "text", tab: "characteristics", section: "life" },
+      { key: "specialItems", label: "schema.character.fields.specialItems", type: "text", tab: "characteristics", section: "life" },
+      { key: "residence", label: "schema.character.fields.residence", type: "text", tab: "characteristics", section: "life" },
+      { key: "homeDescription", label: "schema.character.fields.homeDescription", type: "text", tab: "characteristics", section: "life" },
+      { key: "neighbors", label: "schema.character.fields.neighbors", type: "text", tab: "characteristics", section: "life" },
+      { key: "organizations", label: "schema.character.fields.organizations", type: "text", tab: "characteristics", section: "life" },
+      { key: "income", label: "schema.character.fields.income", type: "text", tab: "characteristics", section: "life" },
+      { key: "occupation", label: "schema.character.fields.occupation", type: "text", tab: "characteristics", section: "life" },
+      { key: "jobTitle", label: "schema.character.fields.jobTitle", type: "text", tab: "characteristics", section: "life" },
+      { key: "jobSatisfaction", label: "schema.character.fields.jobSatisfaction", type: "text", tab: "characteristics", section: "life" },
+      // ── Характеристики → Мироощущение ─────────────────────────────────
+      { key: "personalityTraits", label: "schema.character.fields.personalityTraits", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "moralValues", label: "schema.character.fields.moralValues", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "drivingForce", label: "schema.character.fields.drivingForce", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "discouragement", label: "schema.character.fields.discouragement", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "philosophicalViews", label: "schema.character.fields.philosophicalViews", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "biggestFear", label: "schema.character.fields.biggestFear", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "selfControl", label: "schema.character.fields.selfControl", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "intelligenceLevel", label: "schema.character.fields.intelligenceLevel", type: "text", tab: "characteristics", section: "worldview" },
+      { key: "confidenceLevel", label: "schema.character.fields.confidenceLevel", type: "text", tab: "characteristics", section: "worldview" },
+      // ── Биография ─────────────────────────────────────────────────────
+      { key: "childhood", label: "schema.character.fields.childhood", type: "text", tab: "biography" },
+      { key: "importantPastEvent", label: "schema.character.fields.importantPastEvent", type: "text", tab: "biography" },
+      { key: "bestAchievement", label: "schema.character.fields.bestAchievement", type: "text", tab: "biography" },
+      { key: "otherAchievements", label: "schema.character.fields.otherAchievements", type: "text", tab: "biography" },
+      { key: "worstMoment", label: "schema.character.fields.worstMoment", type: "text", tab: "biography" },
+      { key: "failures", label: "schema.character.fields.failures", type: "text", tab: "biography" },
+      { key: "secrets", label: "schema.character.fields.secrets", type: "text", tab: "biography" },
+      { key: "bestMemories", label: "schema.character.fields.bestMemories", type: "text", tab: "biography" },
+      { key: "worstMemories", label: "schema.character.fields.worstMemories", type: "text", tab: "biography" },
+      // ── Внешность ─────────────────────────────────────────────────────
       { key: "height", label: "schema.character.fields.height", type: "text", tab: "appearance" },
+      { key: "weight", label: "schema.character.fields.weight", type: "text", tab: "appearance" },
       { key: "build", label: "schema.character.fields.build", type: "text", tab: "appearance" },
+      { key: "skinColor", label: "schema.character.fields.skinColor", type: "text", tab: "appearance" },
+      { key: "hairstyle", label: "schema.character.fields.hairstyle", type: "text", tab: "appearance" },
       { key: "hairColor", label: "schema.character.fields.hairColor", type: "text", tab: "appearance" },
+      { key: "eyeShape", label: "schema.character.fields.eyeShape", type: "text", tab: "appearance" },
       { key: "eyeColor", label: "schema.character.fields.eyeColor", type: "text", tab: "appearance" },
-      { key: "appearance", label: "schema.character.fields.appearance", type: "text", tab: "appearance" }
+      { key: "faceShape", label: "schema.character.fields.faceShape", type: "text", tab: "appearance" },
+      { key: "distinctiveFeatures", label: "schema.character.fields.distinctiveFeatures", type: "text", tab: "appearance" },
+      { key: "otherFaceFeatures", label: "schema.character.fields.otherFaceFeatures", type: "text", tab: "appearance" },
+      { key: "posture", label: "schema.character.fields.posture", type: "text", tab: "appearance" },
+      { key: "otherAppearance", label: "schema.character.fields.otherAppearance", type: "text", tab: "appearance" },
+      { key: "ethnicity", label: "schema.character.fields.ethnicity", type: "text", tab: "appearance" },
+      { key: "clothing", label: "schema.character.fields.clothing", type: "text", tab: "appearance" },
+      { key: "accessories", label: "schema.character.fields.accessories", type: "text", tab: "appearance" }
     ],
     links: [
       { key: "project", label: "schema.character.links.project", target: "project", single: true },
       { key: "works", label: "schema.character.links.works", target: "work" },
-      { key: "affiliation", label: "schema.character.links.affiliation", target: "categoryItem", reverse: "members" },
-      { key: "original", label: "schema.character.links.original", target: "character", single: true, reverse: "otherVersions" },
-      { key: "otherVersions", label: "schema.character.links.otherVersions", target: "character", reverse: "original" }
+      { key: "arcs", label: "schema.character.links.arcs", target: "arc", reverse: "keyCharacters" },
+      { key: "affiliation", label: "schema.character.links.affiliation", target: "categoryItem", reverse: "members" }
     ]
   },
   category: {
@@ -1774,30 +1967,17 @@ function bodyTemplate(kind, name) {
 `;
   }
 }
-function characterBody(name) {
-  return `# ${name}
+function characterBody(_name) {
+  return `## \u0421\u0435\u043C\u044C\u044F \u0438 \u043E\u0442\u043D\u043E\u0448\u0435\u043D\u0438\u044F
 
-> [!info] \u0425\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043A\u0430
-> *\u041A\u0442\u043E \u044D\u0442\u043E \u0432 \u043E\u0434\u043D\u043E\u043C \u0430\u0431\u0437\u0430\u0446\u0435.*
-
-> [!note] \u0411\u0438\u043E\u0433\u0440\u0430\u0444\u0438\u044F
-> *\u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u0432\u0435\u0445\u0438 \u0436\u0438\u0437\u043D\u0438.*
-
-> [!abstract] \u0412\u043D\u0435\u0448\u043D\u043E\u0441\u0442\u044C
-> *\u041A\u0430\u043A \u0432\u044B\u0433\u043B\u044F\u0434\u0438\u0442.*
-
----
 
 ## \u041D\u0430\u0441\u0442\u043E\u044F\u0449\u0435\u0435 \u0438\u043C\u044F
 
 
-## \u041C\u0435\u0441\u0442\u043E \u0438 \u0434\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F (\u0432\u043E\u0437\u0440\u0430\u0441\u0442)
+## \u041C\u0435\u0441\u0442\u043E \u0438 \u0434\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F
 
 
-## \u0421\u0435\u043C\u044C\u044F \u0438 \u043E\u0442\u043D\u043E\u0448\u0435\u043D\u0438\u044F
-
-
-## \u0412\u0438\u0437\u0443\u0430\u043B \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430
+## \u0414\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u043E
 
 `;
 }
@@ -2904,7 +3084,7 @@ var CardView = class extends import_obsidian7.ItemView {
     this.unsub = [];
     this._rendering = false;
     this._renderPending = false;
-    this._charTab = "characteristics";
+    this._charTab = "basic";
     this.plugin = plugin;
   }
   getViewType() {
@@ -3064,7 +3244,9 @@ var CardView = class extends import_obsidian7.ItemView {
       titleRow.addClass("has-avatar");
       this.renderAvatarBox(titleRow, entity);
     }
-    this.renderTagsHeader(card, entity);
+    if (entity.kind !== "character") {
+      this.renderTagsHeader(card, entity);
+    }
   }
   /** Строка тегов под заголовком. */
   renderTagsHeader(card, entity) {
@@ -3471,7 +3653,7 @@ var CardView = class extends import_obsidian7.ItemView {
         const file = (_a = input.files) == null ? void 0 : _a[0];
         if (!file)
           return;
-        const path = await this.saveImageToVault(entity, file);
+        const path = await this.saveImageToVault(entity, file, "avatar");
         if (path)
           this.commitProp(entity, "avatar", path);
       };
@@ -3484,23 +3666,40 @@ var CardView = class extends import_obsidian7.ItemView {
     box.createEl("span", { cls: "scenarist-char-avatar-hint", text: t("card.avatar.set") });
   }
   // ---- сохранение изображения в vault ----
-  async saveImageToVault(entity, file) {
+  getAssetsFolder(entity) {
+    const dir = entity.filePath.includes("/") ? entity.filePath.substring(0, entity.filePath.lastIndexOf("/")) : "";
+    return dir ? `${dir}/assets` : "assets";
+  }
+  nameSlug(entity) {
+    return entity.name.replace(/[/\\:*?"<>|]/g, "").replace(/\s+/g, "_");
+  }
+  async saveImageToVault(entity, file, type) {
     if (!entity.filePath)
       return null;
     try {
-      const folderPath = entity.filePath.replace(/\.md$/, "");
-      if (!this.plugin.app.vault.getAbstractFileByPath(folderPath)) {
-        await this.plugin.app.vault.createFolder(folderPath);
+      const assets = this.getAssetsFolder(entity);
+      if (!this.plugin.app.vault.getAbstractFileByPath(assets)) {
+        await this.plugin.app.vault.createFolder(assets);
       }
-      let destPath = `${folderPath}/${file.name}`;
-      if (this.plugin.app.vault.getAbstractFileByPath(destPath)) {
-        const dot = file.name.lastIndexOf(".");
-        const ext = dot !== -1 ? file.name.slice(dot) : "";
-        const base = dot !== -1 ? file.name.slice(0, dot) : file.name;
-        destPath = `${folderPath}/${base}_${Date.now()}${ext}`;
+      const slug = this.nameSlug(entity);
+      const dot = file.name.lastIndexOf(".");
+      const ext = dot !== -1 ? file.name.slice(dot).toLowerCase() : "";
+      let destPath;
+      if (type === "avatar") {
+        destPath = `${assets}/${slug}_avatar${ext}`;
+      } else {
+        let n = 1;
+        while (this.plugin.app.vault.getAbstractFileByPath(`${assets}/${slug}_${type}_${n}${ext}`))
+          n++;
+        destPath = `${assets}/${slug}_${type}_${n}${ext}`;
       }
       const buffer = await file.arrayBuffer();
-      await this.plugin.app.vault.createBinary(destPath, buffer);
+      const existing = this.plugin.app.vault.getAbstractFileByPath(destPath);
+      if (existing instanceof import_obsidian7.TFile) {
+        await this.plugin.app.vault.modifyBinary(existing, buffer);
+      } else {
+        await this.plugin.app.vault.createBinary(destPath, buffer);
+      }
       return destPath;
     } catch (e) {
       return null;
@@ -3528,12 +3727,12 @@ var CardView = class extends import_obsidian7.ItemView {
     document.body.appendChild(overlay);
   }
   // ---- галерея изображений ----
-  renderImageGallery(container, entity) {
-    const rawVal = entity.props["references"] ? String(entity.props["references"]) : "";
+  renderImageGallery(container, entity, propKey, title, fileType) {
+    const rawVal = entity.props[propKey] ? String(entity.props[propKey]) : "";
     const paths = rawVal.split(",").map((p) => p.trim()).filter(Boolean);
     const section = container.createDiv("scenarist-card-section");
     const head = section.createDiv("scenarist-card-body-head");
-    head.createEl("div", { cls: "scenarist-card-section-title", text: t("card.gallery.title") });
+    head.createEl("div", { cls: "scenarist-card-section-title", text: title });
     const addBtn = head.createEl("button", { cls: "scenarist-card-edit-btn" });
     (0, import_obsidian7.setIcon)(addBtn, "plus");
     addBtn.createEl("span", { text: t("card.gallery.add") });
@@ -3548,11 +3747,11 @@ var CardView = class extends import_obsidian7.ItemView {
           return;
         const newPaths = [...paths];
         for (const f of files) {
-          const p = await this.saveImageToVault(entity, f);
+          const p = await this.saveImageToVault(entity, f, fileType);
           if (p)
             newPaths.push(p);
         }
-        this.commitProp(entity, "references", newPaths.join(", ") || null);
+        this.commitProp(entity, propKey, newPaths.join(", ") || null);
       };
       input.click();
     };
@@ -3567,24 +3766,21 @@ var CardView = class extends import_obsidian7.ItemView {
         continue;
       const url = this.plugin.app.vault.getResourcePath(file);
       const cell = grid.createDiv("scenarist-img-cell");
-      const img = cell.createEl("img", { cls: "scenarist-img-thumb", attr: { src: url } });
-      img.onclick = () => this.openLightbox(url);
+      cell.createEl("img", { cls: "scenarist-img-thumb", attr: { src: url } }).onclick = () => this.openLightbox(url);
       const del = cell.createDiv("scenarist-img-del");
       (0, import_obsidian7.setIcon)(del, "x");
       del.onclick = (e) => {
         e.stopPropagation();
-        const next = paths.filter((p) => p !== imgPath);
-        this.commitProp(entity, "references", next.join(", ") || null);
+        this.commitProp(entity, propKey, paths.filter((p) => p !== imgPath).join(", ") || null);
       };
     }
   }
   // ---- вкладки персонажа ----
   async renderCharacterTabs(card, entity) {
     const allFields = this.plugin.store.resolved(entity).fields;
-    const charFields = allFields.filter((f) => !f.tab || f.tab === "characteristics");
-    const bioFields = allFields.filter((f) => f.tab === "biography");
-    const appFields = allFields.filter((f) => f.tab === "appearance");
+    const byTab = (id) => allFields.filter((f) => f.tab === id);
     const tabDefs = [
+      { id: "basic", label: t("card.tab.basic") },
       { id: "characteristics", label: t("card.tab.characteristics") },
       { id: "biography", label: t("card.tab.biography") },
       { id: "appearance", label: t("card.tab.appearance") }
@@ -3608,35 +3804,44 @@ var CardView = class extends import_obsidian7.ItemView {
       btn.dataset.tab = tab.id;
       btn.onclick = () => setTab(tab.id);
     }
-    if (charFields.length > 0) {
-      const sec = sections["characteristics"].createDiv("scenarist-card-section");
-      for (const field of charFields) {
+    const basicFields = byTab("basic");
+    if (basicFields.length > 0) {
+      const sec = sections["basic"].createDiv("scenarist-card-section");
+      for (const field of basicFields) {
         const row = sec.createDiv("scenarist-prop");
         row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
         this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
       }
       this.renderBacklinksProp(sec, entity);
+      this.renderTagsHeader(sec, entity);
     }
-    this.renderRelations(sections["characteristics"], entity);
-    if (bioFields.length > 0) {
-      const sec = sections["biography"].createDiv("scenarist-card-section");
-      for (const field of bioFields) {
-        const row = sec.createDiv("scenarist-prop");
-        row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
-        this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
-      }
-    }
+    this.renderRelations(sections["basic"], entity);
+    this.renderFieldsWithSections(sections["characteristics"], entity, byTab("characteristics"));
+    this.renderFieldsWithSections(sections["biography"], entity, byTab("biography"));
     await this.renderBody(sections["biography"], entity);
-    if (appFields.length > 0) {
-      const sec = sections["appearance"].createDiv("scenarist-card-section");
-      for (const field of appFields) {
-        const row = sec.createDiv("scenarist-prop");
-        row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
-        this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
-      }
-    }
-    this.renderImageGallery(sections["appearance"], entity);
+    this.renderFieldsWithSections(sections["appearance"], entity, byTab("appearance"));
+    this.renderImageGallery(sections["appearance"], entity, "references", t("card.gallery.references"), "ref");
+    this.renderImageGallery(sections["appearance"], entity, "sketches", t("card.gallery.sketches"), "draw");
     setTab(this._charTab);
+  }
+  /** Рендер группы полей с автозаголовками подразделов. */
+  renderFieldsWithSections(container, entity, fields) {
+    if (fields.length === 0)
+      return;
+    const sec = container.createDiv("scenarist-card-section");
+    let lastSection = "";
+    for (const field of fields) {
+      if (field.section && field.section !== lastSection) {
+        lastSection = field.section;
+        sec.createEl("div", {
+          cls: "scenarist-prop-section-head",
+          text: t(`card.section.${field.section}`, void 0, field.section)
+        });
+      }
+      const row = sec.createDiv("scenarist-prop");
+      row.createEl("div", { cls: "scenarist-prop-label", text: t(field.label, void 0, field.label) });
+      this.renderFieldControl(row.createDiv("scenarist-prop-value"), entity, field);
+    }
   }
   // ---- тело ----
   async renderBody(card, entity) {

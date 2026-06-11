@@ -26,30 +26,17 @@ export function bodyTemplate(kind: EntityKind, name: string): string {
 	}
 }
 
-function characterBody(name: string): string {
-	return `# ${name}
+function characterBody(_name: string): string {
+	return `## Семья и отношения
 
-> [!info] Характеристика
-> *Кто это в одном абзаце.*
-
-> [!note] Биография
-> *Ключевые вехи жизни.*
-
-> [!abstract] Внешность
-> *Как выглядит.*
-
----
 
 ## Настоящее имя
 
 
-## Место и дата рождения (возраст)
+## Место и дата рождения
 
 
-## Семья и отношения
-
-
-## Визуал персонажа
+## Дополнительно
 
 `;
 }

@@ -411,7 +411,7 @@ export class ScenaristStore {
 
 	/** Путь к sidecar-файлу рядом с .md заметкой. */
 	sidecarPath(filePath: string): string {
-		return filePath.replace(/\.md$/, '.scenarist.json');
+		return filePath.replace(/\.md$/, '.sc.json');
 	}
 
 	/** Прочитать sidecar-файл и вернуть Entity, или null если его нет. */

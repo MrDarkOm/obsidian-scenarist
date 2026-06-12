@@ -18,6 +18,8 @@ export class CardView extends ItemView {
 	private _rendering = false;
 	private _renderPending = false;
 	private _charTab = 'basic';
+	/** Если задан — вкладка закреплена за конкретной сущностью (не следит за навигатором). */
+	public pinnedId: string | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -34,9 +36,20 @@ export class CardView extends ItemView {
 		return 'film';
 	}
 
+	getState(): Record<string, unknown> {
+		return { pinnedId: this.pinnedId };
+	}
+
+	async setState(state: Record<string, unknown>): Promise<void> {
+		this.pinnedId = (state?.pinnedId as string) || null;
+		this._charTab = 'basic';
+		await this.render();
+	}
+
 	async onOpen() {
 		this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
-		this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
+		// Следим за выбором только для незакреплённых вкладок
+		this.unsub.push(this.plugin.onSelect(() => { if (!this.pinnedId) this.scheduleRender(); }));
 		this.render();
 	}
 	async onClose() {
@@ -57,7 +70,7 @@ export class CardView extends ItemView {
 	}
 
 	private current(): Entity | null {
-		const id = this.plugin.selectedId;
+		const id = this.pinnedId ?? this.plugin.selectedId;
 		return id ? this.plugin.store.get(id) : null;
 	}
 	private single(ids?: string[]): Entity | null {

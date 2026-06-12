@@ -1913,7 +1913,7 @@ var ScenaristStore = class {
   }
   /** Путь к sidecar-файлу рядом с .md заметкой. */
   sidecarPath(filePath) {
-    return filePath.replace(/\.md$/, ".scenarist.json");
+    return filePath.replace(/\.md$/, ".sc.json");
   }
   /** Прочитать sidecar-файл и вернуть Entity, или null если его нет. */
   async readSidecar(filePath) {
@@ -2244,7 +2244,7 @@ var SyncEngine = class {
    * Сканирует все .md-файлы vault:
    * - обновляет filePath для сущностей, у которых путь устарел;
    * - исправляет project-ссылку по расположению файла;
-   * - восстанавливает сущности из sidecar .scenarist.json (приоритет над frontmatter).
+   * - восстанавливает сущности из sidecar .sc.json (приоритет над frontmatter).
    */
   async rescanVault() {
     var _a, _b;
@@ -3289,6 +3289,8 @@ var CardView = class extends import_obsidian7.ItemView {
     this._rendering = false;
     this._renderPending = false;
     this._charTab = "basic";
+    /** Если задан — вкладка закреплена за конкретной сущностью (не следит за навигатором). */
+    this.pinnedId = null;
     this.plugin = plugin;
   }
   getViewType() {
@@ -3301,9 +3303,20 @@ var CardView = class extends import_obsidian7.ItemView {
   getIcon() {
     return "film";
   }
+  getState() {
+    return { pinnedId: this.pinnedId };
+  }
+  async setState(state) {
+    this.pinnedId = (state == null ? void 0 : state.pinnedId) || null;
+    this._charTab = "basic";
+    await this.render();
+  }
   async onOpen() {
     this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
-    this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
+    this.unsub.push(this.plugin.onSelect(() => {
+      if (!this.pinnedId)
+        this.scheduleRender();
+    }));
     this.render();
   }
   async onClose() {
@@ -3321,7 +3334,8 @@ var CardView = class extends import_obsidian7.ItemView {
     this.render();
   }
   current() {
-    const id = this.plugin.selectedId;
+    var _a;
+    const id = (_a = this.pinnedId) != null ? _a : this.plugin.selectedId;
     return id ? this.plugin.store.get(id) : null;
   }
   single(ids) {
@@ -4616,6 +4630,31 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     });
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.injectMarkdownButtons()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.injectMarkdownButtons()));
+    this.registerEvent(
+      this.app.workspace.on("file-open", (file) => {
+        if (!(file == null ? void 0 : file.path.endsWith(".sc.json")))
+          return;
+        const mdPath = file.path.replace(/\.sc\.json$/, ".md");
+        const entity = this.store.findByPath(mdPath);
+        if (!entity)
+          return;
+        const existing = this.findPinnedLeaf(entity.id);
+        if (existing) {
+          this.app.workspace.revealLeaf(existing);
+          const active = this.app.workspace.activeLeaf;
+          if (active && active !== existing)
+            active.detach();
+          return;
+        }
+        const leaf = this.app.workspace.activeLeaf;
+        if (leaf) {
+          void leaf.setViewState({
+            type: CARD_VIEW,
+            state: { pinnedId: entity.id }
+          });
+        }
+      })
+    );
   }
   onunload() {
     this.state.flushSave();
@@ -4685,6 +4724,15 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     const leaf = existing || this.app.workspace.getLeaf("tab");
     await leaf.setViewState({ type, active: true });
     this.app.workspace.revealLeaf(leaf);
+  }
+  /** Найти уже открытую закреплённую вкладку для данной сущности. */
+  findPinnedLeaf(entityId) {
+    let found = null;
+    this.app.workspace.getLeavesOfType(CARD_VIEW).forEach((leaf) => {
+      if (leaf.view.pinnedId === entityId)
+        found = leaf;
+    });
+    return found;
   }
   injectMarkdownButtons() {
     this.app.workspace.iterateAllLeaves((leaf) => {

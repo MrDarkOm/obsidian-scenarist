@@ -251,7 +251,7 @@ export class SyncEngine {
 	 * Сканирует все .md-файлы vault:
 	 * - обновляет filePath для сущностей, у которых путь устарел;
 	 * - исправляет project-ссылку по расположению файла;
-	 * - восстанавливает сущности из sidecar .scenarist.json (приоритет над frontmatter).
+	 * - восстанавливает сущности из sidecar .sc.json (приоритет над frontmatter).
 	 */
 	async rescanVault(): Promise<void> {
 		const { metadataCache } = this.plugin.app;

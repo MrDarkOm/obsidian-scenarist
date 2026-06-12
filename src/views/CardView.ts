@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, MarkdownRenderer, TFile, setIcon } from 'obsidian';
+import { FileView, WorkspaceLeaf, MarkdownRenderer, TFile, setIcon } from 'obsidian';
 import { Entity, EntityKind, FieldDef } from '../models/types';
 import { CreateEntityModal } from '../modals/CreateEntityModal';
 import type ScenaristPlugin from '../main';
@@ -12,7 +12,7 @@ const STRUCTURAL = new Set(['project', 'category']);
 /** Текстовые поля которые рендерятся большими (3+ строки). */
 const LONG_FIELDS = new Set(['summary', 'synopsis', 'description', 'idea', 'goal']);
 
-export class CardView extends ItemView {
+export class CardView extends FileView {
 	private plugin: ScenaristPlugin;
 	private unsub: Array<() => void> = [];
 	private _rendering = false;
@@ -34,6 +34,34 @@ export class CardView extends ItemView {
 	}
 	getIcon() {
 		return 'film';
+	}
+
+	/** Принимаем .sc файлы как собственный тип — они будут видны в дереве и открываться карточкой. */
+	canAcceptExtension(extension: string): boolean {
+		return extension === 'sc';
+	}
+
+	/** Вызывается Obsidian когда пользователь открывает .sc файл из дерева. */
+	async onLoadFile(file: TFile): Promise<void> {
+		try {
+			const raw = await this.app.vault.read(file);
+			const data = JSON.parse(raw) as { id?: string };
+			if (data.id) {
+				if (!this.plugin.store.get(data.id)) {
+					this.plugin.store.importEntity(data as any);
+				}
+				this.pinnedId = data.id;
+				this._charTab = 'basic';
+				await this.render();
+			}
+		} catch {
+			/* повреждённый или пустой файл */
+		}
+	}
+
+	async onUnloadFile(_file: TFile): Promise<void> {
+		this.pinnedId = null;
+		this.scheduleRender();
 	}
 
 	getState(): Record<string, unknown> {

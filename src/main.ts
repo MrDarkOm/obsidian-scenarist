@@ -109,34 +109,8 @@ export default class ScenaristPlugin extends Plugin {
 		this.registerEvent(this.app.workspace.on('active-leaf-change', () => this.injectMarkdownButtons()));
 		this.registerEvent(this.app.workspace.on('layout-change', () => this.injectMarkdownButtons()));
 
-		// Открытие .sc.json файлов как закреплённых карточек сущности
-		this.registerEvent(
-			this.app.workspace.on('file-open', (file: TFile | null) => {
-				if (!file?.path.endsWith('.sc.json')) return;
-				const mdPath = file.path.replace(/\.sc\.json$/, '.md');
-				const entity = this.store.findByPath(mdPath);
-				if (!entity) return;
-
-				// Если уже есть закреплённая вкладка для этой сущности — фокусируем её
-				const existing = this.findPinnedLeaf(entity.id);
-				if (existing) {
-					this.app.workspace.revealLeaf(existing);
-					// Закрываем лист который открыл .sc.json (он не нужен)
-					const active = this.app.workspace.activeLeaf;
-					if (active && active !== existing) active.detach();
-					return;
-				}
-
-				// Заменяем текущий лист карточкой сущности
-				const leaf = this.app.workspace.activeLeaf;
-				if (leaf) {
-					void (leaf as any).setViewState({
-						type: CARD_VIEW,
-						state: { pinnedId: entity.id },
-					} as Parameters<typeof leaf.setViewState>[0]);
-				}
-			})
-		);
+		// .sc файлы открываются как закреплённые карточки сущности
+		this.registerExtensions(['sc'], CARD_VIEW);
 	}
 
 	onunload() {
@@ -217,15 +191,6 @@ export default class ScenaristPlugin extends Plugin {
 		const leaf: WorkspaceLeaf = existing || this.app.workspace.getLeaf('tab');
 		await leaf.setViewState({ type, active: true });
 		this.app.workspace.revealLeaf(leaf);
-	}
-
-	/** Найти уже открытую закреплённую вкладку для данной сущности. */
-	findPinnedLeaf(entityId: string): WorkspaceLeaf | null {
-		let found: WorkspaceLeaf | null = null;
-		this.app.workspace.getLeavesOfType(CARD_VIEW).forEach((leaf) => {
-			if ((leaf.view as CardView).pinnedId === entityId) found = leaf;
-		});
-		return found;
 	}
 
 	injectMarkdownButtons() {

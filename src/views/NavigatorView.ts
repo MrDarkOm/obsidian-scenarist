@@ -303,7 +303,7 @@ export class NavigatorView extends ItemView {
 		const title = head.createEl('span', { cls: 'scenarist-work-title', text: work.name });
 		title.onclick = (e) => {
 			e.stopPropagation();
-			this.plugin.navigateTo(work.id);
+			void this.plugin.openEntity(work.id);
 		};
 
 		const tl = head.createEl('button', { cls: 'clickable-icon' });
@@ -493,7 +493,7 @@ export class NavigatorView extends ItemView {
 			dot.style.background = opt ? opt.color : '#555';
 		}
 		pill.createEl('span', { text: entity.name });
-		pill.onclick = () => this.plugin.navigateTo(entity.id);
+		pill.onclick = () => void this.plugin.openEntity(entity.id);
 		pill.addEventListener('dblclick', () => this.plugin.sync.openNote(entity));
 		pill.addEventListener('contextmenu', (e) => {
 			e.preventDefault();
@@ -535,7 +535,7 @@ export class NavigatorView extends ItemView {
 			i
 				.setTitle(t('nav.openCard'))
 				.setIcon('info')
-				.onClick(() => this.plugin.navigateTo(entity.id))
+				.onClick(() => void this.plugin.openEntity(entity.id))
 		);
 		menu.addItem((i) =>
 			i

@@ -3040,7 +3040,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     const title = head.createEl("span", { cls: "scenarist-work-title", text: work.name });
     title.onclick = (e) => {
       e.stopPropagation();
-      this.plugin.navigateTo(work.id);
+      void this.plugin.openEntity(work.id);
     };
     const tl = head.createEl("button", { cls: "clickable-icon" });
     (0, import_obsidian6.setIcon)(tl, "clock");
@@ -3231,7 +3231,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
       dot.style.background = opt ? opt.color : "#555";
     }
     pill.createEl("span", { text: entity.name });
-    pill.onclick = () => this.plugin.navigateTo(entity.id);
+    pill.onclick = () => void this.plugin.openEntity(entity.id);
     pill.addEventListener("dblclick", () => this.plugin.sync.openNote(entity));
     pill.addEventListener("contextmenu", (e) => {
       e.preventDefault();
@@ -3261,7 +3261,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
   contextMenu(e, entity) {
     const menu = new import_obsidian6.Menu();
     menu.addItem(
-      (i) => i.setTitle(t("nav.openCard")).setIcon("info").onClick(() => this.plugin.navigateTo(entity.id))
+      (i) => i.setTitle(t("nav.openCard")).setIcon("info").onClick(() => void this.plugin.openEntity(entity.id))
     );
     menu.addItem(
       (i) => i.setTitle(t("nav.openNote")).setIcon("file-text").onClick(() => this.plugin.sync.openNote(entity))
@@ -4678,6 +4678,52 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
   navigateTo(id) {
     this.state.navigateTo(id);
     void this.ensureCard();
+  }
+  /**
+   * Открыть сущность как .sc-файл во вкладке (так же, как клик по файлу в дереве).
+   * Если вкладка уже открыта — фокусирует её. Если .sc-файла нет — создаёт.
+   * Фолбэк на главную панель, если у сущности ещё нет .md-заметки.
+   */
+  async openEntity(id) {
+    const entity = this.store.get(id);
+    if (!entity)
+      return;
+    if (!entity.filePath && this.settings.autoCreateNotes) {
+      await this.sync.ensureNote(entity);
+    }
+    if (!entity.filePath) {
+      this.navigateTo(id);
+      return;
+    }
+    const scPath = this.store.sidecarPath(entity.filePath);
+    const existing = this.findScLeaf(scPath);
+    if (existing) {
+      this.app.workspace.revealLeaf(existing);
+      return;
+    }
+    let file = this.app.vault.getAbstractFileByPath(scPath);
+    if (!(file instanceof import_obsidian11.TFile)) {
+      try {
+        file = await this.app.vault.create(scPath, JSON.stringify(entity, null, 2));
+      } catch (e) {
+        file = this.app.vault.getAbstractFileByPath(scPath);
+      }
+    }
+    if (file instanceof import_obsidian11.TFile) {
+      await this.app.workspace.getLeaf("tab").openFile(file);
+    } else {
+      this.navigateTo(id);
+    }
+  }
+  /** Найти открытую вкладку EntityFileView с данным путём .sc-файла. */
+  findScLeaf(scPath) {
+    let found = null;
+    this.app.workspace.getLeavesOfType(ENTITY_FILE_VIEW).forEach((leaf) => {
+      const f = leaf.view.file;
+      if (f && f.path === scPath)
+        found = leaf;
+    });
+    return found;
   }
   back() {
     this.state.back();

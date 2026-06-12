@@ -132,6 +132,61 @@ export default class ScenaristPlugin extends Plugin {
 		void this.ensureCard();
 	}
 
+	/**
+	 * Открыть сущность как .sc-файл во вкладке (так же, как клик по файлу в дереве).
+	 * Если вкладка уже открыта — фокусирует её. Если .sc-файла нет — создаёт.
+	 * Фолбэк на главную панель, если у сущности ещё нет .md-заметки.
+	 */
+	async openEntity(id: string) {
+		const entity = this.store.get(id);
+		if (!entity) return;
+
+		// Гарантируем наличие .md (а значит и пути для .sc)
+		if (!entity.filePath && this.settings.autoCreateNotes) {
+			await this.sync.ensureNote(entity);
+		}
+		if (!entity.filePath) {
+			this.navigateTo(id);
+			return;
+		}
+
+		const scPath = this.store.sidecarPath(entity.filePath);
+
+		// Уже открыта вкладка с этим файлом? — фокусируем
+		const existing = this.findScLeaf(scPath);
+		if (existing) {
+			this.app.workspace.revealLeaf(existing);
+			return;
+		}
+
+		// Файл существует в vault?
+		let file = this.app.vault.getAbstractFileByPath(scPath);
+		if (!(file instanceof TFile)) {
+			try {
+				file = await this.app.vault.create(scPath, JSON.stringify(entity, null, 2));
+			} catch {
+				// возможно уже есть на диске, но не в индексе — пропускаем
+				file = this.app.vault.getAbstractFileByPath(scPath);
+			}
+		}
+
+		if (file instanceof TFile) {
+			await this.app.workspace.getLeaf('tab').openFile(file);
+		} else {
+			this.navigateTo(id);
+		}
+	}
+
+	/** Найти открытую вкладку EntityFileView с данным путём .sc-файла. */
+	private findScLeaf(scPath: string): WorkspaceLeaf | null {
+		let found: WorkspaceLeaf | null = null;
+		this.app.workspace.getLeavesOfType(ENTITY_FILE_VIEW).forEach((leaf) => {
+			const f = (leaf.view as EntityFileView).file;
+			if (f && f.path === scPath) found = leaf;
+		});
+		return found;
+	}
+
 	back() {
 		this.state.back();
 	}

@@ -40,7 +40,9 @@ export class CreateEntityModal extends Modal {
 
 	onOpen() {
 		const { contentEl } = this;
-		const { icon, label, fields, links } = this.defs();
+		const { icon, label, links } = this.defs();
+		// Для сущностей с табами показываем только базовые поля (basic или без таба)
+		const fields = this.defs().fields.filter((f) => !f.tab || f.tab === 'basic');
 		const hidden = new Set<string>(['project', 'category']);
 		(this.opts.parentLinks || []).forEach((p) => hidden.add(p.key));
 

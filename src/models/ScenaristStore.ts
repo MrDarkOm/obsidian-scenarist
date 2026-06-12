@@ -390,12 +390,37 @@ export class ScenaristStore {
 		};
 		const adapter = this.plugin.app.vault.adapter;
 		try {
-			// Убедиться что папка плагина существует
 			const dir = INDEX_PATH.split('/').slice(0, -1).join('/');
 			if (!(await adapter.exists(dir))) await adapter.mkdir(dir);
 			await adapter.write(INDEX_PATH, JSON.stringify(index, null, 2));
+
+			// Записать sidecar-файлы рядом с .md
+			for (const entity of this.entities.values()) {
+				if (entity.filePath) {
+					try {
+						await adapter.write(this.sidecarPath(entity.filePath), JSON.stringify(entity, null, 2));
+					} catch {
+						// файл .md ещё не создан — пропускаем
+					}
+				}
+			}
 		} catch (e) {
 			console.error('Scenarist: не удалось сохранить индекс', e);
+		}
+	}
+
+	/** Путь к sidecar-файлу рядом с .md заметкой. */
+	sidecarPath(filePath: string): string {
+		return filePath.replace(/\.md$/, '.scenarist.json');
+	}
+
+	/** Прочитать sidecar-файл и вернуть Entity, или null если его нет. */
+	async readSidecar(filePath: string): Promise<Entity | null> {
+		try {
+			const raw = await this.plugin.app.vault.adapter.read(this.sidecarPath(filePath));
+			return JSON.parse(raw) as Entity;
+		} catch {
+			return null;
 		}
 	}
 

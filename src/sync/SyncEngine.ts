@@ -225,8 +225,16 @@ export class SyncEngine {
 	handleRename(file: TFile, oldPath: string): void {
 		const entity = this.store.findByPath(oldPath);
 		if (!entity) return;
+
+		// Переименовать sidecar JSON вместе с .md
+		const oldSidecar = this.store.sidecarPath(oldPath);
+		const newSidecar = this.store.sidecarPath(file.path);
+		if (oldSidecar !== newSidecar) {
+			const sf = this.vault.getAbstractFileByPath(oldSidecar);
+			if (sf instanceof TFile) void this.vault.rename(sf, newSidecar);
+		}
+
 		this.store.setFilePath(entity.id, file.path);
-		// Если переместили в другой проект — обновляем привязку
 		this.syncProjectLink(entity, file.path);
 		this.plugin.refreshViews();
 	}
@@ -243,18 +251,21 @@ export class SyncEngine {
 	 * Сканирует все .md-файлы vault:
 	 * - обновляет filePath для сущностей, у которых путь устарел;
 	 * - исправляет project-ссылку по расположению файла;
-	 * - импортирует сущности из файлов с scenarist_id, которых нет в индексе.
+	 * - восстанавливает сущности из sidecar .scenarist.json (приоритет над frontmatter).
 	 */
 	async rescanVault(): Promise<void> {
-		const { metadataCache, vault } = this.plugin.app;
-		const files = vault.getMarkdownFiles();
+		const { metadataCache } = this.plugin.app;
+		const files = this.vault.getMarkdownFiles();
 		let changed = false;
 
 		for (const file of files) {
+			// Приоритет: sidecar JSON > frontmatter
+			const sidecar = await this.store.readSidecar(file.path);
 			const fm = metadataCache.getFileCache(file)?.frontmatter;
-			if (!fm?.scenarist_id) continue;
 
-			const id = String(fm.scenarist_id);
+			const id = sidecar?.id ?? (fm?.scenarist_id ? String(fm.scenarist_id) : null);
+			if (!id) continue;
+
 			const existing = this.store.get(id);
 
 			if (existing) {
@@ -263,7 +274,13 @@ export class SyncEngine {
 					changed = true;
 				}
 				if (this.syncProjectLink(existing, file.path)) changed = true;
-			} else if (fm.kind) {
+			} else if (sidecar) {
+				// Полные данные из sidecar — включая links.project
+				sidecar.filePath = file.path;
+				this.store.importEntity(sidecar);
+				changed = true;
+			} else if (fm?.kind) {
+				// Fallback: реконструкция из frontmatter
 				this.importEntityFromFm(file, fm as Record<string, unknown>);
 				changed = true;
 			}
@@ -316,10 +333,12 @@ export class SyncEngine {
 	}
 
 	private async processCreatedFile(file: TFile): Promise<void> {
+		const sidecar = await this.store.readSidecar(file.path);
 		const fm = this.plugin.app.metadataCache.getFileCache(file)?.frontmatter;
-		if (!fm?.scenarist_id) return;
 
-		const id = String(fm.scenarist_id);
+		const id = sidecar?.id ?? (fm?.scenarist_id ? String(fm.scenarist_id) : null);
+		if (!id) return;
+
 		const existing = this.store.get(id);
 
 		if (existing) {
@@ -333,7 +352,11 @@ export class SyncEngine {
 				void this.store.save();
 				this.plugin.refreshViews();
 			}
-		} else if (fm.kind) {
+		} else if (sidecar) {
+			sidecar.filePath = file.path;
+			this.store.importEntity(sidecar);
+			this.plugin.refreshViews();
+		} else if (fm?.kind) {
 			this.importEntityFromFm(file, fm as Record<string, unknown>);
 			this.plugin.refreshViews();
 		}

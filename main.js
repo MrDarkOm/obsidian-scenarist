@@ -1899,8 +1899,29 @@ var ScenaristStore = class {
       if (!await adapter.exists(dir))
         await adapter.mkdir(dir);
       await adapter.write(INDEX_PATH, JSON.stringify(index, null, 2));
+      for (const entity of this.entities.values()) {
+        if (entity.filePath) {
+          try {
+            await adapter.write(this.sidecarPath(entity.filePath), JSON.stringify(entity, null, 2));
+          } catch (e) {
+          }
+        }
+      }
     } catch (e) {
       console.error("Scenarist: \u043D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u043D\u0434\u0435\u043A\u0441", e);
+    }
+  }
+  /** Путь к sidecar-файлу рядом с .md заметкой. */
+  sidecarPath(filePath) {
+    return filePath.replace(/\.md$/, ".scenarist.json");
+  }
+  /** Прочитать sidecar-файл и вернуть Entity, или null если его нет. */
+  async readSidecar(filePath) {
+    try {
+      const raw = await this.plugin.app.vault.adapter.read(this.sidecarPath(filePath));
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
     }
   }
   // ---- утилиты ----
@@ -2201,6 +2222,13 @@ var SyncEngine = class {
     const entity = this.store.findByPath(oldPath);
     if (!entity)
       return;
+    const oldSidecar = this.store.sidecarPath(oldPath);
+    const newSidecar = this.store.sidecarPath(file.path);
+    if (oldSidecar !== newSidecar) {
+      const sf = this.vault.getAbstractFileByPath(oldSidecar);
+      if (sf instanceof import_obsidian2.TFile)
+        void this.vault.rename(sf, newSidecar);
+    }
     this.store.setFilePath(entity.id, file.path);
     this.syncProjectLink(entity, file.path);
     this.plugin.refreshViews();
@@ -2216,18 +2244,19 @@ var SyncEngine = class {
    * Сканирует все .md-файлы vault:
    * - обновляет filePath для сущностей, у которых путь устарел;
    * - исправляет project-ссылку по расположению файла;
-   * - импортирует сущности из файлов с scenarist_id, которых нет в индексе.
+   * - восстанавливает сущности из sidecar .scenarist.json (приоритет над frontmatter).
    */
   async rescanVault() {
-    var _a;
-    const { metadataCache, vault } = this.plugin.app;
-    const files = vault.getMarkdownFiles();
+    var _a, _b;
+    const { metadataCache } = this.plugin.app;
+    const files = this.vault.getMarkdownFiles();
     let changed = false;
     for (const file of files) {
+      const sidecar = await this.store.readSidecar(file.path);
       const fm = (_a = metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
-      if (!(fm == null ? void 0 : fm.scenarist_id))
+      const id = (_b = sidecar == null ? void 0 : sidecar.id) != null ? _b : (fm == null ? void 0 : fm.scenarist_id) ? String(fm.scenarist_id) : null;
+      if (!id)
         continue;
-      const id = String(fm.scenarist_id);
       const existing = this.store.get(id);
       if (existing) {
         if (existing.filePath !== file.path) {
@@ -2236,7 +2265,11 @@ var SyncEngine = class {
         }
         if (this.syncProjectLink(existing, file.path))
           changed = true;
-      } else if (fm.kind) {
+      } else if (sidecar) {
+        sidecar.filePath = file.path;
+        this.store.importEntity(sidecar);
+        changed = true;
+      } else if (fm == null ? void 0 : fm.kind) {
         this.importEntityFromFm(file, fm);
         changed = true;
       }
@@ -2283,11 +2316,12 @@ var SyncEngine = class {
     ) || null;
   }
   async processCreatedFile(file) {
-    var _a;
+    var _a, _b;
+    const sidecar = await this.store.readSidecar(file.path);
     const fm = (_a = this.plugin.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
-    if (!(fm == null ? void 0 : fm.scenarist_id))
+    const id = (_b = sidecar == null ? void 0 : sidecar.id) != null ? _b : (fm == null ? void 0 : fm.scenarist_id) ? String(fm.scenarist_id) : null;
+    if (!id)
       return;
-    const id = String(fm.scenarist_id);
     const existing = this.store.get(id);
     if (existing) {
       let changed = false;
@@ -2301,7 +2335,11 @@ var SyncEngine = class {
         void this.store.save();
         this.plugin.refreshViews();
       }
-    } else if (fm.kind) {
+    } else if (sidecar) {
+      sidecar.filePath = file.path;
+      this.store.importEntity(sidecar);
+      this.plugin.refreshViews();
+    } else if (fm == null ? void 0 : fm.kind) {
       this.importEntityFromFm(file, fm);
       this.plugin.refreshViews();
     }
@@ -2449,7 +2487,8 @@ var CreateEntityModal = class extends import_obsidian3.Modal {
   onOpen() {
     var _a;
     const { contentEl } = this;
-    const { icon, label, fields, links } = this.defs();
+    const { icon, label, links } = this.defs();
+    const fields = this.defs().fields.filter((f) => !f.tab || f.tab === "basic");
     const hidden = /* @__PURE__ */ new Set(["project", "category"]);
     (this.opts.parentLinks || []).forEach((p) => hidden.add(p.key));
     contentEl.addClass("scenarist-modal");

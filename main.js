@@ -3280,6 +3280,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
 // src/views/CardView.ts
 var import_obsidian7 = require("obsidian");
 var CARD_VIEW = "scenarist-card";
+var ENTITY_FILE_VIEW = "scenarist-entity-file";
 var STRUCTURAL = /* @__PURE__ */ new Set(["project", "category"]);
 var LONG_FIELDS = /* @__PURE__ */ new Set(["summary", "synopsis", "description", "idea", "goal"]);
 var CardView = class extends import_obsidian7.FileView {
@@ -3302,30 +3303,6 @@ var CardView = class extends import_obsidian7.FileView {
   }
   getIcon() {
     return "film";
-  }
-  /** Принимаем .sc файлы как собственный тип — они будут видны в дереве и открываться карточкой. */
-  canAcceptExtension(extension) {
-    return extension === "sc";
-  }
-  /** Вызывается Obsidian когда пользователь открывает .sc файл из дерева. */
-  async onLoadFile(file) {
-    try {
-      const raw = await this.app.vault.read(file);
-      const data = JSON.parse(raw);
-      if (data.id) {
-        if (!this.plugin.store.get(data.id)) {
-          this.plugin.store.importEntity(data);
-        }
-        this.pinnedId = data.id;
-        this._charTab = "basic";
-        await this.render();
-      }
-    } catch (e) {
-    }
-  }
-  async onUnloadFile(_file) {
-    this.pinnedId = null;
-    this.scheduleRender();
   }
   getState() {
     return { pinnedId: this.pinnedId };
@@ -4139,6 +4116,33 @@ var CardView = class extends import_obsidian7.FileView {
     return content;
   }
 };
+var EntityFileView = class extends CardView {
+  getViewType() {
+    return ENTITY_FILE_VIEW;
+  }
+  canAcceptExtension(extension) {
+    return extension === "sc";
+  }
+  async onLoadFile(file) {
+    try {
+      const raw = await this.app.vault.read(file);
+      const data = JSON.parse(raw);
+      if (data.id) {
+        if (!this.plugin.store.get(data.id)) {
+          this.plugin.store.importEntity(data);
+        }
+        this.pinnedId = data.id;
+        this._charTab = "basic";
+        await this.render();
+      }
+    } catch (e) {
+    }
+  }
+  async onUnloadFile(_file) {
+    this.pinnedId = null;
+    this.scheduleRender();
+  }
+};
 
 // src/views/BoardView.ts
 var import_obsidian8 = require("obsidian");
@@ -4595,6 +4599,7 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     }
     this.registerView(NAVIGATOR_VIEW, (leaf) => new NavigatorView(leaf, this));
     this.registerView(CARD_VIEW, (leaf) => new CardView(leaf, this));
+    this.registerView(ENTITY_FILE_VIEW, (leaf) => new EntityFileView(leaf, this));
     this.registerView(BOARD_VIEW, (leaf) => new BoardView(leaf, this));
     this.registerView(GRAPH_VIEW, (leaf) => new GraphView(leaf, this));
     this.registerView(TIMELINE_VIEW, (leaf) => new TimelineView(leaf, this));
@@ -4654,7 +4659,7 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     });
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.injectMarkdownButtons()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.injectMarkdownButtons()));
-    this.registerExtensions(["sc"], CARD_VIEW);
+    this.registerExtensions(["sc"], ENTITY_FILE_VIEW);
   }
   onunload() {
     this.state.flushSave();

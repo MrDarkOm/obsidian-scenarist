@@ -5,6 +5,7 @@ import type ScenaristPlugin from '../main';
 import { t } from '../i18n';
 
 export const CARD_VIEW = 'scenarist-card';
+export const ENTITY_FILE_VIEW = 'scenarist-entity-file';
 
 /** Скрытые из секции «Связи» структурные ключи. */
 const STRUCTURAL = new Set(['project', 'category']);
@@ -13,11 +14,11 @@ const STRUCTURAL = new Set(['project', 'category']);
 const LONG_FIELDS = new Set(['summary', 'synopsis', 'description', 'idea', 'goal']);
 
 export class CardView extends FileView {
-	private plugin: ScenaristPlugin;
+	protected plugin: ScenaristPlugin;
 	private unsub: Array<() => void> = [];
-	private _rendering = false;
+	protected _rendering = false;
 	private _renderPending = false;
-	private _charTab = 'basic';
+	protected _charTab = 'basic';
 	/** Если задан — вкладка закреплена за конкретной сущностью (не следит за навигатором). */
 	public pinnedId: string | null = null;
 
@@ -34,34 +35,6 @@ export class CardView extends FileView {
 	}
 	getIcon() {
 		return 'film';
-	}
-
-	/** Принимаем .sc файлы как собственный тип — они будут видны в дереве и открываться карточкой. */
-	canAcceptExtension(extension: string): boolean {
-		return extension === 'sc';
-	}
-
-	/** Вызывается Obsidian когда пользователь открывает .sc файл из дерева. */
-	async onLoadFile(file: TFile): Promise<void> {
-		try {
-			const raw = await this.app.vault.read(file);
-			const data = JSON.parse(raw) as { id?: string };
-			if (data.id) {
-				if (!this.plugin.store.get(data.id)) {
-					this.plugin.store.importEntity(data as any);
-				}
-				this.pinnedId = data.id;
-				this._charTab = 'basic';
-				await this.render();
-			}
-		} catch {
-			/* повреждённый или пустой файл */
-		}
-	}
-
-	async onUnloadFile(_file: TFile): Promise<void> {
-		this.pinnedId = null;
-		this.scheduleRender();
 	}
 
 	getState(): Record<string, unknown> {
@@ -89,7 +62,7 @@ export class CardView extends FileView {
 	}
 
 	/** Debounced re-entrant-safe render scheduler. */
-	private scheduleRender() {
+	protected scheduleRender() {
 		if (this._rendering) {
 			this._renderPending = true;
 			return;
@@ -115,7 +88,7 @@ export class CardView extends FileView {
 		}
 	}
 
-	private async render() {
+	protected async render() {
 		if (this._rendering) {
 			this._renderPending = true;
 			return;
@@ -991,5 +964,42 @@ export class CardView extends FileView {
 			}
 		}
 		return content;
+	}
+}
+
+/**
+ * Файловый вью для .sc-файлов в дереве vault.
+ * Отдельный тип (не CARD_VIEW) — Obsidian не перепутает его с главной панелью
+ * и будет открывать каждый файл в НОВОЙ вкладке.
+ */
+export class EntityFileView extends CardView {
+	getViewType() {
+		return ENTITY_FILE_VIEW;
+	}
+
+	canAcceptExtension(extension: string): boolean {
+		return extension === 'sc';
+	}
+
+	async onLoadFile(file: TFile): Promise<void> {
+		try {
+			const raw = await this.app.vault.read(file);
+			const data = JSON.parse(raw) as { id?: string };
+			if (data.id) {
+				if (!this.plugin.store.get(data.id)) {
+					this.plugin.store.importEntity(data as any);
+				}
+				this.pinnedId = data.id;
+				this._charTab = 'basic';
+				await this.render();
+			}
+		} catch {
+			/* повреждённый файл — показываем пустую карточку */
+		}
+	}
+
+	async onUnloadFile(_file: TFile): Promise<void> {
+		this.pinnedId = null;
+		this.scheduleRender();
 	}
 }

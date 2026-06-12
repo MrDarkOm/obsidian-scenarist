@@ -4,7 +4,7 @@ import { ScenaristStore } from './models/ScenaristStore';
 import { SyncEngine } from './sync/SyncEngine';
 import { ScenaristState } from './state/ScenaristState';
 import { NavigatorView, NAVIGATOR_VIEW } from './views/NavigatorView';
-import { CardView, CARD_VIEW } from './views/CardView';
+import { CardView, CARD_VIEW, EntityFileView, ENTITY_FILE_VIEW } from './views/CardView';
 import { BoardView, BOARD_VIEW } from './views/BoardView';
 import { GraphView, GRAPH_VIEW } from './views/GraphView';
 import { TimelineView, TIMELINE_VIEW } from './views/TimelineView';
@@ -45,6 +45,7 @@ export default class ScenaristPlugin extends Plugin {
 
 		this.registerView(NAVIGATOR_VIEW, (leaf) => new NavigatorView(leaf, this));
 		this.registerView(CARD_VIEW, (leaf) => new CardView(leaf, this));
+		this.registerView(ENTITY_FILE_VIEW, (leaf) => new EntityFileView(leaf, this));
 		this.registerView(BOARD_VIEW, (leaf) => new BoardView(leaf, this));
 		this.registerView(GRAPH_VIEW, (leaf) => new GraphView(leaf, this));
 		this.registerView(TIMELINE_VIEW, (leaf) => new TimelineView(leaf, this));
@@ -109,8 +110,8 @@ export default class ScenaristPlugin extends Plugin {
 		this.registerEvent(this.app.workspace.on('active-leaf-change', () => this.injectMarkdownButtons()));
 		this.registerEvent(this.app.workspace.on('layout-change', () => this.injectMarkdownButtons()));
 
-		// .sc файлы открываются как закреплённые карточки сущности
-		this.registerExtensions(['sc'], CARD_VIEW);
+		// .sc файлы открываются как закреплённые карточки сущности (отдельный тип — не CARD_VIEW)
+		this.registerExtensions(['sc'], ENTITY_FILE_VIEW);
 	}
 
 	onunload() {

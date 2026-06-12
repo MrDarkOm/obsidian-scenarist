@@ -3305,10 +3305,13 @@ var CardView = class extends import_obsidian7.FileView {
     return "film";
   }
   getState() {
-    return { pinnedId: this.pinnedId };
+    return { ...super.getState(), pinnedId: this.pinnedId };
   }
-  async setState(state) {
-    this.pinnedId = (state == null ? void 0 : state.pinnedId) || null;
+  async setState(state, result) {
+    await super.setState(state, result);
+    if (state && "pinnedId" in state && state.pinnedId) {
+      this.pinnedId = state.pinnedId;
+    }
     this._charTab = "basic";
     await this.render();
   }

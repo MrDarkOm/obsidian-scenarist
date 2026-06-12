@@ -1,4 +1,4 @@
-import { FileView, WorkspaceLeaf, MarkdownRenderer, TFile, setIcon } from 'obsidian';
+import { FileView, WorkspaceLeaf, MarkdownRenderer, TFile, ViewStateResult, setIcon } from 'obsidian';
 import { Entity, EntityKind, FieldDef } from '../models/types';
 import { CreateEntityModal } from '../modals/CreateEntityModal';
 import type ScenaristPlugin from '../main';
@@ -38,11 +38,16 @@ export class CardView extends FileView {
 	}
 
 	getState(): Record<string, unknown> {
-		return { pinnedId: this.pinnedId };
+		// Сохраняем file-состояние FileView (для .sc вкладок) + pinnedId
+		return { ...super.getState(), pinnedId: this.pinnedId };
 	}
 
-	async setState(state: Record<string, unknown>): Promise<void> {
-		this.pinnedId = (state?.pinnedId as string) || null;
+	async setState(state: Record<string, unknown>, result: ViewStateResult): Promise<void> {
+		// FileView сам загрузит файл из state.file и вызовет onLoadFile (важно для .sc вкладок)
+		await super.setState(state, result);
+		if (state && 'pinnedId' in state && state.pinnedId) {
+			this.pinnedId = state.pinnedId as string;
+		}
 		this._charTab = 'basic';
 		await this.render();
 	}

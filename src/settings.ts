@@ -62,9 +62,9 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 	display() {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.createEl('h2', { text: t('settings.title') });
+		new Setting(containerEl).setName(t('settings.title')).setHeading();
 
-		containerEl.createEl('h3', { text: t('settings.general') });
+		new Setting(containerEl).setName(t('settings.general')).setHeading();
 
 		new Setting(containerEl)
 			.setName(t('settings.rootFolder'))
@@ -76,6 +76,7 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.rootFolder = value.trim() || 'Scenarist';
 						await this.plugin.saveSettings();
+						new Notice(t('settings.rootFolderChanged'));
 					})
 			);
 
@@ -89,7 +90,7 @@ export class ScenaristSettingsTab extends PluginSettingTab {
 				})
 			);
 
-		containerEl.createEl('h3', { text: t('settings.quickTypes') });
+		new Setting(containerEl).setName(t('settings.quickTypes')).setHeading();
 		containerEl.createEl('p', {
 			cls: 'setting-item-description',
 			text: t('settings.quickTypesDesc'),

@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, Menu, Notice, setIcon } from 'obsidian';
+import { ItemView, WorkspaceLeaf, Menu, Modal, Notice, setIcon } from 'obsidian';
 import { Entity, NO_PROJECT } from '../models/types';
 import { SCHEMAS } from '../models/schema';
 import { CreateEntityModal } from '../modals/CreateEntityModal';
@@ -10,7 +10,11 @@ import { t } from '../i18n';
 
 export const NAVIGATOR_VIEW = 'scenarist-navigator';
 
-const CHAR_ROLES = ['Главная', 'Ключевая', 'Второстепенная', 'Эпизодическая'];
+/** Role values come from the schema — keeps them in sync with the select options. */
+const CHAR_ROLES: string[] = (() => {
+	const roleField = SCHEMAS.character.fields.find((f) => f.key === 'role');
+	return roleField?.options?.map((o) => o.value) ?? [];
+})();
 
 /** Lucide-иконки для статичных вкладок и типов сущностей. */
 const ENTITY_ICON: Record<string, string> = {
@@ -26,12 +30,61 @@ const ENTITY_ICON: Record<string, string> = {
 	categoryItem: 'circle-dot',
 };
 
+class ConfirmDeleteModal extends Modal {
+	private entity: Entity;
+	private itemCount: number;
+	private onConfirm: () => Promise<void>;
+
+	constructor(plugin: ScenaristPlugin, entity: Entity, onConfirm: () => Promise<void>) {
+		super(plugin.app);
+		this.entity = entity;
+		this.itemCount = entity.kind === 'category' ? plugin.store.categoryItems(entity.id).length : 0;
+		this.onConfirm = onConfirm;
+	}
+
+	onOpen() {
+		const { contentEl } = this;
+		contentEl.addClass('scenarist-modal');
+
+		contentEl.createEl('p', {
+			cls: 'scenarist-modal-title',
+			text: t('nav.deleteConfirmTitle', { name: this.entity.name }),
+		});
+
+		const desc = this.entity.kind === 'category' && this.itemCount > 0
+			? t('nav.deleteConfirmTextCategory', { count: String(this.itemCount) })
+			: t('nav.deleteConfirmText');
+		contentEl.createEl('p', { text: desc });
+
+		const buttons = contentEl.createDiv('scenarist-modal-buttons');
+		const delBtn = buttons.createEl('button', {
+			cls: 'scenarist-btn mod-warning',
+			text: t('nav.deleteConfirmBtn'),
+		});
+		delBtn.addEventListener('click', async () => {
+			this.close();
+			await this.onConfirm();
+		});
+		const cancelBtn = buttons.createEl('button', {
+			cls: 'scenarist-btn',
+			text: t('modal.cancel'),
+		});
+		cancelBtn.addEventListener('click', () => this.close());
+	}
+
+	onClose() {
+		this.contentEl.empty();
+	}
+}
+
 export class NavigatorView extends ItemView {
 	private plugin: ScenaristPlugin;
 	private unsub: Array<() => void> = [];
 	private expanded: Set<string> = new Set();
 	private search = '';
 	private tab = 'work';
+	private renderTimer: number | null = null;
+	private searchTimer: number | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -49,16 +102,23 @@ export class NavigatorView extends ItemView {
 	}
 
 	async onOpen() {
-		this.unsub.push(this.plugin.store.onChange(() => this.render()));
-		this.unsub.push(this.plugin.onSelect(() => this.render()));
+		this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
+		this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
 		this.render();
 	}
 	async onClose() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
+		if (this.searchTimer !== null) window.clearTimeout(this.searchTimer);
 		this.unsub.forEach((u) => u());
 	}
 
 	refresh() {
 		this.render();
+	}
+
+	private scheduleRender() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
+		this.renderTimer = window.setTimeout(() => { this.renderTimer = null; this.render(); }, 50);
 	}
 
 	private get store() {
@@ -142,7 +202,8 @@ export class NavigatorView extends ItemView {
 		input.value = this.search;
 		input.oninput = () => {
 			this.search = input.value;
-			this.render();
+			if (this.searchTimer !== null) window.clearTimeout(this.searchTimer);
+			this.searchTimer = window.setTimeout(() => { this.searchTimer = null; this.render(); }, 150);
 		};
 	}
 
@@ -160,8 +221,7 @@ export class NavigatorView extends ItemView {
 		const chars = this.store.byKindForProject('character').filter((c) => this.matches(c));
 		if (chars.length > 0) {
 			this.searchSectionTitle(body, t('nav.characters'));
-			const pills = body.createDiv('scenarist-pills');
-			pills.style.paddingLeft = '12px';
+			const pills = body.createDiv('scenarist-pills scenarist-pills-indent');
 			for (const ch of chars) this.renderPill(pills, ch);
 			totalFound += chars.length;
 		}
@@ -212,10 +272,16 @@ export class NavigatorView extends ItemView {
 		setIcon(gear, 'settings');
 		gear.setAttribute('aria-label', t('nav.openSettings'));
 		gear.onclick = () => {
-			const setting = (this.app as any).setting;
-			if (setting) {
-				setting.open();
-				setting.openTabById(this.plugin.manifest.id);
+			try {
+				const setting = (this.app as any).setting;
+				if (setting?.open) {
+					setting.open();
+					setting.openTabById?.(this.plugin.manifest.id);
+				} else {
+					new Notice(t('nav.openSettingsManual'));
+				}
+			} catch {
+				new Notice(t('nav.openSettingsManual'));
 			}
 		};
 
@@ -257,7 +323,7 @@ export class NavigatorView extends ItemView {
 		// Lucide-иконка; emoji-fallback для старых пользовательских данных
 		if ([...icon].length <= 2) {
 			b.textContent = icon;
-			b.style.fontSize = '15px';
+			b.addClass('scenarist-emoji-icon');
 		} else {
 			setIcon(b, icon);
 		}
@@ -490,7 +556,7 @@ export class NavigatorView extends ItemView {
 				.find((f) => f.key === 'status')
 				?.options?.find((o) => o.value === entity.props['status']);
 			const dot = pill.createEl('span', { cls: 'scenarist-pill-dot' });
-			dot.style.background = opt ? opt.color : '#555';
+			dot.style.setProperty('--dot-color', opt ? opt.color : '#555');
 		}
 		pill.createEl('span', { text: entity.name });
 		pill.onclick = () => void this.plugin.openEntity(entity.id);
@@ -548,9 +614,11 @@ export class NavigatorView extends ItemView {
 			i
 				.setTitle(t('nav.delete'))
 				.setIcon('trash')
-				.onClick(async () => {
-					await this.plugin.sync.deleteEntity(entity.id);
-					new Notice(t('nav.deleted', { name: entity.name }));
+				.onClick(() => {
+					new ConfirmDeleteModal(this.plugin, entity, async () => {
+						await this.plugin.sync.deleteEntity(entity.id);
+						new Notice(t('nav.deleted', { name: entity.name }));
+					}).open();
 				})
 		);
 		menu.showAtMouseEvent(e);

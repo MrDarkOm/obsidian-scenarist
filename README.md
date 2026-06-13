@@ -7,9 +7,9 @@ Writing and worldbuilding tool for Obsidian. Manage works, books, arcs, chapters
 ### Navigator panel
 - **Project selector** — switch between projects or work without a project
 - **Works** tab — hierarchy: Work → Books → Chapters / Arcs → Anchors; timeline button per work
-- **Characters** tab — grouped by role (Main / Key / Secondary / Episodic)
+- **Characters** tab — grouped by role (derived from schema options)
 - **Custom category tabs** — Organizations, Locations, Languages or any type you define in settings
-- Context menus on every entity (open card, open note, delete)
+- Context menus on every entity (open card, open note, delete with confirmation modal)
 - Search across all sections simultaneously
 
 ### Card view
@@ -18,6 +18,7 @@ Writing and worldbuilding tool for Obsidian. Manage works, books, arcs, chapters
 - Backlinks field (`[[wikilinks]]`)
 - Relation chips with add / remove
 - Breadcrumb navigation
+- Character card has tabbed layout (Basic / Characteristics / Biography / Appearance)
 
 ### Timeline view
 - Horizontal rail of anchors (key events) for a work
@@ -28,6 +29,10 @@ Writing and worldbuilding tool for Obsidian. Manage works, books, arcs, chapters
 
 ### Graph view
 - Force-directed graph of all entities, scoped to active project
+- Drag nodes to rearrange; positions are cached between renders
+
+### Sidecar files (`.sc`)
+Each `.md` note has a companion `.sc` JSON file (same name, different extension) that stores a snapshot of the entity. Clicking a `.sc` file in the vault tree opens a pinned card view for that entity. Sidecar files are written automatically and should not be edited manually.
 
 ### Settings
 - Quick category types — toggle or create custom types with Lucide icon picker

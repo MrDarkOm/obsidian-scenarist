@@ -1,3 +1,4 @@
+"use strict";
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -223,6 +224,7 @@ var ru = {
     nothingFound: "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E",
     noItems: "\u041D\u0435\u0442 {{label}}. \u041D\u0430\u0436\u043C\u0438\u0442\u0435 + \u0447\u0442\u043E\u0431\u044B \u0441\u043E\u0437\u0434\u0430\u0442\u044C.",
     openSettings: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 Scenarist",
+    openSettingsManual: "\u041E\u0442\u043A\u0440\u043E\u0439\u0442\u0435 \u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 \u2192 Scenarist \u0432\u0440\u0443\u0447\u043D\u0443\u044E",
     noProject: "\u2014 \u0411\u0435\u0437 \u043F\u0440\u043E\u0435\u043A\u0442\u0430",
     createProject: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0440\u043E\u0435\u043A\u0442",
     newProject: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442",
@@ -232,6 +234,10 @@ var ru = {
     openNote: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
     delete: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C",
     deleted: "\u0423\u0434\u0430\u043B\u0435\u043D\u043E: {{name}}",
+    deleteConfirmTitle: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \xAB{{name}}\xBB?",
+    deleteConfirmText: "\u0424\u0430\u0439\u043B \u043F\u0435\u0440\u0435\u043C\u0435\u0441\u0442\u0438\u0442\u0441\u044F \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0443. \u0414\u0430\u043D\u043D\u044B\u0435 Scenarist \u0443\u0434\u0430\u043B\u044F\u0442\u0441\u044F \u0431\u0435\u0437\u0432\u043E\u0437\u0432\u0440\u0430\u0442\u043D\u043E.",
+    deleteConfirmTextCategory: "\u0411\u0443\u0434\u0435\u0442 \u0443\u0434\u0430\u043B\u0435\u043D\u043E \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u043E\u0432: {{count}}. \u0424\u0430\u0439\u043B\u044B \u043F\u0435\u0440\u0435\u043C\u0435\u0441\u0442\u044F\u0442\u0441\u044F \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0443. \u0414\u0430\u043D\u043D\u044B\u0435 Scenarist \u0443\u0434\u0430\u043B\u044F\u0442\u0441\u044F \u0431\u0435\u0437\u0432\u043E\u0437\u0432\u0440\u0430\u0442\u043D\u043E.",
+    deleteConfirmBtn: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C",
     createWork: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u0435",
     createCharacter: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430",
     createFor: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C: {{label}}",
@@ -353,6 +359,7 @@ var ru = {
     general: "\u041E\u0431\u0449\u0438\u0435",
     rootFolder: "\u041A\u043E\u0440\u043D\u0435\u0432\u0430\u044F \u043F\u0430\u043F\u043A\u0430",
     rootFolderDesc: "\u041F\u0430\u043F\u043A\u0430 \u0432 vault, \u0433\u0434\u0435 Scenarist \u0445\u0440\u0430\u043D\u0438\u0442 \u0437\u0430\u043C\u0435\u0442\u043A\u0438",
+    rootFolderChanged: "\u041A\u043E\u0440\u043D\u0435\u0432\u0430\u044F \u043F\u0430\u043F\u043A\u0430 \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0430. \u0412\u044B\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \xAB\u041F\u0435\u0440\u0435\u0441\u043A\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u0442\u044C vault\xBB, \u0447\u0442\u043E\u0431\u044B \u043E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u043F\u0443\u0442\u0438 \u0444\u0430\u0439\u043B\u043E\u0432.",
     autoCreate: "\u0410\u0432\u0442\u043E\u0441\u043E\u0437\u0434\u0430\u043D\u0438\u0435 \u0437\u0430\u043C\u0435\u0442\u043E\u043A",
     autoCreateDesc: "\u0421\u043E\u0437\u0434\u0430\u0432\u0430\u0442\u044C .md-\u0437\u0430\u043C\u0435\u0442\u043A\u0443 \u043F\u0440\u0438 \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u0438 \u0441\u0443\u0449\u043D\u043E\u0441\u0442\u0438",
     quickTypes: "\u0411\u044B\u0441\u0442\u0440\u044B\u0435 \u0442\u0438\u043F\u044B \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0439",
@@ -374,6 +381,32 @@ var ru = {
     newCategory: "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
     rescanVault: "\u041F\u0435\u0440\u0435\u0441\u043A\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u0442\u044C vault (\u043E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u043F\u0443\u0442\u0438 \u0444\u0430\u0439\u043B\u043E\u0432)",
     ribbon: "Scenarist"
+  },
+  sync: {
+    linksRestoredNotice: "\u0421\u0432\u044F\u0437\u0438 \u0440\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u044E\u0442\u0441\u044F \u0432 \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0435 Scenarist \u2014 \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043E\u0442\u043C\u0435\u043D\u0435\u043D\u043E.",
+    fallbackProject: "_\u0411\u0435\u0437 \u043F\u0440\u043E\u0435\u043A\u0442\u0430",
+    fallbackName: "\u0411\u0435\u0437 \u0438\u043C\u0435\u043D\u0438",
+    fallbackWork: "_\u0411\u0435\u0437 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F",
+    fallbackCategory: "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F",
+    folders: {
+      books: "\u041A\u043D\u0438\u0433\u0438",
+      arcs: "\u0410\u0440\u043A\u0438",
+      anchors: "\u042F\u043A\u043E\u0440\u044F",
+      chapters: "\u0413\u043B\u0430\u0432\u044B",
+      pages: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u044B",
+      characters: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438"
+    }
+  },
+  templates: {
+    project: "# {{name}}\n\n## \u041E \u043F\u0440\u043E\u0435\u043A\u0442\u0435\n> *\u0427\u0442\u043E \u044D\u0442\u043E \u0437\u0430 \u0432\u0441\u0435\u043B\u0435\u043D\u043D\u0430\u044F / \u0441\u0431\u043E\u0440\u043D\u0438\u043A \u0438\u0441\u0442\u043E\u0440\u0438\u0439.*\n\n## \u0417\u0430\u043C\u0435\u0442\u043A\u0438\n- \n",
+    work: "# {{name}}\n\n## \u041B\u043E\u0433\u043B\u0430\u0439\u043D\n> *\u041E\u0434\u043D\u043E \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435, \u043E \u0447\u0451\u043C \u044D\u0442\u043E.*\n\n## \u0422\u0435\u043C\u044B\n- \n",
+    book: "# {{name}}\n\n## \u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441\n\n## \u0418\u0434\u0435\u044F\n\n",
+    arc: "# {{name}}\n\n## \u0426\u0435\u043B\u044C \u0430\u0440\u043A\u0438\n\n## \u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435\n\n## \u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F\n- \n",
+    anchor: "# {{name}}\n\n## \u0427\u0442\u043E \u043F\u0440\u043E\u0438\u0441\u0445\u043E\u0434\u0438\u0442\n> *\u0421\u0443\u0442\u044C \u043A\u043B\u044E\u0447\u0435\u0432\u043E\u0433\u043E \u0441\u043E\u0431\u044B\u0442\u0438\u044F.*\n\n## \u041F\u043E\u0441\u043B\u0435\u0434\u0441\u0442\u0432\u0438\u044F\n- \n",
+    chapter: "# {{name}}\n\n## \u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441\n\n---\n\n## \u0421\u0446\u0435\u043D\u0430\n\n> *\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043E\u0431\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0438.*\n\n",
+    page: "# {{name}}\n\n> *\u0421\u043E\u0434\u0435\u0440\u0436\u0438\u043C\u043E\u0435 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B / \u0440\u0430\u0441\u043A\u0430\u0434\u0440\u043E\u0432\u043A\u0430.*\n\n",
+    categoryItem: "# {{name}}\n\n## \u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435\n\n## \u0414\u0435\u0442\u0430\u043B\u0438\n\n",
+    character: "## \u0421\u0435\u043C\u044C\u044F \u0438 \u043E\u0442\u043D\u043E\u0448\u0435\u043D\u0438\u044F\n\n\n## \u041D\u0430\u0441\u0442\u043E\u044F\u0449\u0435\u0435 \u0438\u043C\u044F\n\n\n## \u041C\u0435\u0441\u0442\u043E \u0438 \u0434\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F\n\n\n## \u0414\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u043E\n\n"
   },
   board: {
     title: "\u0414\u043E\u0441\u043A\u0430 \u0433\u043B\u0430\u0432",
@@ -594,6 +627,7 @@ var en = {
     nothingFound: "Nothing found",
     noItems: "No {{label}}. Click + to create.",
     openSettings: "Scenarist settings",
+    openSettingsManual: "Open Settings \u2192 Scenarist manually",
     noProject: "\u2014 No project",
     createProject: "Create project",
     newProject: "New project",
@@ -603,6 +637,10 @@ var en = {
     openNote: "Open note",
     delete: "Delete",
     deleted: "Deleted: {{name}}",
+    deleteConfirmTitle: 'Delete "{{name}}"?',
+    deleteConfirmText: "The file will be moved to trash. Scenarist data will be permanently deleted.",
+    deleteConfirmTextCategory: "This will delete {{count}} items. Files will be moved to trash. Scenarist data will be permanently deleted.",
+    deleteConfirmBtn: "Delete",
     createWork: "Create work",
     createCharacter: "Create character",
     createFor: "Create: {{label}}",
@@ -724,6 +762,7 @@ var en = {
     general: "General",
     rootFolder: "Root folder",
     rootFolderDesc: "Folder in vault where Scenarist stores notes",
+    rootFolderChanged: 'Root folder changed. Run "Rescan vault" to update file paths.',
     autoCreate: "Auto-create notes",
     autoCreateDesc: "Create a .md note when adding an entity",
     quickTypes: "Quick category types",
@@ -745,6 +784,32 @@ var en = {
     newCategory: "New category",
     rescanVault: "Rescan vault (update file paths)",
     ribbon: "Scenarist"
+  },
+  sync: {
+    linksRestoredNotice: "Links are managed in the Scenarist card \u2014 edit reverted.",
+    fallbackProject: "_No project",
+    fallbackName: "Unnamed",
+    fallbackWork: "_No work",
+    fallbackCategory: "Category",
+    folders: {
+      books: "Books",
+      arcs: "Arcs",
+      anchors: "Anchors",
+      chapters: "Chapters",
+      pages: "Pages",
+      characters: "Characters"
+    }
+  },
+  templates: {
+    project: "# {{name}}\n\n## About\n> *What is this universe / story collection about.*\n\n## Notes\n- \n",
+    work: "# {{name}}\n\n## Logline\n> *One sentence about what this is.*\n\n## Themes\n- \n",
+    book: "# {{name}}\n\n## Synopsis\n\n## Idea\n\n",
+    arc: "# {{name}}\n\n## Arc goal\n\n## Description\n\n## Key events\n- \n",
+    anchor: "# {{name}}\n\n## What happens\n> *The essence of the key event.*\n\n## Consequences\n- \n",
+    chapter: "# {{name}}\n\n## Synopsis\n\n---\n\n## Scene\n\n> *Setting description.*\n\n",
+    page: "# {{name}}\n\n> *Page content / storyboard.*\n\n",
+    categoryItem: "# {{name}}\n\n## Description\n\n## Details\n\n",
+    character: "## Family & relationships\n\n\n## Real name\n\n\n## Place & date of birth\n\n\n## Additional\n\n"
   },
   board: {
     title: "Chapter board",
@@ -774,9 +839,9 @@ var LOCALES = { ru, en };
 var translations = ru;
 var currentLang = "ru";
 function detectLang() {
-  var _a, _b, _c, _d;
-  const locale = (_c = (_b = (_a = window.moment) == null ? void 0 : _a.locale) == null ? void 0 : _b.call(_a)) != null ? _c : "en";
-  return (_d = Object.keys(LOCALES).find((l) => locale.startsWith(l))) != null ? _d : "en";
+  var _a, _b, _c, _d, _e, _f, _g;
+  const locale = (_f = (_e = (_b = (_a = window.app) == null ? void 0 : _a.getLanguage) == null ? void 0 : _b.call(_a)) != null ? _e : (_d = (_c = window.moment) == null ? void 0 : _c.locale) == null ? void 0 : _d.call(_c)) != null ? _f : "en";
+  return (_g = Object.keys(LOCALES).find((l) => locale.startsWith(l))) != null ? _g : "en";
 }
 function setLocale(lang) {
   var _a;
@@ -833,12 +898,13 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: t("settings.title") });
-    containerEl.createEl("h3", { text: t("settings.general") });
+    new import_obsidian.Setting(containerEl).setName(t("settings.title")).setHeading();
+    new import_obsidian.Setting(containerEl).setName(t("settings.general")).setHeading();
     new import_obsidian.Setting(containerEl).setName(t("settings.rootFolder")).setDesc(t("settings.rootFolderDesc")).addText(
       (text) => text.setPlaceholder("Scenarist").setValue(this.plugin.settings.rootFolder).onChange(async (value) => {
         this.plugin.settings.rootFolder = value.trim() || "Scenarist";
         await this.plugin.saveSettings();
+        new import_obsidian.Notice(t("settings.rootFolderChanged"));
       })
     );
     new import_obsidian.Setting(containerEl).setName(t("settings.autoCreate")).setDesc(t("settings.autoCreateDesc")).addToggle(
@@ -847,7 +913,7 @@ var ScenaristSettingsTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       })
     );
-    containerEl.createEl("h3", { text: t("settings.quickTypes") });
+    new import_obsidian.Setting(containerEl).setName(t("settings.quickTypes")).setHeading();
     containerEl.createEl("p", {
       cls: "setting-item-description",
       text: t("settings.quickTypesDesc")
@@ -1096,6 +1162,12 @@ var nanoid = (size = 21) => crypto.getRandomValues(new Uint8Array(size)).reduce(
 // src/models/types.ts
 var INDEX_VERSION = 2;
 var NO_PROJECT = "__none__";
+function isValidEntity(data) {
+  if (!data || typeof data !== "object")
+    return false;
+  const d = data;
+  return typeof d.id === "string" && d.id.length > 0 && typeof d.kind === "string" && d.kind.length > 0 && typeof d.name === "string" && typeof d.props === "object" && d.props !== null && !Array.isArray(d.props) && typeof d.links === "object" && d.links !== null && !Array.isArray(d.links);
+}
 
 // src/models/schema.ts
 var SCHEMAS = {
@@ -1163,7 +1235,7 @@ var SCHEMAS = {
     label: "schema.book.label",
     labelPlural: "schema.book.labelPlural",
     icon: "book-open",
-    folder: "\u041A\u043D\u0438\u0433\u0438",
+    folder: "sync.folders.books",
     layer: "text",
     titleField: "Name",
     fields: [
@@ -1209,7 +1281,7 @@ var SCHEMAS = {
     label: "schema.arc.label",
     labelPlural: "schema.arc.labelPlural",
     icon: "git-branch",
-    folder: "\u0410\u0440\u043A\u0438",
+    folder: "sync.folders.arcs",
     layer: "text",
     titleField: "Name",
     fields: [
@@ -1229,7 +1301,7 @@ var SCHEMAS = {
     label: "schema.anchor.label",
     labelPlural: "schema.anchor.labelPlural",
     icon: "anchor",
-    folder: "\u042F\u043A\u043E\u0440\u044F",
+    folder: "sync.folders.anchors",
     layer: "text",
     titleField: "Name",
     fields: [
@@ -1249,7 +1321,7 @@ var SCHEMAS = {
     label: "schema.chapter.label",
     labelPlural: "schema.chapter.labelPlural",
     icon: "scroll",
-    folder: "\u0413\u043B\u0430\u0432\u044B",
+    folder: "sync.folders.chapters",
     layer: "text",
     titleField: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
     fields: [
@@ -1280,7 +1352,7 @@ var SCHEMAS = {
     label: "schema.page.label",
     labelPlural: "schema.page.labelPlural",
     icon: "file-text",
-    folder: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u044B",
+    folder: "sync.folders.pages",
     layer: "text",
     titleField: "Name",
     fields: [{ key: "archived", label: "schema.page.fields.archived", type: "checkbox" }],
@@ -1294,7 +1366,7 @@ var SCHEMAS = {
     label: "schema.character.label",
     labelPlural: "schema.character.labelPlural",
     icon: "user",
-    folder: "\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438",
+    folder: "sync.folders.characters",
     layer: "world",
     titleField: "Name",
     fields: [
@@ -1551,6 +1623,8 @@ var ScenaristStore = class {
     this.activeProjectId = NO_PROJECT;
     this.listeners = [];
     this.saveTimer = null;
+    /** Ids сущностей, изменённых с последнего save — пишем sidecar только для них. */
+    this.dirtyIds = /* @__PURE__ */ new Set();
     // ---- Вторичные индексы ----
     /** kind → Set<id> */
     this.byKindIndex = /* @__PURE__ */ new Map();
@@ -1641,6 +1715,7 @@ var ScenaristStore = class {
     this.entities.set(entity.id, entity);
     this.indexAdd(entity);
     this.attachToActiveProject(entity);
+    this.dirtyIds.add(entity.id);
     this.scheduleSave();
     this.notify();
     return entity;
@@ -1659,6 +1734,7 @@ var ScenaristStore = class {
     this.entities.set(p.id, p);
     this.indexAdd(p);
     this.activeProjectId = p.id;
+    this.dirtyIds.add(p.id);
     this.scheduleSave();
     this.notify();
     return p;
@@ -1696,6 +1772,7 @@ var ScenaristStore = class {
       return;
     e.name = name;
     e.updatedAt = Date.now();
+    this.dirtyIds.add(id);
     this.scheduleSave();
     this.notify();
   }
@@ -1705,6 +1782,7 @@ var ScenaristStore = class {
       return;
     e.props[key] = value;
     e.updatedAt = Date.now();
+    this.dirtyIds.add(id);
     this.scheduleSave();
     this.notify();
   }
@@ -1717,6 +1795,7 @@ var ScenaristStore = class {
     e.filePath = filePath;
     if (filePath)
       this.byPathIndex.set(filePath, id);
+    this.dirtyIds.add(id);
     this.scheduleSave();
   }
   /** Установить связь с поддержкой реципрокности (LinkDef.reverse). */
@@ -1729,6 +1808,7 @@ var ScenaristStore = class {
     const added = targetIds.filter((t2) => !prev.includes(t2));
     e.links[key] = [...targetIds];
     e.updatedAt = Date.now();
+    this.dirtyIds.add(id);
     const def = findLinkDef(e, key, this);
     const reverse = def == null ? void 0 : def.reverse;
     if (reverse) {
@@ -1744,10 +1824,21 @@ var ScenaristStore = class {
     const e = this.entities.get(id);
     if (!e)
       return;
-    const cur = new Set(e.links[key] || []);
-    cur.add(value);
-    e.links[key] = Array.from(cur);
+    const linkDef = this.resolved(e).links.find((l) => l.key === key);
+    if (linkDef == null ? void 0 : linkDef.single) {
+      const prevOwners = (e.links[key] || []).filter((oid) => oid !== value);
+      if (linkDef.reverse) {
+        for (const oid of prevOwners)
+          this.removeReverse(oid, linkDef.reverse, id);
+      }
+      e.links[key] = [value];
+    } else {
+      const cur = new Set(e.links[key] || []);
+      cur.add(value);
+      e.links[key] = Array.from(cur);
+    }
     e.updatedAt = Date.now();
+    this.dirtyIds.add(id);
   }
   removeReverse(id, key, value) {
     const e = this.entities.get(id);
@@ -1755,6 +1846,7 @@ var ScenaristStore = class {
       return;
     e.links[key] = (e.links[key] || []).filter((v) => v !== value);
     e.updatedAt = Date.now();
+    this.dirtyIds.add(id);
   }
   delete(id) {
     const e = this.entities.get(id);
@@ -1780,6 +1872,7 @@ var ScenaristStore = class {
     }
     this.indexRemove(e);
     this.entities.delete(id);
+    this.dirtyIds.delete(id);
     if (this.activeProjectId === id)
       this.activeProjectId = NO_PROJECT;
     this.scheduleSave();
@@ -1794,6 +1887,7 @@ var ScenaristStore = class {
       return;
     this.entities.set(entity.id, entity);
     this.indexAdd(entity);
+    this.dirtyIds.add(entity.id);
     this.scheduleSave();
     this.notify();
   }
@@ -1837,12 +1931,18 @@ var ScenaristStore = class {
       } catch (e) {
         try {
           raw = await adapter.read(LEGACY_INDEX_PATH);
-          console.log("Scenarist: \u043C\u0438\u0433\u0440\u0438\u0440\u0443\u0435\u043C index.json \u0438\u0437 .scenarist/ \u0432 \u043F\u0430\u043F\u043A\u0443 \u043F\u043B\u0430\u0433\u0438\u043D\u0430");
         } catch (e2) {
         }
       }
       if (raw) {
         const data = JSON.parse(raw);
+        if (data.version !== void 0 && data.version > INDEX_VERSION) {
+          console.error(
+            `Scenarist: \u0438\u043D\u0434\u0435\u043A\u0441 \u0432\u0435\u0440\u0441\u0438\u0438 ${data.version} \u043D\u0435 \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u044D\u0442\u043E\u0439 \u0432\u0435\u0440\u0441\u0438\u0435\u0439 \u043F\u043B\u0430\u0433\u0438\u043D\u0430 (\u043E\u0436\u0438\u0434\u0430\u043B\u043E\u0441\u044C \u2264${INDEX_VERSION}). \u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430 \u043E\u0442\u043C\u0435\u043D\u0435\u043D\u0430.`
+          );
+          return;
+        }
+        this.migrateIndex(data);
         this.entities.clear();
         (data.entities || []).forEach((e) => {
           e.props = e.props || {};
@@ -1853,12 +1953,28 @@ var ScenaristStore = class {
         this.migrateCategoryIcons();
       }
       this.rebuildIndexes();
+      this.markAllDirty();
       if (raw)
         await this.save();
     } catch (err) {
       console.error("Scenarist: \u043E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u0438\u043D\u0434\u0435\u043A\u0441\u0430", err);
     }
     this.notify();
+  }
+  /**
+   * Пошаговая миграция формата индекса.
+   * Каждый шаг повышает data.version на 1.
+   * Добавляй новые шаги сюда при изменении структуры ScenaristIndex.
+   */
+  migrateIndex(data) {
+    var _a;
+    const prev = (_a = data.version) != null ? _a : 1;
+    if (data.version !== INDEX_VERSION) {
+      data.version = INDEX_VERSION;
+      if (prev !== INDEX_VERSION) {
+        console.log(`Scenarist: \u0438\u043D\u0434\u0435\u043A\u0441 \u043C\u0438\u0433\u0440\u0438\u0440\u043E\u0432\u0430\u043D \u0441 \u0432\u0435\u0440\u0441\u0438\u0438 ${prev} \u0434\u043E ${INDEX_VERSION}`);
+      }
+    }
   }
   /** Мигрирует старые emoji-иконки в categorySchema.icon → Lucide-имена. */
   migrateCategoryIcons() {
@@ -1899,8 +2015,11 @@ var ScenaristStore = class {
       if (!await adapter.exists(dir))
         await adapter.mkdir(dir);
       await adapter.write(INDEX_PATH, JSON.stringify(index, null, 2));
-      for (const entity of this.entities.values()) {
-        if (entity.filePath) {
+      const dirty = Array.from(this.dirtyIds);
+      this.dirtyIds.clear();
+      for (const id of dirty) {
+        const entity = this.entities.get(id);
+        if (entity == null ? void 0 : entity.filePath) {
           try {
             await adapter.write(this.sidecarPath(entity.filePath), JSON.stringify(entity, null, 2));
           } catch (e) {
@@ -1911,15 +2030,23 @@ var ScenaristStore = class {
       console.error("Scenarist: \u043D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u043D\u0434\u0435\u043A\u0441", e);
     }
   }
+  /** Пометить все сущности как dirty (для полного пересохранения sidecar — миграция, rescan). */
+  markAllDirty() {
+    for (const id of this.entities.keys())
+      this.dirtyIds.add(id);
+  }
   /** Путь к sidecar-файлу рядом с .md заметкой. */
   sidecarPath(filePath) {
+    if (filePath.endsWith(".sc"))
+      return filePath;
     return filePath.replace(/\.md$/, ".sc");
   }
-  /** Прочитать sidecar-файл и вернуть Entity, или null если его нет. */
+  /** Прочитать sidecar-файл и вернуть Entity, или null если его нет или невалиден. */
   async readSidecar(filePath) {
     try {
       const raw = await this.plugin.app.vault.adapter.read(this.sidecarPath(filePath));
-      return JSON.parse(raw);
+      const data = JSON.parse(raw);
+      return isValidEntity(data) ? data : null;
     } catch (e) {
       return null;
     }
@@ -1937,96 +2064,27 @@ var import_obsidian2 = require("obsidian");
 function bodyTemplate(kind, name) {
   switch (kind) {
     case "character":
-      return characterBody(name);
+      return t("templates.character");
     case "project":
-      return `# ${name}
-
-## \u041E \u043F\u0440\u043E\u0435\u043A\u0442\u0435
-> *\u0427\u0442\u043E \u044D\u0442\u043E \u0437\u0430 \u0432\u0441\u0435\u043B\u0435\u043D\u043D\u0430\u044F / \u0441\u0431\u043E\u0440\u043D\u0438\u043A \u0438\u0441\u0442\u043E\u0440\u0438\u0439.*
-
-## \u0417\u0430\u043C\u0435\u0442\u043A\u0438
-- 
-`;
+      return t("templates.project", { name });
     case "work":
-      return `# ${name}
-
-## \u041B\u043E\u0433\u043B\u0430\u0439\u043D
-> *\u041E\u0434\u043D\u043E \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435, \u043E \u0447\u0451\u043C \u044D\u0442\u043E.*
-
-## \u0422\u0435\u043C\u044B
-- 
-`;
+      return t("templates.work", { name });
     case "book":
-      return `# ${name}
-
-## \u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441
-
-## \u0418\u0434\u0435\u044F
-
-`;
+      return t("templates.book", { name });
     case "arc":
-      return `# ${name}
-
-## \u0426\u0435\u043B\u044C \u0430\u0440\u043A\u0438
-
-## \u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435
-
-## \u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F
-- 
-`;
+      return t("templates.arc", { name });
     case "anchor":
-      return `# ${name}
-
-## \u0427\u0442\u043E \u043F\u0440\u043E\u0438\u0441\u0445\u043E\u0434\u0438\u0442
-> *\u0421\u0443\u0442\u044C \u043A\u043B\u044E\u0447\u0435\u0432\u043E\u0433\u043E \u0441\u043E\u0431\u044B\u0442\u0438\u044F.*
-
-## \u041F\u043E\u0441\u043B\u0435\u0434\u0441\u0442\u0432\u0438\u044F
-- 
-`;
+      return t("templates.anchor", { name });
     case "chapter":
-      return `# ${name}
-
-## \u0421\u0438\u043D\u043E\u043F\u0441\u0438\u0441
-
----
-
-## \u0421\u0446\u0435\u043D\u0430
-
-> *\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043E\u0431\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0438.*
-
-`;
+      return t("templates.chapter", { name });
     case "page":
-      return `# ${name}
-
-> *\u0421\u043E\u0434\u0435\u0440\u0436\u0438\u043C\u043E\u0435 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B / \u0440\u0430\u0441\u043A\u0430\u0434\u0440\u043E\u0432\u043A\u0430.*
-
-`;
+      return t("templates.page", { name });
     case "categoryItem":
-      return `# ${name}
-
-## \u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435
-
-## \u0414\u0435\u0442\u0430\u043B\u0438
-
-`;
+      return t("templates.categoryItem", { name });
     default:
       return `# ${name}
 `;
   }
-}
-function characterBody(_name) {
-  return `## \u0421\u0435\u043C\u044C\u044F \u0438 \u043E\u0442\u043D\u043E\u0448\u0435\u043D\u0438\u044F
-
-
-## \u041D\u0430\u0441\u0442\u043E\u044F\u0449\u0435\u0435 \u0438\u043C\u044F
-
-
-## \u041C\u0435\u0441\u0442\u043E \u0438 \u0434\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F
-
-
-## \u0414\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u043E
-
-`;
 }
 
 // src/sync/SyncEngine.ts
@@ -2036,7 +2094,8 @@ var SyncEngine = class {
      * Пути файлов, куда плагин сам только что записал через processFrontMatter.
      * Используется для подавления ложных срабатываний handleModify.
      */
-    this.selfWrites = /* @__PURE__ */ new Set();
+    /** path → timestamp ms of write; ignored in handleModify only if < 1500 ms old */
+    this.selfWrites = /* @__PURE__ */ new Map();
     this.plugin = plugin;
   }
   get store() {
@@ -2083,10 +2142,10 @@ var SyncEngine = class {
       pid = w ? (w.links["project"] || [])[0] || null : null;
     }
     const p = pid ? this.store.get(pid) : null;
-    return p ? this.safe(p.name) : "_\u0411\u0435\u0437 \u043F\u0440\u043E\u0435\u043A\u0442\u0430";
+    return p ? this.safe(p.name) : t("sync.fallbackProject");
   }
   safe(name) {
-    return name.replace(/[\\/:*?"<>|]/g, "-").trim() || "\u0411\u0435\u0437 \u0438\u043C\u0435\u043D\u0438";
+    return name.replace(/[\\/:*?"<>|]/g, "-").trim() || t("sync.fallbackName");
   }
   /** Путь к заметке сущности. */
   buildPath(entity) {
@@ -2100,24 +2159,33 @@ var SyncEngine = class {
       case "work":
         return (0, import_obsidian2.normalizePath)(`${projFolder}/${name}/${name}.md`);
       case "character":
-        return (0, import_obsidian2.normalizePath)(`${projFolder}/\u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438/${name}.md`);
+        return (0, import_obsidian2.normalizePath)(`${projFolder}/${t("sync.folders.characters")}/${name}.md`);
       case "category":
         return (0, import_obsidian2.normalizePath)(`${projFolder}/${name}/${name}.md`);
       case "categoryItem": {
         const cat = this.single(entity.links["category"]);
-        const catName = cat ? this.safe(cat.name) : "\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F";
+        const catName = cat ? this.safe(cat.name) : t("sync.fallbackCategory");
         return (0, import_obsidian2.normalizePath)(`${projFolder}/${catName}/${name}.md`);
       }
       default: {
         const work = this.ownerWork(entity);
-        const workName = work ? this.safe(work.name) : "_\u0411\u0435\u0437 \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0435\u043D\u0438\u044F";
-        const folder = SCHEMAS[entity.kind].folder;
+        const workName = work ? this.safe(work.name) : t("sync.fallbackWork");
+        const folder = t(SCHEMAS[entity.kind].folder);
         return (0, import_obsidian2.normalizePath)(`${projFolder}/${workName}/${folder}/${name}.md`);
       }
     }
   }
   async ensureNote(entity) {
-    const path = this.buildPath(entity);
+    const basePath = this.buildPath(entity);
+    let path = basePath;
+    let suffix = 2;
+    while (true) {
+      const occupant = this.store.findByPath(path);
+      if (!occupant || occupant.id === entity.id)
+        break;
+      path = (0, import_obsidian2.normalizePath)(`${basePath.replace(/\.md$/, "")} (${suffix}).md`);
+      suffix++;
+    }
     this.store.setFilePath(entity.id, path);
     let file = this.vault.getAbstractFileByPath(path);
     if (!file) {
@@ -2138,7 +2206,7 @@ var SyncEngine = class {
     const file = fileArg != null ? fileArg : entity.filePath ? this.vault.getAbstractFileByPath(entity.filePath) : null;
     if (!(file instanceof import_obsidian2.TFile))
       return;
-    this.selfWrites.add(file.path);
+    this.selfWrites.set(file.path, Date.now());
     await this.plugin.app.fileManager.processFrontMatter(file, (fm) => {
       fm["scenarist_id"] = entity.id;
       fm["kind"] = entity.kind;
@@ -2164,6 +2232,42 @@ var SyncEngine = class {
       }
     });
   }
+  /**
+   * Переименовывает сущность и переносит её файл (и папку для контейнеров).
+   * `fileManager.renameFile` сохраняет wikilinks и запускает handleRename,
+   * который обновит filePath и sidecar автоматически.
+   */
+  async renameEntity(id, newName) {
+    const entity = this.store.get(id);
+    if (!entity)
+      return;
+    const oldPath = entity.filePath;
+    this.store.rename(id, newName);
+    const newPath = this.buildPath(entity);
+    if (oldPath) {
+      const isContainer = entity.kind === "project" || entity.kind === "work" || entity.kind === "category";
+      if (isContainer) {
+        const oldFolder = oldPath.split("/").slice(0, -1).join("/");
+        const newFolder = newPath.split("/").slice(0, -1).join("/");
+        if (oldFolder !== newFolder) {
+          const folder = this.vault.getAbstractFileByPath(oldFolder);
+          if (folder) {
+            await this.plugin.app.fileManager.renameFile(folder, newFolder);
+            return;
+          }
+        }
+      }
+      const oldFile = this.vault.getAbstractFileByPath(oldPath);
+      if (oldFile instanceof import_obsidian2.TFile) {
+        await this.ensureFolder(newPath);
+        await this.plugin.app.fileManager.renameFile(oldFile, newPath);
+      } else {
+        this.store.setFilePath(id, newPath);
+      }
+    } else {
+      this.store.setFilePath(id, newPath);
+    }
+  }
   async openNote(entity) {
     const file = await this.ensureNote(entity);
     if (file)
@@ -2187,6 +2291,10 @@ var SyncEngine = class {
         if (file instanceof import_obsidian2.TFile) {
           await this.plugin.app.fileManager.trashFile(file);
         }
+        const scFile = this.vault.getAbstractFileByPath(this.store.sidecarPath(e.filePath));
+        if (scFile instanceof import_obsidian2.TFile) {
+          await this.plugin.app.fileManager.trashFile(scFile);
+        }
       }
     }
     this.store.delete(id);
@@ -2197,9 +2305,13 @@ var SyncEngine = class {
    */
   handleModify(file) {
     var _a, _b;
-    if (this.selfWrites.has(file.path)) {
-      this.selfWrites.delete(file.path);
+    if (file.extension !== "md")
       return;
+    const ts = this.selfWrites.get(file.path);
+    if (ts !== void 0) {
+      this.selfWrites.delete(file.path);
+      if (Date.now() - ts < 1500)
+        return;
     }
     const entity = this.store.findByPath(file.path);
     if (!entity)
@@ -2207,9 +2319,9 @@ var SyncEngine = class {
     const fm = (_a = this.plugin.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
     if (!fm)
       return;
-    const fields = this.store.resolved(entity).fields;
+    const schema = this.store.resolved(entity);
     let changed = false;
-    for (const field of fields) {
+    for (const field of schema.fields) {
       if (field.key in fm && entity.props[field.key] !== fm[field.key]) {
         entity.props[field.key] = (_b = fm[field.key]) != null ? _b : null;
         changed = true;
@@ -2217,8 +2329,23 @@ var SyncEngine = class {
     }
     if (changed)
       void this.store.save();
+    for (const link of schema.links) {
+      if (link.key === "project" || !(link.key in fm))
+        continue;
+      const ids = entity.links[link.key] || [];
+      const expected = ids.map((id) => this.store.get(id)).filter((e) => !!e).map((e) => `[[${e.name}]]`);
+      const actual = fm[link.key];
+      const actualArr = Array.isArray(actual) ? actual.map(String) : actual != null ? [String(actual)] : [];
+      if (JSON.stringify([...expected].sort()) !== JSON.stringify([...actualArr].sort())) {
+        new import_obsidian2.Notice(t("sync.linksRestoredNotice"));
+        void this.syncToNote(entity);
+        break;
+      }
+    }
   }
   handleRename(file, oldPath) {
+    if (file.extension !== "md")
+      return;
     const entity = this.store.findByPath(oldPath);
     if (!entity)
       return;
@@ -2238,6 +2365,8 @@ var SyncEngine = class {
    * MetadataCache может ещё не проиндексировать файл, поэтому откладываем на 600 мс.
    */
   handleCreate(file) {
+    if (file.extension !== "md")
+      return;
     window.setTimeout(() => void this.processCreatedFile(file), 600);
   }
   /**
@@ -2275,6 +2404,7 @@ var SyncEngine = class {
       }
     }
     if (changed) {
+      this.store.markAllDirty();
       void this.store.save();
       this.plugin.refreshViews();
     }
@@ -2441,8 +2571,9 @@ var ScenaristState = class {
     this.listeners.forEach((fn) => fn());
   }
   // ---- сброс ----
-  /** Вызывается при onunload: немедленно сохраняем settings без debounce. */
-  flushSave() {
+  /** Вызывается при onunload: отменяет debounce-таймер сохранения настроек.
+   * Фактическое сохранение делает onunload → saveSettings(). */
+  cancelPendingSave() {
     if (this.saveTimer !== null) {
       window.clearTimeout(this.saveTimer);
       this.saveTimer = null;
@@ -2768,7 +2899,11 @@ var CreateCategoryModal = class extends import_obsidian5.Modal {
 
 // src/views/NavigatorView.ts
 var NAVIGATOR_VIEW = "scenarist-navigator";
-var CHAR_ROLES = ["\u0413\u043B\u0430\u0432\u043D\u0430\u044F", "\u041A\u043B\u044E\u0447\u0435\u0432\u0430\u044F", "\u0412\u0442\u043E\u0440\u043E\u0441\u0442\u0435\u043F\u0435\u043D\u043D\u0430\u044F", "\u042D\u043F\u0438\u0437\u043E\u0434\u0438\u0447\u0435\u0441\u043A\u0430\u044F"];
+var CHAR_ROLES = (() => {
+  var _a, _b;
+  const roleField = SCHEMAS.character.fields.find((f) => f.key === "role");
+  return (_b = (_a = roleField == null ? void 0 : roleField.options) == null ? void 0 : _a.map((o) => o.value)) != null ? _b : [];
+})();
 var ENTITY_ICON = {
   work: "pen-line",
   book: "book-open",
@@ -2781,6 +2916,41 @@ var ENTITY_ICON = {
   category: "tag",
   categoryItem: "circle-dot"
 };
+var ConfirmDeleteModal = class extends import_obsidian6.Modal {
+  constructor(plugin, entity, onConfirm) {
+    super(plugin.app);
+    this.entity = entity;
+    this.itemCount = entity.kind === "category" ? plugin.store.categoryItems(entity.id).length : 0;
+    this.onConfirm = onConfirm;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.addClass("scenarist-modal");
+    contentEl.createEl("p", {
+      cls: "scenarist-modal-title",
+      text: t("nav.deleteConfirmTitle", { name: this.entity.name })
+    });
+    const desc = this.entity.kind === "category" && this.itemCount > 0 ? t("nav.deleteConfirmTextCategory", { count: String(this.itemCount) }) : t("nav.deleteConfirmText");
+    contentEl.createEl("p", { text: desc });
+    const buttons = contentEl.createDiv("scenarist-modal-buttons");
+    const delBtn = buttons.createEl("button", {
+      cls: "scenarist-btn mod-warning",
+      text: t("nav.deleteConfirmBtn")
+    });
+    delBtn.addEventListener("click", async () => {
+      this.close();
+      await this.onConfirm();
+    });
+    const cancelBtn = buttons.createEl("button", {
+      cls: "scenarist-btn",
+      text: t("modal.cancel")
+    });
+    cancelBtn.addEventListener("click", () => this.close());
+  }
+  onClose() {
+    this.contentEl.empty();
+  }
+};
 var NavigatorView = class extends import_obsidian6.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
@@ -2788,6 +2958,8 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     this.expanded = /* @__PURE__ */ new Set();
     this.search = "";
     this.tab = "work";
+    this.renderTimer = null;
+    this.searchTimer = null;
     this.plugin = plugin;
   }
   getViewType() {
@@ -2800,15 +2972,27 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     return "film";
   }
   async onOpen() {
-    this.unsub.push(this.plugin.store.onChange(() => this.render()));
-    this.unsub.push(this.plugin.onSelect(() => this.render()));
+    this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
+    this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
     this.render();
   }
   async onClose() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
+    if (this.searchTimer !== null)
+      window.clearTimeout(this.searchTimer);
     this.unsub.forEach((u) => u());
   }
   refresh() {
     this.render();
+  }
+  scheduleRender() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
+    this.renderTimer = window.setTimeout(() => {
+      this.renderTimer = null;
+      this.render();
+    }, 50);
   }
   get store() {
     return this.plugin.store;
@@ -2885,7 +3069,12 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     input.value = this.search;
     input.oninput = () => {
       this.search = input.value;
-      this.render();
+      if (this.searchTimer !== null)
+        window.clearTimeout(this.searchTimer);
+      this.searchTimer = window.setTimeout(() => {
+        this.searchTimer = null;
+        this.render();
+      }, 150);
     };
   }
   // ── результаты поиска по всем разделам ─────────────────────────────────────
@@ -2901,8 +3090,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     const chars = this.store.byKindForProject("character").filter((c) => this.matches(c));
     if (chars.length > 0) {
       this.searchSectionTitle(body, t("nav.characters"));
-      const pills = body.createDiv("scenarist-pills");
-      pills.style.paddingLeft = "12px";
+      const pills = body.createDiv("scenarist-pills scenarist-pills-indent");
       for (const ch of chars)
         this.renderPill(pills, ch);
       totalFound += chars.length;
@@ -2951,10 +3139,17 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     (0, import_obsidian6.setIcon)(gear, "settings");
     gear.setAttribute("aria-label", t("nav.openSettings"));
     gear.onclick = () => {
-      const setting = this.app.setting;
-      if (setting) {
-        setting.open();
-        setting.openTabById(this.plugin.manifest.id);
+      var _a;
+      try {
+        const setting = this.app.setting;
+        if (setting == null ? void 0 : setting.open) {
+          setting.open();
+          (_a = setting.openTabById) == null ? void 0 : _a.call(setting, this.plugin.manifest.id);
+        } else {
+          new import_obsidian6.Notice(t("nav.openSettingsManual"));
+        }
+      } catch (e) {
+        new import_obsidian6.Notice(t("nav.openSettingsManual"));
       }
     };
     const sel = bar.createEl("select", { cls: "scenarist-work-select" });
@@ -2991,7 +3186,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     });
     if ([...icon].length <= 2) {
       b.textContent = icon;
-      b.style.fontSize = "15px";
+      b.addClass("scenarist-emoji-icon");
     } else {
       (0, import_obsidian6.setIcon)(b, icon);
     }
@@ -3228,7 +3423,7 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     if (entity.kind === "chapter") {
       const opt = (_b = (_a = SCHEMAS.chapter.fields.find((f) => f.key === "status")) == null ? void 0 : _a.options) == null ? void 0 : _b.find((o) => o.value === entity.props["status"]);
       const dot = pill.createEl("span", { cls: "scenarist-pill-dot" });
-      dot.style.background = opt ? opt.color : "#555";
+      dot.style.setProperty("--dot-color", opt ? opt.color : "#555");
     }
     pill.createEl("span", { text: entity.name });
     pill.onclick = () => void this.plugin.openEntity(entity.id);
@@ -3268,9 +3463,11 @@ var NavigatorView = class extends import_obsidian6.ItemView {
     );
     menu.addSeparator();
     menu.addItem(
-      (i) => i.setTitle(t("nav.delete")).setIcon("trash").onClick(async () => {
-        await this.plugin.sync.deleteEntity(entity.id);
-        new import_obsidian6.Notice(t("nav.deleted", { name: entity.name }));
+      (i) => i.setTitle(t("nav.delete")).setIcon("trash").onClick(() => {
+        new ConfirmDeleteModal(this.plugin, entity, async () => {
+          await this.plugin.sync.deleteEntity(entity.id);
+          new import_obsidian6.Notice(t("nav.deleted", { name: entity.name }));
+        }).open();
       })
     );
     menu.showAtMouseEvent(e);
@@ -3292,6 +3489,8 @@ var CardView = class extends import_obsidian7.FileView {
     this._charTab = "basic";
     /** Если задан — вкладка закреплена за конкретной сущностью (не следит за навигатором). */
     this.pinnedId = null;
+    /** Cleanup fn for any open lightbox (removes overlay + keydown listener). */
+    this._closeLightbox = null;
     this.plugin = plugin;
   }
   getViewType() {
@@ -3324,7 +3523,9 @@ var CardView = class extends import_obsidian7.FileView {
     this.render();
   }
   async onClose() {
+    var _a;
     this.unsub.forEach((u) => u());
+    (_a = this._closeLightbox) == null ? void 0 : _a.call(this);
   }
   refresh() {
     this.render();
@@ -3443,8 +3644,7 @@ var CardView = class extends import_obsidian7.FileView {
       trail.createEl("span", { cls: "scenarist-crumb-sep", text: "/" });
     });
     trail.createEl("span", { cls: "scenarist-crumb current", text: t(schema.label, void 0, schema.label) });
-    const spacer = top.createDiv();
-    spacer.style.flex = "1";
+    const spacer = top.createDiv("scenarist-flex-spacer");
     const openBtn = top.createEl("button", { cls: "scenarist-card-note-btn", attr: { title: t("card.openNote") } });
     (0, import_obsidian7.setIcon)(openBtn, "external-link");
     openBtn.createEl("span", { text: t("card.noteLabel") });
@@ -3458,8 +3658,7 @@ var CardView = class extends import_obsidian7.FileView {
     title.onchange = () => {
       const v = title.value.trim();
       if (v && v !== entity.name) {
-        this.plugin.store.rename(entity.id, v);
-        this.plugin.sync.syncToNote(this.plugin.store.get(entity.id));
+        void this.plugin.sync.renameEntity(entity.id, v);
       }
     };
     if (entity.kind === "character") {
@@ -3493,7 +3692,7 @@ var CardView = class extends import_obsidian7.FileView {
     }
     const addBtn = row.createEl("button", { cls: "scenarist-tag-add", text: t("card.addTag") });
     addBtn.onclick = () => {
-      addBtn.style.display = "none";
+      addBtn.addClass("is-hidden");
       const inp = row.createEl("input", { cls: "scenarist-tag-input" });
       inp.placeholder = t("card.tagPlaceholder");
       inp.focus();
@@ -3509,7 +3708,7 @@ var CardView = class extends import_obsidian7.FileView {
         }
         if (e.key === "Escape") {
           inp.remove();
-          addBtn.style.display = "";
+          addBtn.removeClass("is-hidden");
         }
       });
       inp.addEventListener("blur", commit);
@@ -3538,8 +3737,7 @@ var CardView = class extends import_obsidian7.FileView {
     const row = section.createDiv("scenarist-prop");
     row.createEl("div", { cls: "scenarist-prop-label", text: t("card.noteLinks") });
     const valWrap = row.createDiv("scenarist-prop-value");
-    const chipRow = valWrap.createDiv("scenarist-card-tags scenarist-link-chips");
-    chipRow.style.margin = "0";
+    const chipRow = valWrap.createDiv("scenarist-card-tags scenarist-link-chips scenarist-no-margin");
     const commitLinks = (newLinks) => {
       const val = newLinks.length ? newLinks.map((l) => `[[${l}]]`).join(", ") : null;
       this.commitProp(entity, "backlinks", val);
@@ -3560,10 +3758,9 @@ var CardView = class extends import_obsidian7.FileView {
     }
     const addBtn = chipRow.createEl("button", { cls: "scenarist-tag-add", text: t("card.addLink") });
     addBtn.onclick = () => {
-      addBtn.style.display = "none";
-      const inp = chipRow.createEl("input", { cls: "scenarist-tag-input" });
+      addBtn.addClass("is-hidden");
+      const inp = chipRow.createEl("input", { cls: "scenarist-tag-input scenarist-link-input" });
       inp.placeholder = t("card.linkPlaceholder");
-      inp.style.width = "160px";
       inp.focus();
       const commit = () => {
         const val = inp.value.trim().replace(/^\[\[|\]\]$/g, "");
@@ -3575,7 +3772,7 @@ var CardView = class extends import_obsidian7.FileView {
           commit();
         if (e.key === "Escape") {
           inp.remove();
-          addBtn.style.display = "";
+          addBtn.removeClass("is-hidden");
         }
       });
       inp.addEventListener("blur", commit);
@@ -3592,8 +3789,7 @@ var CardView = class extends import_obsidian7.FileView {
       const selected = val ? String(val).split(",").map((v) => v.trim()).filter(Boolean) : [];
       const settingsOpts = ((_a = this.plugin.settings.genreOptions) == null ? void 0 : _a.length) ? this.plugin.settings.genreOptions : (field.options || []).map((o) => o.value);
       const optMap = new Map((field.options || []).map((o) => [o.value, o.color]));
-      const chipRow = wrap.createDiv("scenarist-card-tags scenarist-genre-chips");
-      chipRow.style.margin = "0";
+      const chipRow = wrap.createDiv("scenarist-card-tags scenarist-genre-chips scenarist-no-margin");
       const commitGenres = (next) => this.commitProp(entity, field.key, next.length ? next.join(", ") : null);
       const renderChips = () => {
         chipRow.empty();
@@ -3614,7 +3810,7 @@ var CardView = class extends import_obsidian7.FileView {
           if (!sel.value)
             return;
           if (sel.value === "__new__") {
-            sel.style.display = "none";
+            sel.addClass("is-hidden");
             const inp = chipRow.createEl("input", { cls: "scenarist-tag-input" });
             inp.placeholder = t("card.newGenrePlaceholder");
             inp.focus();
@@ -3632,7 +3828,7 @@ var CardView = class extends import_obsidian7.FileView {
                 }
               } else {
                 sel.value = "";
-                sel.style.display = "";
+                sel.removeClass("is-hidden");
                 renderChips();
               }
             };
@@ -3642,7 +3838,7 @@ var CardView = class extends import_obsidian7.FileView {
               }
               if (e.key === "Escape") {
                 inp.remove();
-                sel.style.display = "";
+                sel.removeClass("is-hidden");
                 sel.value = "";
               }
             });
@@ -3667,16 +3863,14 @@ var CardView = class extends import_obsidian7.FileView {
       });
       if (!val && ((_b = field.options) == null ? void 0 : _b.length)) {
         sel.value = field.options[0].value;
-        queueMicrotask(() => this.commitProp(entity, field.key, field.options[0].value));
       }
       const updateDot = () => {
         const opt = (field.options || []).find((o) => o.value === sel.value);
         if (opt) {
-          dot.style.background = opt.color;
-          dot.style.opacity = "1";
+          dot.style.setProperty("--dot-color", opt.color);
+          dot.removeClass("scenarist-dot-hidden");
         } else {
-          dot.style.background = "transparent";
-          dot.style.opacity = "0";
+          dot.addClass("scenarist-dot-hidden");
         }
       };
       updateDot();
@@ -3929,16 +4123,20 @@ var CardView = class extends import_obsidian7.FileView {
   }
   // ---- лайтбокс ----
   openLightbox(url) {
+    var _a;
+    (_a = this._closeLightbox) == null ? void 0 : _a.call(this);
     const overlay = document.createElement("div");
     overlay.className = "scenarist-lightbox";
     const close = () => {
       overlay.remove();
       document.removeEventListener("keydown", onKey);
+      this._closeLightbox = null;
     };
     const onKey = (e) => {
       if (e.key === "Escape")
         close();
     };
+    this._closeLightbox = close;
     overlay.onclick = close;
     const img = document.createElement("img");
     img.className = "scenarist-lightbox-img";
@@ -4018,7 +4216,7 @@ var CardView = class extends import_obsidian7.FileView {
         el.toggleClass("is-active", el.dataset.tab === id);
       });
       for (const [key, el] of Object.entries(sections)) {
-        el.style.display = key === id ? "" : "none";
+        el.toggleClass("is-hidden", key !== id);
       }
     };
     for (const tab of tabDefs) {
@@ -4095,12 +4293,18 @@ var CardView = class extends import_obsidian7.FileView {
   openTagSearch(tag) {
     var _a, _b, _c, _d, _e;
     const query = `tag:#${tag}`;
-    const search = (_b = (_a = this.app.internalPlugins) == null ? void 0 : _a.getPluginById) == null ? void 0 : _b.call(_a, "global-search");
-    if ((search == null ? void 0 : search.enabled) && ((_c = search.instance) == null ? void 0 : _c.openGlobalSearch)) {
-      search.instance.openGlobalSearch(query);
-      return;
+    try {
+      const search = (_b = (_a = this.app.internalPlugins) == null ? void 0 : _a.getPluginById) == null ? void 0 : _b.call(_a, "global-search");
+      if ((search == null ? void 0 : search.enabled) && ((_c = search.instance) == null ? void 0 : _c.openGlobalSearch)) {
+        search.instance.openGlobalSearch(query);
+        return;
+      }
+      const opened = (_e = (_d = this.app.commands) == null ? void 0 : _d.executeCommandById) == null ? void 0 : _e.call(_d, "global-search:open");
+      if (!opened)
+        new import_obsidian7.Notice(`tag:#${tag}`);
+    } catch (e) {
+      new import_obsidian7.Notice(`tag:#${tag}`);
     }
-    (_e = (_d = this.app.commands) == null ? void 0 : _d.executeCommandById) == null ? void 0 : _e.call(_d, "global-search:open");
   }
   /**
    * Убирает YAML frontmatter из контента для рендеринга тела заметки.
@@ -4130,14 +4334,16 @@ var EntityFileView = class extends CardView {
     try {
       const raw = await this.app.vault.read(file);
       const data = JSON.parse(raw);
-      if (data.id) {
-        if (!this.plugin.store.get(data.id)) {
-          this.plugin.store.importEntity(data);
-        }
-        this.pinnedId = data.id;
-        this._charTab = "basic";
-        await this.render();
+      if (!isValidEntity(data)) {
+        new import_obsidian7.Notice("Scenarist: invalid .sc file \u2014 " + file.basename);
+        return;
       }
+      if (!this.plugin.store.get(data.id)) {
+        this.plugin.store.importEntity(data);
+      }
+      this.pinnedId = data.id;
+      this._charTab = "basic";
+      await this.render();
     } catch (e) {
     }
   }
@@ -4154,6 +4360,7 @@ var BoardView = class extends import_obsidian8.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.unsub = [];
+    this.renderTimer = null;
     this.plugin = plugin;
   }
   getViewType() {
@@ -4166,14 +4373,24 @@ var BoardView = class extends import_obsidian8.ItemView {
     return "kanban-square";
   }
   async onOpen() {
-    this.unsub.push(this.plugin.store.onChange(() => this.render()));
+    this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
     this.render();
   }
   async onClose() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
     this.unsub.forEach((u) => u());
   }
   refresh() {
     this.render();
+  }
+  scheduleRender() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
+    this.renderTimer = window.setTimeout(() => {
+      this.renderTimer = null;
+      this.render();
+    }, 50);
   }
   projectChapters() {
     const works = this.plugin.store.byKindForProject("work");
@@ -4199,7 +4416,7 @@ var BoardView = class extends import_obsidian8.ItemView {
       const col = board.createDiv("scenarist-board-col");
       const head = col.createDiv("scenarist-board-col-head");
       const dot = head.createEl("span", { cls: "scenarist-status-dot" });
-      dot.style.background = status.color;
+      dot.style.setProperty("--dot-color", status.color);
       head.createEl("span", { text: status.value });
       const cards = chapters.filter((ch) => ch.props["status"] === status.value);
       head.createEl("span", { cls: "scenarist-count-badge", text: String(cards.length) });
@@ -4264,14 +4481,16 @@ var NODE_COLORS = {
   character: "#4a9eff",
   categoryItem: "#f5a623",
   arc: "#1abc9c",
-  anchor: "#e84393",
-  book: "#7ed321"
+  anchor: "#e84393"
 };
 var GRAPH_KINDS = ["work", "character", "categoryItem", "arc", "anchor"];
 var GraphView = class extends import_obsidian9.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.unsub = [];
+    this.renderTimer = null;
+    /** Кэш позиций узлов — сохраняется между рендерами, не сбрасывается при навигации. */
+    this.nodePositions = /* @__PURE__ */ new Map();
     this.plugin = plugin;
   }
   getViewType() {
@@ -4284,15 +4503,25 @@ var GraphView = class extends import_obsidian9.ItemView {
     return "git-fork";
   }
   async onOpen() {
-    this.unsub.push(this.plugin.store.onChange(() => this.render()));
-    this.unsub.push(this.plugin.onSelect(() => this.render()));
+    this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
+    this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
     this.render();
   }
   async onClose() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
     this.unsub.forEach((u) => u());
   }
   refresh() {
     this.render();
+  }
+  scheduleRender() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
+    this.renderTimer = window.setTimeout(() => {
+      this.renderTimer = null;
+      this.render();
+    }, 50);
   }
   render() {
     const c = this.containerEl.children[1];
@@ -4309,9 +4538,15 @@ var GraphView = class extends import_obsidian9.ItemView {
     const H = 600;
     const idSet = new Set(entities.map((e) => e.id));
     const nodes = entities.map((e, i) => {
+      var _a, _b;
       const a = i / entities.length * Math.PI * 2;
-      return { e, x: W / 2 + Math.cos(a) * 180, y: H / 2 + Math.sin(a) * 180, vx: 0, vy: 0 };
+      const cached = this.nodePositions.get(e.id);
+      return { e, x: (_a = cached == null ? void 0 : cached.x) != null ? _a : W / 2 + Math.cos(a) * 180, y: (_b = cached == null ? void 0 : cached.y) != null ? _b : H / 2 + Math.sin(a) * 180, vx: 0, vy: 0 };
     });
+    for (const id of this.nodePositions.keys()) {
+      if (!idSet.has(id))
+        this.nodePositions.delete(id);
+    }
     const index = new Map(nodes.map((n) => [n.e.id, n]));
     const edges = [];
     const seen = /* @__PURE__ */ new Set();
@@ -4330,7 +4565,11 @@ var GraphView = class extends import_obsidian9.ItemView {
         }
       }
     }
-    this.simulate(nodes, edges, W, H);
+    const hasNewNodes = nodes.some((n) => !this.nodePositions.has(n.e.id));
+    if (hasNewNodes)
+      this.simulate(nodes, edges, W, H);
+    for (const n of nodes)
+      this.nodePositions.set(n.e.id, { x: n.x, y: n.y });
     const svg = document.createElementNS(SVG_NS, "svg");
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     svg.addClass("scenarist-graph-svg");
@@ -4342,8 +4581,35 @@ var GraphView = class extends import_obsidian9.ItemView {
       svg.appendChild(line);
       return { line, a, b };
     });
-    for (const n of nodes)
-      this.renderNode(svg, n, edgeEls);
+    let draggingNode = null;
+    const placeFns = /* @__PURE__ */ new Map();
+    svg.addEventListener("mousemove", (ev) => {
+      var _a;
+      if (!draggingNode)
+        return;
+      const n = draggingNode;
+      const pt = this.svgPoint(svg, ev);
+      n.x = pt.x;
+      n.y = pt.y;
+      this.nodePositions.set(n.e.id, { x: n.x, y: n.y });
+      (_a = placeFns.get(n)) == null ? void 0 : _a();
+      for (const e of edgeEls)
+        if (e.a === n || e.b === n)
+          this.setLine(e.line, e.a, e.b);
+    });
+    const stopDrag = () => {
+      draggingNode = null;
+    };
+    svg.addEventListener("mouseup", stopDrag);
+    svg.addEventListener("mouseleave", stopDrag);
+    for (const n of nodes) {
+      const place = this.renderNode(svg, n, { get current() {
+        return draggingNode;
+      }, set current(v) {
+        draggingNode = v;
+      } });
+      placeFns.set(n, place);
+    }
     const legend = c.createDiv("scenarist-graph-legend");
     const legendKeys = [
       ["work", t("graph.legend.work")],
@@ -4355,7 +4621,7 @@ var GraphView = class extends import_obsidian9.ItemView {
     for (const [kind, label] of legendKeys) {
       const item = legend.createDiv("scenarist-legend-item");
       const dot = item.createEl("span", { cls: "scenarist-status-dot" });
-      dot.style.background = NODE_COLORS[kind] || "#888";
+      dot.style.setProperty("--dot-color", NODE_COLORS[kind] || "#888");
       item.createEl("span", { text: label });
     }
   }
@@ -4414,7 +4680,8 @@ var GraphView = class extends import_obsidian9.ItemView {
       temp *= 0.95;
     }
   }
-  renderNode(svg, n, edgeEls) {
+  /** Рендерит узел графа. Возвращает функцию place() для обновления позиции при перетаскивании. */
+  renderNode(svg, n, dragState) {
     const g = document.createElementNS(SVG_NS, "g");
     g.setAttribute("class", "scenarist-graph-node");
     const place = () => g.setAttribute("transform", `translate(${n.x}, ${n.y})`);
@@ -4432,33 +4699,21 @@ var GraphView = class extends import_obsidian9.ItemView {
     label.setAttribute("class", "scenarist-graph-label");
     label.textContent = n.e.name;
     g.appendChild(label);
-    let dragging = false;
+    let mouseDownX = 0;
+    let mouseDownY = 0;
     g.addEventListener("mousedown", (ev) => {
-      dragging = true;
+      dragState.current = n;
+      mouseDownX = n.x;
+      mouseDownY = n.y;
       ev.preventDefault();
     });
-    const move = (ev) => {
-      if (!dragging)
-        return;
-      const pt = this.svgPoint(svg, ev);
-      n.x = pt.x;
-      n.y = pt.y;
-      place();
-      for (const e of edgeEls)
-        if (e.a === n || e.b === n)
-          this.setLine(e.line, e.a, e.b);
-    };
-    const up = () => {
-      dragging = false;
-    };
-    svg.addEventListener("mousemove", move);
-    svg.addEventListener("mouseup", up);
-    svg.addEventListener("mouseleave", up);
     g.addEventListener("click", () => {
-      if (!dragging)
+      if (Math.hypot(n.x - mouseDownX, n.y - mouseDownY) < 5) {
         this.plugin.navigateTo(n.e.id);
+      }
     });
     svg.appendChild(g);
+    return place;
   }
   svgPoint(svg, ev) {
     const rect = svg.getBoundingClientRect();
@@ -4476,6 +4731,7 @@ var TimelineView = class extends import_obsidian10.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.unsub = [];
+    this.renderTimer = null;
     this.plugin = plugin;
   }
   getViewType() {
@@ -4488,14 +4744,24 @@ var TimelineView = class extends import_obsidian10.ItemView {
     return "clock";
   }
   async onOpen() {
-    this.unsub.push(this.plugin.store.onChange(() => this.render()));
+    this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
     this.render();
   }
   async onClose() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
     this.unsub.forEach((u) => u());
   }
   refresh() {
     this.render();
+  }
+  scheduleRender() {
+    if (this.renderTimer !== null)
+      window.clearTimeout(this.renderTimer);
+    this.renderTimer = window.setTimeout(() => {
+      this.renderTimer = null;
+      this.render();
+    }, 50);
   }
   anchorsOf(workId) {
     return this.plugin.store.byKind("anchor").filter((a) => (a.links["work"] || []).includes(workId)).sort((a, b) => {
@@ -4665,7 +4931,7 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     this.registerExtensions(["sc"], ENTITY_FILE_VIEW);
   }
   onunload() {
-    this.state.flushSave();
+    this.state.cancelPendingSave();
     void this.store.save();
     void this.saveSettings();
   }
@@ -4719,8 +4985,9 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
   findScLeaf(scPath) {
     let found = null;
     this.app.workspace.getLeavesOfType(ENTITY_FILE_VIEW).forEach((leaf) => {
-      const f = leaf.view.file;
-      if (f && f.path === scPath)
+      var _a, _b;
+      const statePath = (_b = (_a = leaf.getViewState()) == null ? void 0 : _a.state) == null ? void 0 : _b.file;
+      if (statePath && statePath === scPath)
         found = leaf;
     });
     return found;
@@ -4735,7 +5002,6 @@ var ScenaristPlugin = class extends import_obsidian11.Plugin {
     return this.state.onSelect(fn);
   }
   refreshViews() {
-    void this.store.save();
     this.state.notify();
   }
   /** Принудительно перерисовать все открытые вью (например, после смены языка). */

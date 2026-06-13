@@ -1,5 +1,5 @@
-import { FileView, WorkspaceLeaf, MarkdownRenderer, TFile, ViewStateResult, setIcon } from 'obsidian';
-import { Entity, EntityKind, FieldDef } from '../models/types';
+import { FileView, WorkspaceLeaf, MarkdownRenderer, Notice, TFile, ViewStateResult, setIcon } from 'obsidian';
+import { Entity, EntityKind, FieldDef, isValidEntity } from '../models/types';
 import { CreateEntityModal } from '../modals/CreateEntityModal';
 import type ScenaristPlugin from '../main';
 import { t } from '../i18n';
@@ -21,6 +21,8 @@ export class CardView extends FileView {
 	protected _charTab = 'basic';
 	/** Если задан — вкладка закреплена за конкретной сущностью (не следит за навигатором). */
 	public pinnedId: string | null = null;
+	/** Cleanup fn for any open lightbox (removes overlay + keydown listener). */
+	private _closeLightbox: (() => void) | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -60,6 +62,7 @@ export class CardView extends FileView {
 	}
 	async onClose() {
 		this.unsub.forEach((u) => u());
+		this._closeLightbox?.();
 	}
 
 	refresh() {
@@ -188,8 +191,7 @@ export class CardView extends FileView {
 		});
 		trail.createEl('span', { cls: 'scenarist-crumb current', text: t(schema.label, undefined, schema.label) });
 
-		const spacer = top.createDiv();
-		spacer.style.flex = '1';
+		const spacer = top.createDiv('scenarist-flex-spacer');
 
 		const openBtn = top.createEl('button', { cls: 'scenarist-card-note-btn', attr: { title: t('card.openNote') } });
 		setIcon(openBtn, 'external-link');
@@ -207,8 +209,7 @@ export class CardView extends FileView {
 		title.onchange = () => {
 			const v = title.value.trim();
 			if (v && v !== entity.name) {
-				this.plugin.store.rename(entity.id, v);
-				this.plugin.sync.syncToNote(this.plugin.store.get(entity.id)!);
+				void this.plugin.sync.renameEntity(entity.id, v);
 			}
 		};
 
@@ -254,7 +255,7 @@ export class CardView extends FileView {
 
 		const addBtn = row.createEl('button', { cls: 'scenarist-tag-add', text: t('card.addTag') });
 		addBtn.onclick = () => {
-			addBtn.style.display = 'none';
+			addBtn.addClass('is-hidden');
 			const inp = row.createEl('input', { cls: 'scenarist-tag-input' });
 			inp.placeholder = t('card.tagPlaceholder');
 			inp.focus();
@@ -270,7 +271,7 @@ export class CardView extends FileView {
 				}
 				if (e.key === 'Escape') {
 					inp.remove();
-					addBtn.style.display = '';
+					addBtn.removeClass('is-hidden');
 				}
 			});
 			inp.addEventListener('blur', commit);
@@ -303,8 +304,7 @@ export class CardView extends FileView {
 		const row = section.createDiv('scenarist-prop');
 		row.createEl('div', { cls: 'scenarist-prop-label', text: t('card.noteLinks') });
 		const valWrap = row.createDiv('scenarist-prop-value');
-		const chipRow = valWrap.createDiv('scenarist-card-tags scenarist-link-chips');
-		chipRow.style.margin = '0';
+		const chipRow = valWrap.createDiv('scenarist-card-tags scenarist-link-chips scenarist-no-margin');
 
 		const commitLinks = (newLinks: string[]) => {
 			const val = newLinks.length ? newLinks.map((l) => `[[${l}]]`).join(', ') : null;
@@ -328,10 +328,9 @@ export class CardView extends FileView {
 
 		const addBtn = chipRow.createEl('button', { cls: 'scenarist-tag-add', text: t('card.addLink') });
 		addBtn.onclick = () => {
-			addBtn.style.display = 'none';
-			const inp = chipRow.createEl('input', { cls: 'scenarist-tag-input' });
+			addBtn.addClass('is-hidden');
+			const inp = chipRow.createEl('input', { cls: 'scenarist-tag-input scenarist-link-input' });
 			inp.placeholder = t('card.linkPlaceholder');
-			inp.style.width = '160px';
 			inp.focus();
 			const commit = () => {
 				const val = inp.value.trim().replace(/^\[\[|\]\]$/g, '');
@@ -341,7 +340,7 @@ export class CardView extends FileView {
 				if (e.key === 'Enter') commit();
 				if (e.key === 'Escape') {
 					inp.remove();
-					addBtn.style.display = '';
+					addBtn.removeClass('is-hidden');
 				}
 			});
 			inp.addEventListener('blur', commit);
@@ -379,8 +378,7 @@ export class CardView extends FileView {
 				: (field.options || []).map((o) => o.value);
 			const optMap = new Map((field.options || []).map((o) => [o.value, o.color]));
 
-			const chipRow = wrap.createDiv('scenarist-card-tags scenarist-genre-chips');
-			chipRow.style.margin = '0';
+			const chipRow = wrap.createDiv('scenarist-card-tags scenarist-genre-chips scenarist-no-margin');
 
 			const commitGenres = (next: string[]) =>
 				this.commitProp(entity, field.key, next.length ? next.join(', ') : null);
@@ -404,7 +402,7 @@ export class CardView extends FileView {
 				sel.onchange = async () => {
 					if (!sel.value) return;
 					if (sel.value === '__new__') {
-						sel.style.display = 'none';
+						sel.addClass('is-hidden');
 						const inp = chipRow.createEl('input', { cls: 'scenarist-tag-input' });
 						inp.placeholder = t('card.newGenrePlaceholder');
 						inp.focus();
@@ -422,7 +420,7 @@ export class CardView extends FileView {
 								}
 							} else {
 								sel.value = '';
-								sel.style.display = '';
+								sel.removeClass('is-hidden');
 								renderChips();
 							}
 						};
@@ -432,7 +430,7 @@ export class CardView extends FileView {
 							}
 							if (e.key === 'Escape') {
 								inp.remove();
-								sel.style.display = '';
+								sel.removeClass('is-hidden');
 								sel.value = '';
 							}
 						});
@@ -460,17 +458,16 @@ export class CardView extends FileView {
 
 			if (!val && field.options?.length) {
 				sel.value = field.options[0].value;
-				queueMicrotask(() => this.commitProp(entity, field.key, field.options![0].value));
+				// Visual default only — committed on explicit user change
 			}
 
 			const updateDot = () => {
 				const opt = (field.options || []).find((o) => o.value === sel.value);
 				if (opt) {
-					dot.style.background = opt.color;
-					dot.style.opacity = '1';
+					dot.style.setProperty('--dot-color', opt.color);
+					dot.removeClass('scenarist-dot-hidden');
 				} else {
-					dot.style.background = 'transparent';
-					dot.style.opacity = '0';
+					dot.addClass('scenarist-dot-hidden');
 				}
 			};
 			updateDot();
@@ -751,15 +748,19 @@ export class CardView extends FileView {
 
 	// ---- лайтбокс ----
 	private openLightbox(url: string) {
+		this._closeLightbox?.();
+
 		const overlay = document.createElement('div');
 		overlay.className = 'scenarist-lightbox';
 
 		const close = () => {
 			overlay.remove();
 			document.removeEventListener('keydown', onKey);
+			this._closeLightbox = null;
 		};
 		const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
 
+		this._closeLightbox = close;
 		overlay.onclick = close;
 
 		const img = document.createElement('img');
@@ -855,7 +856,7 @@ export class CardView extends FileView {
 				(el as HTMLElement).toggleClass('is-active', (el as HTMLElement).dataset.tab === id);
 			});
 			for (const [key, el] of Object.entries(sections)) {
-				el.style.display = key === id ? '' : 'none';
+				el.toggleClass('is-hidden', key !== id);
 			}
 		};
 
@@ -946,12 +947,18 @@ export class CardView extends FileView {
 	/** Открыть встроенный поиск Obsidian с фильтром по тегу. */
 	private openTagSearch(tag: string) {
 		const query = `tag:#${tag}`;
-		const search = (this.app as any).internalPlugins?.getPluginById?.('global-search');
-		if (search?.enabled && search.instance?.openGlobalSearch) {
-			search.instance.openGlobalSearch(query);
-			return;
+		try {
+			const search = (this.app as any).internalPlugins?.getPluginById?.('global-search');
+			if (search?.enabled && search.instance?.openGlobalSearch) {
+				search.instance.openGlobalSearch(query);
+				return;
+			}
+			// Fallback: open the search pane via command API
+			const opened = (this.app as any).commands?.executeCommandById?.('global-search:open');
+			if (!opened) new Notice(`tag:#${tag}`);
+		} catch {
+			new Notice(`tag:#${tag}`);
 		}
-		(this.app as any).commands?.executeCommandById?.('global-search:open');
 	}
 
 	/**
@@ -989,15 +996,17 @@ export class EntityFileView extends CardView {
 	async onLoadFile(file: TFile): Promise<void> {
 		try {
 			const raw = await this.app.vault.read(file);
-			const data = JSON.parse(raw) as { id?: string };
-			if (data.id) {
-				if (!this.plugin.store.get(data.id)) {
-					this.plugin.store.importEntity(data as any);
-				}
-				this.pinnedId = data.id;
-				this._charTab = 'basic';
-				await this.render();
+			const data = JSON.parse(raw);
+			if (!isValidEntity(data)) {
+				new Notice('Scenarist: invalid .sc file — ' + file.basename);
+				return;
 			}
+			if (!this.plugin.store.get(data.id)) {
+				this.plugin.store.importEntity(data);
+			}
+			this.pinnedId = data.id;
+			this._charTab = 'basic';
+			await this.render();
 		} catch {
 			/* повреждённый файл — показываем пустую карточку */
 		}

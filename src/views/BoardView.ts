@@ -10,6 +10,7 @@ export const BOARD_VIEW = 'scenarist-board';
 export class BoardView extends ItemView {
 	private plugin: ScenaristPlugin;
 	private unsub: Array<() => void> = [];
+	private renderTimer: number | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -27,15 +28,21 @@ export class BoardView extends ItemView {
 	}
 
 	async onOpen() {
-		this.unsub.push(this.plugin.store.onChange(() => this.render()));
+		this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
 		this.render();
 	}
 	async onClose() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
 		this.unsub.forEach((u) => u());
 	}
 
 	refresh() {
 		this.render();
+	}
+
+	private scheduleRender() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
+		this.renderTimer = window.setTimeout(() => { this.renderTimer = null; this.render(); }, 50);
 	}
 
 	private projectChapters(): Entity[] {
@@ -68,7 +75,7 @@ export class BoardView extends ItemView {
 			const col = board.createDiv('scenarist-board-col');
 			const head = col.createDiv('scenarist-board-col-head');
 			const dot = head.createEl('span', { cls: 'scenarist-status-dot' });
-			dot.style.background = status.color;
+			dot.style.setProperty('--dot-color', status.color);
 			head.createEl('span', { text: status.value });
 			const cards = chapters.filter((ch) => ch.props['status'] === status.value);
 			head.createEl('span', { cls: 'scenarist-count-badge', text: String(cards.length) });

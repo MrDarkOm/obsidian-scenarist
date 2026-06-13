@@ -1,8 +1,9 @@
-import { TFile, normalizePath } from 'obsidian';
+import { Notice, TFile, normalizePath } from 'obsidian';
 import { Entity, EntityKind } from '../models/types';
 import { KINDS, SCHEMAS } from '../models/schema';
 import { bodyTemplate } from '../templates';
 import type ScenaristPlugin from '../main';
+import { t } from '../i18n';
 
 /**
  * Связывает граф (ScenaristStore) с .md-заметками.
@@ -16,7 +17,8 @@ export class SyncEngine {
 	 * Пути файлов, куда плагин сам только что записал через processFrontMatter.
 	 * Используется для подавления ложных срабатываний handleModify.
 	 */
-	private selfWrites: Set<string> = new Set();
+	/** path → timestamp ms of write; ignored in handleModify only if < 1500 ms old */
+	private selfWrites: Map<string, number> = new Map();
 
 	constructor(plugin: ScenaristPlugin) {
 		this.plugin = plugin;
@@ -64,11 +66,11 @@ export class SyncEngine {
 			pid = w ? (w.links['project'] || [])[0] || null : null;
 		}
 		const p = pid ? this.store.get(pid) : null;
-		return p ? this.safe(p.name) : '_Без проекта';
+		return p ? this.safe(p.name) : t('sync.fallbackProject');
 	}
 
 	private safe(name: string): string {
-		return name.replace(/[\\/:*?"<>|]/g, '-').trim() || 'Без имени';
+		return name.replace(/[\\/:*?"<>|]/g, '-').trim() || t('sync.fallbackName');
 	}
 
 	/** Путь к заметке сущности. */
@@ -84,26 +86,35 @@ export class SyncEngine {
 			case 'work':
 				return normalizePath(`${projFolder}/${name}/${name}.md`);
 			case 'character':
-				return normalizePath(`${projFolder}/Персонажи/${name}.md`);
+				return normalizePath(`${projFolder}/${t('sync.folders.characters')}/${name}.md`);
 			case 'category':
 				return normalizePath(`${projFolder}/${name}/${name}.md`);
 			case 'categoryItem': {
 				const cat = this.single(entity.links['category']);
-				const catName = cat ? this.safe(cat.name) : 'Категория';
+				const catName = cat ? this.safe(cat.name) : t('sync.fallbackCategory');
 				return normalizePath(`${projFolder}/${catName}/${name}.md`);
 			}
 			default: {
 				// book / arc / anchor / chapter / page
 				const work = this.ownerWork(entity);
-				const workName = work ? this.safe(work.name) : '_Без произведения';
-				const folder = SCHEMAS[entity.kind].folder;
+				const workName = work ? this.safe(work.name) : t('sync.fallbackWork');
+				const folder = t(SCHEMAS[entity.kind].folder);
 				return normalizePath(`${projFolder}/${workName}/${folder}/${name}.md`);
 			}
 		}
 	}
 
 	async ensureNote(entity: Entity): Promise<TFile | null> {
-		const path = this.buildPath(entity);
+		const basePath = this.buildPath(entity);
+		let path = basePath;
+		let suffix = 2;
+		// Resolve name collision: find a free path if another entity owns basePath
+		while (true) {
+			const occupant = this.store.findByPath(path);
+			if (!occupant || occupant.id === entity.id) break;
+			path = normalizePath(`${basePath.replace(/\.md$/, '')} (${suffix}).md`);
+			suffix++;
+		}
 		this.store.setFilePath(entity.id, path);
 
 		let file = this.vault.getAbstractFileByPath(path);
@@ -131,7 +142,7 @@ export class SyncEngine {
 			fileArg ?? (entity.filePath ? (this.vault.getAbstractFileByPath(entity.filePath) as TFile | null) : null);
 		if (!(file instanceof TFile)) return;
 
-		this.selfWrites.add(file.path);
+		this.selfWrites.set(file.path, Date.now());
 
 		await this.plugin.app.fileManager.processFrontMatter(file, (fm) => {
 			fm['scenarist_id'] = entity.id;
@@ -166,6 +177,45 @@ export class SyncEngine {
 		});
 	}
 
+	/**
+	 * Переименовывает сущность и переносит её файл (и папку для контейнеров).
+	 * `fileManager.renameFile` сохраняет wikilinks и запускает handleRename,
+	 * который обновит filePath и sidecar автоматически.
+	 */
+	async renameEntity(id: string, newName: string): Promise<void> {
+		const entity = this.store.get(id);
+		if (!entity) return;
+
+		const oldPath = entity.filePath;
+		this.store.rename(id, newName);
+		const newPath = this.buildPath(entity); // entity.name is now newName
+
+		if (oldPath) {
+			const isContainer = (entity.kind === 'project' || entity.kind === 'work' || entity.kind === 'category');
+			if (isContainer) {
+				const oldFolder = oldPath.split('/').slice(0, -1).join('/');
+				const newFolder = newPath.split('/').slice(0, -1).join('/');
+				if (oldFolder !== newFolder) {
+					const folder = this.vault.getAbstractFileByPath(oldFolder);
+					if (folder) {
+						await this.plugin.app.fileManager.renameFile(folder, newFolder);
+						// handleRename events update filePaths and sidecars for all children
+						return;
+					}
+				}
+			}
+			const oldFile = this.vault.getAbstractFileByPath(oldPath);
+			if (oldFile instanceof TFile) {
+				await this.ensureFolder(newPath);
+				await this.plugin.app.fileManager.renameFile(oldFile, newPath);
+			} else {
+				this.store.setFilePath(id, newPath);
+			}
+		} else {
+			this.store.setFilePath(id, newPath);
+		}
+	}
+
 	async openNote(entity: Entity): Promise<void> {
 		const file = await this.ensureNote(entity);
 		if (file) await this.plugin.app.workspace.getLeaf(false).openFile(file);
@@ -189,6 +239,10 @@ export class SyncEngine {
 				if (file instanceof TFile) {
 					await this.plugin.app.fileManager.trashFile(file);
 				}
+				const scFile = this.vault.getAbstractFileByPath(this.store.sidecarPath(e.filePath));
+				if (scFile instanceof TFile) {
+					await this.plugin.app.fileManager.trashFile(scFile);
+				}
 			}
 		}
 
@@ -200,10 +254,12 @@ export class SyncEngine {
 	 * Читает frontmatter через MetadataCache и обновляет Store.
 	 */
 	handleModify(file: TFile): void {
-		// Игнорируем записи, сделанные самим плагином
-		if (this.selfWrites.has(file.path)) {
+		if (file.extension !== 'md') return;
+		// Игнорируем записи, сделанные самим плагином (в пределах 1500 мс)
+		const ts = this.selfWrites.get(file.path);
+		if (ts !== undefined) {
 			this.selfWrites.delete(file.path);
-			return;
+			if (Date.now() - ts < 1500) return;
 		}
 		const entity = this.store.findByPath(file.path);
 		if (!entity) return;
@@ -211,18 +267,36 @@ export class SyncEngine {
 		const fm = this.plugin.app.metadataCache.getFileCache(file)?.frontmatter;
 		if (!fm) return;
 
-		const fields = this.store.resolved(entity).fields;
+		const schema = this.store.resolved(entity);
 		let changed = false;
-		for (const field of fields) {
+		for (const field of schema.fields) {
 			if (field.key in fm && entity.props[field.key] !== fm[field.key]) {
 				entity.props[field.key] = fm[field.key] ?? null;
 				changed = true;
 			}
 		}
 		if (changed) void this.store.save();
+
+		// Restore links if user edited wikilinks in frontmatter directly (links are managed in the card)
+		for (const link of schema.links) {
+			if (link.key === 'project' || !(link.key in fm)) continue;
+			const ids = entity.links[link.key] || [];
+			const expected = ids
+				.map((id) => this.store.get(id))
+				.filter((e): e is Entity => !!e)
+				.map((e) => `[[${e.name}]]`);
+			const actual = fm[link.key];
+			const actualArr = Array.isArray(actual) ? actual.map(String) : actual != null ? [String(actual)] : [];
+			if (JSON.stringify([...expected].sort()) !== JSON.stringify([...actualArr].sort())) {
+				new Notice(t('sync.linksRestoredNotice'));
+				void this.syncToNote(entity);
+				break;
+			}
+		}
 	}
 
 	handleRename(file: TFile, oldPath: string): void {
+		if (file.extension !== 'md') return;
 		const entity = this.store.findByPath(oldPath);
 		if (!entity) return;
 
@@ -244,6 +318,7 @@ export class SyncEngine {
 	 * MetadataCache может ещё не проиндексировать файл, поэтому откладываем на 600 мс.
 	 */
 	handleCreate(file: TFile): void {
+		if (file.extension !== 'md') return;
 		window.setTimeout(() => void this.processCreatedFile(file), 600);
 	}
 
@@ -287,6 +362,7 @@ export class SyncEngine {
 		}
 
 		if (changed) {
+			this.store.markAllDirty();
 			void this.store.save();
 			this.plugin.refreshViews();
 		}

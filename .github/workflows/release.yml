@@ -23,12 +23,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build plugin
-        run: npm run build
-
       - name: Get version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Patch manifest.json to tag version
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            m.version = '$VERSION';
+            fs.writeFileSync('manifest.json', JSON.stringify(m, null, 2) + '\n');
+          "
+
+      - name: Build plugin
+        run: npm run build
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -39,6 +49,7 @@ jobs:
             main.js
             manifest.json
             styles.css
+            versions.json
           body: |
             ## Scenarist ${{ steps.version.outputs.VERSION }}
 

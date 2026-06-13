@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { CategoryPreset, Entity, EntityKind, NO_PROJECT, ScenaristIndex, INDEX_VERSION } from './types';
+import { CategoryPreset, Entity, EntityKind, isValidEntity, NO_PROJECT, ScenaristIndex, INDEX_VERSION } from './types';
 import { CATEGORY_PRESETS, findLinkDef, resolveSchema, SCHEMAS } from './schema';
 import type ScenaristPlugin from '../main';
 
@@ -26,6 +26,8 @@ export class ScenaristStore {
 	private activeProjectId: string | null = NO_PROJECT;
 	private listeners: Array<() => void> = [];
 	private saveTimer: number | null = null;
+	/** Ids сущностей, изменённых с последнего save — пишем sidecar только для них. */
+	private dirtyIds: Set<string> = new Set();
 
 	// ---- Вторичные индексы ----
 	/** kind → Set<id> */
@@ -122,6 +124,7 @@ export class ScenaristStore {
 		this.entities.set(entity.id, entity);
 		this.indexAdd(entity);
 		this.attachToActiveProject(entity);
+		this.dirtyIds.add(entity.id);
 		this.scheduleSave();
 		this.notify();
 		return entity;
@@ -141,6 +144,7 @@ export class ScenaristStore {
 		this.entities.set(p.id, p);
 		this.indexAdd(p);
 		this.activeProjectId = p.id;
+		this.dirtyIds.add(p.id);
 		this.scheduleSave();
 		this.notify();
 		return p;
@@ -179,6 +183,7 @@ export class ScenaristStore {
 		if (!e) return;
 		e.name = name;
 		e.updatedAt = Date.now();
+		this.dirtyIds.add(id);
 		this.scheduleSave();
 		this.notify();
 	}
@@ -188,6 +193,7 @@ export class ScenaristStore {
 		if (!e) return;
 		e.props[key] = value;
 		e.updatedAt = Date.now();
+		this.dirtyIds.add(id);
 		this.scheduleSave();
 		this.notify();
 	}
@@ -195,10 +201,10 @@ export class ScenaristStore {
 	setFilePath(id: string, filePath: string) {
 		const e = this.entities.get(id);
 		if (!e) return;
-		// Обновляем path-индекс
 		if (e.filePath) this.byPathIndex.delete(e.filePath);
 		e.filePath = filePath;
 		if (filePath) this.byPathIndex.set(filePath, id);
+		this.dirtyIds.add(id);
 		this.scheduleSave();
 	}
 
@@ -212,6 +218,7 @@ export class ScenaristStore {
 
 		e.links[key] = [...targetIds];
 		e.updatedAt = Date.now();
+		this.dirtyIds.add(id);
 
 		const def = findLinkDef(e, key, this);
 		const reverse = def?.reverse;
@@ -226,16 +233,28 @@ export class ScenaristStore {
 	private addReverse(id: string, key: string, value: string) {
 		const e = this.entities.get(id);
 		if (!e) return;
-		const cur = new Set(e.links[key] || []);
-		cur.add(value);
-		e.links[key] = Array.from(cur);
+		const linkDef = this.resolved(e).links.find((l) => l.key === key);
+		if (linkDef?.single) {
+			// Evict old owners before assigning the new one
+			const prevOwners = (e.links[key] || []).filter((oid) => oid !== value);
+			if (linkDef.reverse) {
+				for (const oid of prevOwners) this.removeReverse(oid, linkDef.reverse, id);
+			}
+			e.links[key] = [value];
+		} else {
+			const cur = new Set(e.links[key] || []);
+			cur.add(value);
+			e.links[key] = Array.from(cur);
+		}
 		e.updatedAt = Date.now();
+		this.dirtyIds.add(id);
 	}
 	private removeReverse(id: string, key: string, value: string) {
 		const e = this.entities.get(id);
 		if (!e) return;
 		e.links[key] = (e.links[key] || []).filter((v) => v !== value);
 		e.updatedAt = Date.now();
+		this.dirtyIds.add(id);
 	}
 
 	delete(id: string) {
@@ -265,6 +284,7 @@ export class ScenaristStore {
 
 		this.indexRemove(e);
 		this.entities.delete(id);
+		this.dirtyIds.delete(id); // deleted entities don't need sidecar write
 		if (this.activeProjectId === id) this.activeProjectId = NO_PROJECT;
 		this.scheduleSave();
 		this.notify();
@@ -278,6 +298,7 @@ export class ScenaristStore {
 		if (this.entities.has(entity.id)) return;
 		this.entities.set(entity.id, entity);
 		this.indexAdd(entity);
+		this.dirtyIds.add(entity.id);
 		this.scheduleSave();
 		this.notify();
 	}
@@ -327,7 +348,6 @@ export class ScenaristStore {
 				// Не нашли — пробуем легаси-путь (миграция)
 				try {
 					raw = await adapter.read(LEGACY_INDEX_PATH);
-					console.log('Scenarist: мигрируем index.json из .scenarist/ в папку плагина');
 				} catch {
 					// Первый запуск — файла нет ни там ни там
 				}
@@ -335,6 +355,15 @@ export class ScenaristStore {
 
 			if (raw) {
 				const data = JSON.parse(raw) as ScenaristIndex;
+				// Version guard: refuse to load indexes written by a newer plugin
+				if (data.version !== undefined && data.version > INDEX_VERSION) {
+					console.error(
+						`Scenarist: индекс версии ${data.version} не поддерживается этой версией плагина (ожидалось ≤${INDEX_VERSION}). Загрузка отменена.`,
+					);
+					return;
+				}
+				// Migrate index format to current version
+				this.migrateIndex(data);
 				this.entities.clear();
 				(data.entities || []).forEach((e) => {
 					e.props = e.props || {};
@@ -347,12 +376,34 @@ export class ScenaristStore {
 
 			this.rebuildIndexes();
 
+			// После загрузки — все сущности потенциально нуждаются в актуальном sidecar
+			this.markAllDirty();
 			// Если мигрировали — сразу сохраняем в новое место
 			if (raw) await this.save();
 		} catch (err) {
 			console.error('Scenarist: ошибка загрузки индекса', err);
 		}
 		this.notify();
+	}
+
+	/**
+	 * Пошаговая миграция формата индекса.
+	 * Каждый шаг повышает data.version на 1.
+	 * Добавляй новые шаги сюда при изменении структуры ScenaristIndex.
+	 */
+	private migrateIndex(data: ScenaristIndex) {
+		const prev = data.version ?? 1;
+		// step 1→2: (placeholder — добавь реальную логику при изменении структуры)
+		// if ((data.version ?? 1) < 2) {
+		//     data.entities?.forEach(e => { /* ... */ });
+		//     data.version = 2;
+		// }
+		if (data.version !== INDEX_VERSION) {
+			data.version = INDEX_VERSION;
+			if (prev !== INDEX_VERSION) {
+				console.log(`Scenarist: индекс мигрирован с версии ${prev} до ${INDEX_VERSION}`);
+			}
+		}
 	}
 
 	/** Мигрирует старые emoji-иконки в categorySchema.icon → Lucide-имена. */
@@ -394,13 +445,16 @@ export class ScenaristStore {
 			if (!(await adapter.exists(dir))) await adapter.mkdir(dir);
 			await adapter.write(INDEX_PATH, JSON.stringify(index, null, 2));
 
-			// Записать sidecar-файлы рядом с .md
-			for (const entity of this.entities.values()) {
-				if (entity.filePath) {
+			// Записать sidecar только для изменившихся сущностей
+			const dirty = Array.from(this.dirtyIds);
+			this.dirtyIds.clear();
+			for (const id of dirty) {
+				const entity = this.entities.get(id);
+				if (entity?.filePath) {
 					try {
 						await adapter.write(this.sidecarPath(entity.filePath), JSON.stringify(entity, null, 2));
 					} catch {
-						// файл .md ещё не создан — пропускаем
+						// .md ещё не создан — пропускаем
 					}
 				}
 			}
@@ -409,16 +463,23 @@ export class ScenaristStore {
 		}
 	}
 
+	/** Пометить все сущности как dirty (для полного пересохранения sidecar — миграция, rescan). */
+	markAllDirty() {
+		for (const id of this.entities.keys()) this.dirtyIds.add(id);
+	}
+
 	/** Путь к sidecar-файлу рядом с .md заметкой. */
 	sidecarPath(filePath: string): string {
+		if (filePath.endsWith('.sc')) return filePath;
 		return filePath.replace(/\.md$/, '.sc');
 	}
 
-	/** Прочитать sidecar-файл и вернуть Entity, или null если его нет. */
+	/** Прочитать sidecar-файл и вернуть Entity, или null если его нет или невалиден. */
 	async readSidecar(filePath: string): Promise<Entity | null> {
 		try {
 			const raw = await this.plugin.app.vault.adapter.read(this.sidecarPath(filePath));
-			return JSON.parse(raw) as Entity;
+			const data = JSON.parse(raw);
+			return isValidEntity(data) ? data : null;
 		} catch {
 			return null;
 		}

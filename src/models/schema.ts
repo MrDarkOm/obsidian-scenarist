@@ -71,7 +71,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		label: 'schema.book.label',
 		labelPlural: 'schema.book.labelPlural',
 		icon: 'book-open',
-		folder: 'Книги',
+		folder: 'sync.folders.books',
 		layer: 'text',
 		titleField: 'Name',
 		fields: [
@@ -118,7 +118,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		label: 'schema.arc.label',
 		labelPlural: 'schema.arc.labelPlural',
 		icon: 'git-branch',
-		folder: 'Арки',
+		folder: 'sync.folders.arcs',
 		layer: 'text',
 		titleField: 'Name',
 		fields: [
@@ -139,7 +139,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		label: 'schema.anchor.label',
 		labelPlural: 'schema.anchor.labelPlural',
 		icon: 'anchor',
-		folder: 'Якоря',
+		folder: 'sync.folders.anchors',
 		layer: 'text',
 		titleField: 'Name',
 		fields: [
@@ -160,7 +160,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		label: 'schema.chapter.label',
 		labelPlural: 'schema.chapter.labelPlural',
 		icon: 'scroll',
-		folder: 'Главы',
+		folder: 'sync.folders.chapters',
 		layer: 'text',
 		titleField: 'Название',
 		fields: [
@@ -192,7 +192,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		label: 'schema.page.label',
 		labelPlural: 'schema.page.labelPlural',
 		icon: 'file-text',
-		folder: 'Страницы',
+		folder: 'sync.folders.pages',
 		layer: 'text',
 		titleField: 'Name',
 		fields: [{ key: 'archived', label: 'schema.page.fields.archived', type: 'checkbox' }],
@@ -207,7 +207,7 @@ export const SCHEMAS: Record<EntityKind, EntitySchema> = {
 		label: 'schema.character.label',
 		labelPlural: 'schema.character.labelPlural',
 		icon: 'user',
-		folder: 'Персонажи',
+		folder: 'sync.folders.characters',
 		layer: 'world',
 		titleField: 'Name',
 		fields: [

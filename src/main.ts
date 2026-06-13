@@ -14,11 +14,11 @@ import { CreateCategoryModal } from './modals/CreateCategoryModal';
 import { setLocale, detectLang, t } from './i18n';
 
 export default class ScenaristPlugin extends Plugin {
-	settings: ScenaristSettings;
-	store: ScenaristStore;
-	sync: SyncEngine;
+	settings!: ScenaristSettings;
+	store!: ScenaristStore;
+	sync!: SyncEngine;
 	/** Состояние UI: выбранный элемент, навигация, подписки. */
-	state: ScenaristState;
+	state!: ScenaristState;
 
 	// ── Обратная совместимость для views, которые читают plugin.selectedId ──
 	get selectedId(): string | null {
@@ -115,7 +115,7 @@ export default class ScenaristPlugin extends Plugin {
 	}
 
 	onunload() {
-		this.state.flushSave();
+		this.state.cancelPendingSave();
 		void this.store.save();
 		void this.saveSettings();
 	}
@@ -181,8 +181,9 @@ export default class ScenaristPlugin extends Plugin {
 	private findScLeaf(scPath: string): WorkspaceLeaf | null {
 		let found: WorkspaceLeaf | null = null;
 		this.app.workspace.getLeavesOfType(ENTITY_FILE_VIEW).forEach((leaf) => {
-			const f = (leaf.view as EntityFileView).file;
-			if (f && f.path === scPath) found = leaf;
+			// Use getViewState() to avoid accessing leaf.view when it may be a DeferredView (Obsidian ≥1.7.2)
+			const statePath = leaf.getViewState()?.state?.file as string | undefined;
+			if (statePath && statePath === scPath) found = leaf;
 		});
 		return found;
 	}
@@ -200,7 +201,6 @@ export default class ScenaristPlugin extends Plugin {
 	}
 
 	refreshViews() {
-		void this.store.save();
 		this.state.notify();
 	}
 

@@ -98,3 +98,16 @@ export const INDEX_VERSION = 2;
 
 /** Сентинел «Без проекта». */
 export const NO_PROJECT = '__none__';
+
+/** Минимальная проверка структуры перед импортом из .sc / frontmatter. */
+export function isValidEntity(data: unknown): data is Entity {
+	if (!data || typeof data !== 'object') return false;
+	const d = data as Record<string, unknown>;
+	return (
+		typeof d.id === 'string' && d.id.length > 0 &&
+		typeof d.kind === 'string' && d.kind.length > 0 &&
+		typeof d.name === 'string' &&
+		typeof d.props === 'object' && d.props !== null && !Array.isArray(d.props) &&
+		typeof d.links === 'object' && d.links !== null && !Array.isArray(d.links)
+	);
+}

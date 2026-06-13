@@ -1,42 +1,28 @@
 import { EntityKind } from '../models/types';
+import { t } from '../i18n';
 
 /** Тело .md-заметки (без frontmatter) для новой сущности. */
 export function bodyTemplate(kind: EntityKind, name: string): string {
 	switch (kind) {
 		case 'character':
-			return characterBody(name);
+			return t('templates.character');
 		case 'project':
-			return `# ${name}\n\n## О проекте\n> *Что это за вселенная / сборник историй.*\n\n## Заметки\n- \n`;
+			return t('templates.project', { name });
 		case 'work':
-			return `# ${name}\n\n## Логлайн\n> *Одно предложение, о чём это.*\n\n## Темы\n- \n`;
+			return t('templates.work', { name });
 		case 'book':
-			return `# ${name}\n\n## Синопсис\n\n## Идея\n\n`;
+			return t('templates.book', { name });
 		case 'arc':
-			return `# ${name}\n\n## Цель арки\n\n## Описание\n\n## Ключевые события\n- \n`;
+			return t('templates.arc', { name });
 		case 'anchor':
-			return `# ${name}\n\n## Что происходит\n> *Суть ключевого события.*\n\n## Последствия\n- \n`;
+			return t('templates.anchor', { name });
 		case 'chapter':
-			return `# ${name}\n\n## Синопсис\n\n---\n\n## Сцена\n\n> *Описание обстановки.*\n\n`;
+			return t('templates.chapter', { name });
 		case 'page':
-			return `# ${name}\n\n> *Содержимое страницы / раскадровка.*\n\n`;
+			return t('templates.page', { name });
 		case 'categoryItem':
-			return `# ${name}\n\n## Описание\n\n## Детали\n\n`;
+			return t('templates.categoryItem', { name });
 		default:
 			return `# ${name}\n`;
 	}
-}
-
-function characterBody(_name: string): string {
-	return `## Семья и отношения
-
-
-## Настоящее имя
-
-
-## Место и дата рождения
-
-
-## Дополнительно
-
-`;
 }

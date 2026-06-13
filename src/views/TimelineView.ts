@@ -9,6 +9,7 @@ export const TIMELINE_VIEW = 'scenarist-timeline';
 export class TimelineView extends ItemView {
 	private plugin: ScenaristPlugin;
 	private unsub: Array<() => void> = [];
+	private renderTimer: number | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -26,15 +27,21 @@ export class TimelineView extends ItemView {
 	}
 
 	async onOpen() {
-		this.unsub.push(this.plugin.store.onChange(() => this.render()));
+		this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
 		this.render();
 	}
 	async onClose() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
 		this.unsub.forEach((u) => u());
 	}
 
 	refresh() {
 		this.render();
+	}
+
+	private scheduleRender() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
+		this.renderTimer = window.setTimeout(() => { this.renderTimer = null; this.render(); }, 50);
 	}
 
 	private anchorsOf(workId: string): Entity[] {

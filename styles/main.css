@@ -1311,3 +1311,35 @@
   color: var(--text-on-accent);
   border-color: transparent;
 }
+
+/* ================================================================
+   UTILITY CLASSES (replaces inline styles)
+   ================================================================ */
+
+/* Flex spacer */
+.scenarist-flex-spacer { flex: 1; }
+
+/* Zero-margin chip row variants */
+.scenarist-no-margin { margin: 0; }
+
+/* Link input width */
+.scenarist-link-input { width: 160px; }
+
+/* Emoji icon fallback size */
+.scenarist-emoji-icon { font-size: 15px; }
+
+/* Navigator search pills with indent */
+.scenarist-pills-indent { padding-left: 12px; }
+
+/* Status/role dot — dynamic color via CSS variable; color-mix blends with bg for theme adaptation */
+.scenarist-status-dot,
+.scenarist-pill-dot {
+  background: color-mix(in srgb, var(--dot-color, #888) 85%, var(--background-secondary));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--dot-color, #888) 30%, transparent);
+}
+
+/* Dot hidden state (no color selected) */
+.scenarist-dot-hidden { background: transparent !important; opacity: 0; }
+
+/* Tab section hidden state */
+.is-hidden { display: none !important; }

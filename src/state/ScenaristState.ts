@@ -58,8 +58,9 @@ export class ScenaristState {
 
 	// ---- сброс ----
 
-	/** Вызывается при onunload: немедленно сохраняем settings без debounce. */
-	flushSave() {
+	/** Вызывается при onunload: отменяет debounce-таймер сохранения настроек.
+	 * Фактическое сохранение делает onunload → saveSettings(). */
+	cancelPendingSave() {
 		if (this.saveTimer !== null) {
 			window.clearTimeout(this.saveTimer);
 			this.saveTimer = null;

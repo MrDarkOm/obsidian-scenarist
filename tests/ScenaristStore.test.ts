@@ -120,6 +120,46 @@ describe('ScenaristStore — реципрокные связи', () => {
 	});
 });
 
+describe('ScenaristStore — single-link реципрокность (Fix 4)', () => {
+	let store: ScenaristStore;
+
+	beforeEach(() => {
+		vi.useFakeTimers();
+		store = new ScenaristStore(makeMockPlugin());
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it('перенос главы в другую книгу убирает её из старой книги', () => {
+		const bookA = store.create('book', 'Книга А');
+		const bookB = store.create('book', 'Книга Б');
+		const chapter = store.create('chapter', 'Глава 1');
+
+		store.setLink(bookA.id, 'chapters', [chapter.id]);
+		expect(store.get(chapter.id)?.links['book']).toEqual([bookA.id]);
+		expect(store.get(bookA.id)?.links['chapters']).toContain(chapter.id);
+
+		// Перенос в bookB
+		store.setLink(bookB.id, 'chapters', [chapter.id]);
+		expect(store.get(chapter.id)?.links['book']).toEqual([bookB.id]);
+		expect(store.get(bookA.id)?.links['chapters']).not.toContain(chapter.id);
+		expect(store.get(bookB.id)?.links['chapters']).toContain(chapter.id);
+	});
+
+	it('chapter.book содержит только одну книгу', () => {
+		const bookA = store.create('book', 'Книга А');
+		const bookB = store.create('book', 'Книга Б');
+		const chapter = store.create('chapter', 'Глава 1');
+
+		store.setLink(bookA.id, 'chapters', [chapter.id]);
+		store.setLink(bookB.id, 'chapters', [chapter.id]);
+		expect(store.get(chapter.id)?.links['book']).toHaveLength(1);
+		expect(store.get(chapter.id)?.links['book']).toEqual([bookB.id]);
+	});
+});
+
 describe('ScenaristStore — загрузка и миграция', () => {
 	afterEach(() => {
 		vi.useRealTimers();

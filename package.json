@@ -1,6 +1,6 @@
 {
   "name": "obsidian-scenarist",
-  "version": "0.4.11",
+  "version": "0.5.2",
   "description": "Scenarist plugin for Obsidian",
   "main": "main.js",
   "scripts": {
@@ -18,15 +18,17 @@
     "writing",
     "worldbuilding"
   ],
+  "dependencies": {
+    "nanoid": "^3.3.7"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "builtin-modules": "^3.3.0",
-    "esbuild": "0.17.3",
+    "esbuild": "^0.25.0",
     "eslint": "^8.57.0",
-    "nanoid": "^3.3.7",
-    "obsidian": "latest",
+    "obsidian": "^1.7.2",
     "prettier": "^3.3.0",
     "tslib": "2.4.0",
     "typescript": "5.4.5",

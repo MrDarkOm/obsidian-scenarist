@@ -12,7 +12,6 @@ const NODE_COLORS: Partial<Record<EntityKind, string>> = {
 	categoryItem: '#f5a623',
 	arc: '#1abc9c',
 	anchor: '#e84393',
-	book: '#7ed321',
 };
 const GRAPH_KINDS: EntityKind[] = ['work', 'character', 'categoryItem', 'arc', 'anchor'];
 
@@ -28,6 +27,9 @@ interface Node {
 export class GraphView extends ItemView {
 	private plugin: ScenaristPlugin;
 	private unsub: Array<() => void> = [];
+	private renderTimer: number | null = null;
+	/** Кэш позиций узлов — сохраняется между рендерами, не сбрасывается при навигации. */
+	private nodePositions: Map<string, { x: number; y: number }> = new Map();
 
 	constructor(leaf: WorkspaceLeaf, plugin: ScenaristPlugin) {
 		super(leaf);
@@ -45,16 +47,22 @@ export class GraphView extends ItemView {
 	}
 
 	async onOpen() {
-		this.unsub.push(this.plugin.store.onChange(() => this.render()));
-		this.unsub.push(this.plugin.onSelect(() => this.render()));
+		this.unsub.push(this.plugin.store.onChange(() => this.scheduleRender()));
+		this.unsub.push(this.plugin.onSelect(() => this.scheduleRender()));
 		this.render();
 	}
 	async onClose() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
 		this.unsub.forEach((u) => u());
 	}
 
 	refresh() {
 		this.render();
+	}
+
+	private scheduleRender() {
+		if (this.renderTimer !== null) window.clearTimeout(this.renderTimer);
+		this.renderTimer = window.setTimeout(() => { this.renderTimer = null; this.render(); }, 50);
 	}
 
 	private render() {
@@ -76,10 +84,18 @@ export class GraphView extends ItemView {
 		const W = 800;
 		const H = 600;
 		const idSet = new Set(entities.map((e) => e.id));
+
+		// Use cached positions for existing nodes; compute initial layout for new ones
 		const nodes: Node[] = entities.map((e, i) => {
 			const a = (i / entities.length) * Math.PI * 2;
-			return { e, x: W / 2 + Math.cos(a) * 180, y: H / 2 + Math.sin(a) * 180, vx: 0, vy: 0 };
+			const cached = this.nodePositions.get(e.id);
+			return { e, x: cached?.x ?? (W / 2 + Math.cos(a) * 180), y: cached?.y ?? (H / 2 + Math.sin(a) * 180), vx: 0, vy: 0 };
 		});
+
+		// Remove stale positions for entities no longer in the graph
+		for (const id of this.nodePositions.keys()) {
+			if (!idSet.has(id)) this.nodePositions.delete(id);
+		}
 		const index = new Map(nodes.map((n) => [n.e.id, n]));
 
 		const edges: Array<[Node, Node]> = [];
@@ -97,7 +113,12 @@ export class GraphView extends ItemView {
 			}
 		}
 
-		this.simulate(nodes, edges, W, H);
+		// Only simulate layout for new nodes (no cached position)
+		const hasNewNodes = nodes.some((n) => !this.nodePositions.has(n.e.id));
+		if (hasNewNodes) this.simulate(nodes, edges, W, H);
+
+		// Save positions for next render
+		for (const n of nodes) this.nodePositions.set(n.e.id, { x: n.x, y: n.y });
 
 		const svg = document.createElementNS(SVG_NS, 'svg');
 		svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -112,7 +133,28 @@ export class GraphView extends ItemView {
 			return { line, a, b };
 		});
 
-		for (const n of nodes) this.renderNode(svg, n, edgeEls);
+		// Shared drag state — single set of svg-level listeners instead of per-node
+		let draggingNode: Node | null = null;
+		const placeFns = new Map<Node, () => void>();
+
+		svg.addEventListener('mousemove', (ev) => {
+			if (!draggingNode) return;
+			const n = draggingNode;
+			const pt = this.svgPoint(svg, ev);
+			n.x = pt.x;
+			n.y = pt.y;
+			this.nodePositions.set(n.e.id, { x: n.x, y: n.y });
+			placeFns.get(n)?.();
+			for (const e of edgeEls) if (e.a === n || e.b === n) this.setLine(e.line, e.a, e.b);
+		});
+		const stopDrag = () => { draggingNode = null; };
+		svg.addEventListener('mouseup', stopDrag);
+		svg.addEventListener('mouseleave', stopDrag);
+
+		for (const n of nodes) {
+			const place = this.renderNode(svg, n, { get current() { return draggingNode; }, set current(v) { draggingNode = v; } });
+			placeFns.set(n, place);
+		}
 
 		const legend = c.createDiv('scenarist-graph-legend');
 		const legendKeys: Array<[EntityKind, string]> = [
@@ -125,7 +167,7 @@ export class GraphView extends ItemView {
 		for (const [kind, label] of legendKeys) {
 			const item = legend.createDiv('scenarist-legend-item');
 			const dot = item.createEl('span', { cls: 'scenarist-status-dot' });
-			dot.style.background = NODE_COLORS[kind] || '#888';
+			dot.style.setProperty('--dot-color', NODE_COLORS[kind] || '#888');
 			item.createEl('span', { text: label });
 		}
 	}
@@ -191,7 +233,8 @@ export class GraphView extends ItemView {
 		}
 	}
 
-	private renderNode(svg: SVGSVGElement, n: Node, edgeEls: Array<{ line: Element; a: Node; b: Node }>) {
+	/** Рендерит узел графа. Возвращает функцию place() для обновления позиции при перетаскивании. */
+	private renderNode(svg: SVGSVGElement, n: Node, dragState: { current: Node | null }): () => void {
 		const g = document.createElementNS(SVG_NS, 'g');
 		g.setAttribute('class', 'scenarist-graph-node');
 		const place = () => g.setAttribute('transform', `translate(${n.x}, ${n.y})`);
@@ -211,31 +254,21 @@ export class GraphView extends ItemView {
 		label.textContent = n.e.name;
 		g.appendChild(label);
 
-		// перетаскивание
-		let dragging = false;
+		let mouseDownX = 0;
+		let mouseDownY = 0;
 		g.addEventListener('mousedown', (ev) => {
-			dragging = true;
+			dragState.current = n;
+			mouseDownX = n.x;
+			mouseDownY = n.y;
 			ev.preventDefault();
 		});
-		const move = (ev: MouseEvent) => {
-			if (!dragging) return;
-			const pt = this.svgPoint(svg, ev);
-			n.x = pt.x;
-			n.y = pt.y;
-			place();
-			for (const e of edgeEls) if (e.a === n || e.b === n) this.setLine(e.line, e.a, e.b);
-		};
-		const up = () => {
-			dragging = false;
-		};
-		svg.addEventListener('mousemove', move);
-		svg.addEventListener('mouseup', up);
-		svg.addEventListener('mouseleave', up);
-
 		g.addEventListener('click', () => {
-			if (!dragging) this.plugin.navigateTo(n.e.id);
+			if (Math.hypot(n.x - mouseDownX, n.y - mouseDownY) < 5) {
+				this.plugin.navigateTo(n.e.id);
+			}
 		});
 		svg.appendChild(g);
+		return place;
 	}
 
 	private svgPoint(svg: SVGSVGElement, ev: MouseEvent): { x: number; y: number } {
